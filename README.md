@@ -43,7 +43,7 @@ This package is a client side Unity SDK
 Add this to your Unity project's `manifest.json`:
 
 ```json
-"com.yourorg.bolt-unity-sdk": "https://github.com/yourusername/bolt-unity-sdk.git"
+"com.yourorg.bolt-unity-sdk": "https://github.com/boltapp/bolt-unity-sdk.git"
 
 ```
 
@@ -54,6 +54,57 @@ Add this to your Unity project's `manifest.json`:
 1. Add the SDK to your project
 2. Add routes to your backend server [(see example usage)](https://github.com/davidminin/bolt-gameserver-sample/blob/main/example-usage.ts)
 3. Use the staging api configs to test purchases in your dev environment
+
+<br>
+
+**Example Usage:**
+```c#
+using UnityEngine;
+
+public class BoltDemo : MonoBehaviour
+{
+    [Header("Backend Config")]
+    public string backendBaseUrl = "https://your-backend-server.com";
+
+    private BoltApiService boltApi;
+    private WebViewManager webViewManager;
+
+    void Start()
+    {
+        // Initialize Bolt SDK with your backend server URL
+        boltApi = new BoltApiService(backendBaseUrl);
+
+        // Add WebViewManager component at runtime
+        webViewManager = gameObject.AddComponent<WebViewManager>();
+        webViewManager.OnWebViewClosed += HandleWebViewClosed;
+
+        // Fetch subscription data for specific user
+        StartCoroutine(boltApi.GetUserSubscriptions("test@test.com"));
+
+        // Open full screen webview (e.g. for purchasing a product). 
+        // It's recommended to embed URLs as data attributes into your in-game objects or to maintain a list using a helper class.
+        // You can generate these links using the bolt dashboard https://help.bolt.com/products/bolt-charge/charge-setup/#set-up-your-products
+        OpenCheckoutPage("https://digital-subscriptions-test-14-04.c-staging.bolt.com/c?u=SRZKjocdzkUmJfS2J7JNCQ&publishable_key=BQ9PKQksUGtj.Q9LwVLfV3WF4.32122926f7b9651a416a5099dc92dc2b4c87c8b922c114229f83b345d65f4695");
+    }
+
+    public void OpenCheckoutPage(string webUrl)
+    {
+        webViewManager.OpenFullScreenWebView(webUrl);
+    }
+
+    public void CloseCheckoutPage()
+    {
+        webViewManager.CloseWebView();
+    }
+
+    void HandleWebViewClosed()
+    {
+        Debug.Log("WebView was closed by the user.");
+        // Trigger anything you want here (check ownership of subscription, refresh UI, resume game, etc.)
+    }
+}
+
+```
 
 ## 📚 Documentation
 
