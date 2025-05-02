@@ -1,39 +1,54 @@
 using UnityEngine;
 using System;
+using UnityEngine.UI;
 
 public class WebViewManager : MonoBehaviour
 {
-    private UniWebView webView;
-
-    public Action OnWebViewClosed; // External callback
+    private WebViewObject webViewObject;
+    public Action OnWebViewClosed;
 
     public void OpenFullScreenWebView(string url)
     {
-        if (webView != null) return;
+        if (webViewObject != null) return;
 
-        webView = gameObject.AddComponent<UniWebView>();
-        webView.Frame = new Rect(0, 0, Screen.width, Screen.height);
-        webView.OnShouldClose += OnShouldClose;
-        webView.OnPageFinished += (view, statusCode, urlStr) => Debug.Log("Page Loaded: " + urlStr);
-        webView.Load(url);
-        webView.Show();
-    }
+        webViewObject = (new GameObject("WebViewObject")).AddComponent<WebViewObject>();
+        webViewObject.Init(
+            cb: (msg) =>
+            {
+                Debug.Log(string.Format("CallFromJS[{0}]", msg));
+            },
+            err: (msg) =>
+            {
+                Debug.Log(string.Format("CallOnError[{0}]", msg));
+            },
+            started: (msg) =>
+            {
+                Debug.Log(string.Format("CallOnStarted[{0}]", msg));
+            },
+            ld: (msg) =>
+            {
+                Debug.Log(string.Format("CallOnLoaded[{0}]", msg));
+            },
+            enableWKWebView: true);
 
-    private bool OnShouldClose(UniWebView webView)
-    {
-        CloseWebView();
-        OnWebViewClosed?.Invoke(); // Fire the close event
-        return true;
+        webViewObject.SetMargins(0, 0, 0, 0);
+        webViewObject.SetVisibility(true);
+        webViewObject.LoadURL(url);
     }
 
     public void CloseWebView()
     {
-        if (webView != null)
+        if (webViewObject != null)
         {
-            webView.OnShouldClose -= OnShouldClose;
-            webView.Hide();
-            Destroy(webView);
-            webView = null;
+            webViewObject.SetVisibility(false);
+            Destroy(webViewObject.gameObject);
+            webViewObject = null;
+            OnWebViewClosed?.Invoke();
         }
+    }
+
+    private void OnDestroy()
+    {
+        CloseWebView();
     }
 }

@@ -43,14 +43,22 @@ The SDK supports Unity versions LTS 2021.3 to Unity 6. Code might work for older
 
 ## 📦 Installation
 
-Add this to your Unity project's `manifest.json`:
+This project depends on [unity-webview](https://github.com/gree/unity-webview) plugin. Both the webview plugin and the bolt unity SDK require manual installations.
 
-```json
-"com.yourorg.bolt-unity-sdk": "https://github.com/boltapp/bolt-unity-sdk.git"
+**Note:** This project is still in early access but we plan to provide official package support in the near future.
 
-```
+For both the [unity-webview](https://github.com/gree/unity-webview) plugin and for the bolt-unity-sdk:
+1. Download the repo as a zip file
+2. Unpack it and drag it into your project's `Assets/` folder
+3. Follow readme steps to resolve errors
 
-Alternatively follow the [UPM install guide](https://docs.unity3d.com/6000.0/Documentation/Manual/upm-ui-giturl.html) from Unity.
+The `unity-webview` package is particularly complicated to install because it has an example project inside of it. 
+> Once you have the unzipped folder in your assets folder, make sure to run the `dist/unity-webview.unitypackage` file which will import the necessary files into your project. 
+>
+> You can then delete the unzipped unity-webview folder you just added to `/Assets`. This should also resolve import errors from the Bolt sdk package.
+>
+> If you have any issues our discord support team will be happy to help.
+
 
 ## 🔧 Quick Start
 
