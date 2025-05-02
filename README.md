@@ -6,6 +6,8 @@
   <img src="https://cdn.sanity.io/images/fuvbjjlp/production/bd6440647fa19b1863cd025fa45f8dad98d33181-2000x2000.png" width="40%" />
 </div>
 
+<br>
+
 Native Unity support for [Bolt Charge](https://www.bolt.com/charge), a fully hosted webshop for out-of-app purchases and subscriptions.
 
 <div class="discord-link">
@@ -21,22 +23,23 @@ Native Unity support for [Bolt Charge](https://www.bolt.com/charge), a fully hos
 
 ## 💰 Why Bolt
 
-Only with Bolt you get **2.1% + $0.30 on transactions**. More than 10x cheaper than traditional app stores which take 30% of your revenue!
-
+Only with Bolt you get **2.1% + $0.30 on all transactions**. That's 10x better than traditional app stores which take 30% of your revenue! That's the fair and transparent pricing you get with using Bolt.
 
 <p style="font-size:12px;font-style:italic;opacity:85%">
-<strong>Disclaimer:</strong> Fees are subject to change but will continue to remain highly competitive. See <a href="https://www.bolt.com/pricing">bolt.com/pricing</a> for up to date rates.
+<strong>Disclaimer:</strong> Fees are subject to change but will continue to remain highly competitive. See <a href="https://www.bolt.com/pricing">bolt.com/pricing</a> for up to date rates and visit  <a href="https://www.bolt.com/end-user-terms">bolt.com/end-user-terms</a> for end user terms and conditions.
 </p>
 
 ## 🚀 Features
 
-This package is a client side Unity SDK
-- Bring your own storefront UI
+This open source package is a light-weight Unity SDK.
+- Bring your own UI
 - Open webstore links directly inside your app
 - Radically cheaper payment processing rates
 - **Future:** User session management
 
-**Have a feature request?** We are constantly improving our SDK support and looking for suggestions. [Join our discord](https://discord.gg/BSUp9qjtnc) and chat with our development team to help get it prioritized!
+The SDK supports Unity versions LTS 2021.3 to Unity 6. Code might work for older versions of Unity but is not officially supported.
+
+**Have a feature request?** We are constantly improving our SDKs and looking for suggestions. [Join our discord](https://discord.gg/BSUp9qjtnc) and chat directly with our development team to help with our roadmap!
 
 ## 📦 Installation
 
@@ -46,6 +49,8 @@ Add this to your Unity project's `manifest.json`:
 "com.yourorg.bolt-unity-sdk": "https://github.com/boltapp/bolt-unity-sdk.git"
 
 ```
+
+Alternatively follow the [UPM install guide](https://docs.unity3d.com/6000.0/Documentation/Manual/upm-ui-giturl.html) from Unity.
 
 ## 🔧 Quick Start
 
