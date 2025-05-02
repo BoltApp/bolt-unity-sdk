@@ -1,0 +1,9 @@
+{
+  "name": "bolt-unity-sdk",
+  "version": "1.0.0",
+  "displayName": "Bolt SDK for Unity",
+  "description": "A Unity SDK for performing in-app purchases and subscriptions outside of the app store.",
+  "unity": "2021.3",
+  "keywords": ["bolt", "sdk", "subscription", "webview"],
+  "license": "MIT"
+}
