@@ -74,7 +74,7 @@ Only with Bolt you get **2.1% + $0.30 on all transactions**. That's 10x better t
 
 You need 3 things to get started:
 
-1. **Existing App:** You will need an applicaiton in the same platform as this SDK
+1. **Existing App:** You will need an application in the same platform as this SDK
 2. **Backend Server:** You will need to bring your own backend server (any language)
 3. **Bolt Merchant Account:** Dashboard access to manage your store ([signup](https://merchant.bolt.com/onboarding/get-started) or [login](https://merchant.bolt.com/))
 
@@ -200,17 +200,17 @@ public class BoltPayments : MonoBehaviour
 
 ## Next Steps
 
-Now that you have a single checkout working, you will want to adopt some best practices to make them easy to mantain.
+Now that you have a single checkout working, you will want to adopt some best practices to make them easy to maintain.
 
 #### Configs
 Use a config for managing your collection of checkout links. We recommend using JSON and mapping links to readable names. You can swap configs based on environment. Ex:
 ```
 {
-  GEMS_100:   'https://your-checkout-link-here.com,
-  GEMS_500:   'https://your-checkout-link-here.com,
-  GEMS_1000:  'https://your-checkout-link-here.com,
-  BUNDLE_ONE: 'https://your-checkout-link-here.com,
-  BUNDLE_TWO: 'https://your-checkout-link-here.com
+  GEMS_100:   'https://your-checkout-link-here.com',
+  GEMS_500:   'https://your-checkout-link-here.com',
+  GEMS_1000:  'https://your-checkout-link-here.com',
+  BUNDLE_ONE: 'https://your-checkout-link-here.com',
+  BUNDLE_TWO: 'https://your-checkout-link-here.com'
   // etc...
 }
 ```
