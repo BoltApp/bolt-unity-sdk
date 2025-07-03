@@ -85,42 +85,30 @@ For broad documentation and API reference visit our [documentation site](https:/
 
 ## 📦 Installation
 
+
 ### Step 1: Install the Unity SDK
 
-**Note:** This project is still in early access but we plan to provide official package support in the near future.
+<div style="border: 1px solid #b688ff; background-color: rgba(182, 136, 255, 0.1); padding: 15px; border-radius: 8px;margin-bottom: 16px;">
+<b>Note:</b> This Unity SDK is still in early access and requires a manual install. Official package support is planned for the near future.
+</div>
 
-**Clone / Copy the Plugin**
+This project depends on [unity-webview](https://github.com/gree/unity-webview) plugin.
 
-1. Create or open your Unreal Engine 5 project.
-2. Inside your project folder, create a `Plugins` directory if it doesn't exist:
+For both this Bolt Unity SDK and the [unity-webview](https://github.com/gree/unity-webview) plugin:
+1. Download the repo as a zip file
+2. Unpack it and drag it into your project's `Assets/` folder
+3. The next section will help you resolve errors
 
-   ```bash
-   mkdir Plugins
-   ```
-3. Copy the entire BoltUnrealSDK folder (this repo) into the Plugins folder. You can download the repo as a zip.
+#### ⚠️ Fix unity-webview issues
+The `unity-webview` package is finicky to install because it has an example project inside of it. Please follow the next steps carefully.
 
-    ```
-    YourProject/
-    └── Plugins/
-        └── BoltUnrealSDK/
-            ├── BoltUnrealSDK.uplugin
-            ├── README.md
-            └── Source/BoltUnrealSDK/...
-    ```
-4. Restart Unreal Engine.
-5. When prompted, click Yes to rebuild the plugin binaries if required.
+Once you have the unzipped folder in your assets folder, make sure to run the `dist/unity-webview.unitypackage` file which will import the necessary files into your project. 
 
-**Create the WebView Widget Blueprint**
+You can then delete the unzipped unity-webview folder you just added to `/Assets`. This should also resolve import errors from the Bolt sdk package.
 
-This plugin relies on a UI widget with a Web Browser component:
+Review the [General Notes](https://github.com/gree/unity-webview?tab=readme-ov-file#general-notes) to ensure you resolve any package errors.
 
-1. In the Unreal Content Browser, create a folder at:
-2. Inside /Game/UI/, create a new User Widget Blueprint called:
-3. Open WebViewWidget:
-    - Add a Web Browser component from the Palette.
-    - Set its anchor to Full Screen and stretch it to fill.
-    - Rename the Web Browser component to `WebBrowser`
-4. Save and compile.
+If you have any issues our discord support team will be happy to help.
 
 ### Step 2: Set up your backend server
 
@@ -140,7 +128,7 @@ You need to bring your own server to safely handle transactions and api keys.
 
 ### Step 3: Get your Bolt account
 
-1. Go to [merchant.bolt.com](https://www.bolt.com) and login to the dashboard. You can signup here if you
+1. Go to [merchant.bolt.com](https://www.bolt.com) and login to the dashboard. You can signup here if you don't have an account.
 2. Set up your products in the Bolt dashboard
 3. Get your payment links (they look like: `https://digital-subscriptions-test-14-04.c-staging.bolt.com/c?u=SRZKjocdzkUmJfS2J7JNCQ&publishable_key=BQ9PKQksUGtj.Q9LwVLfV3WF4.32122926f7b9651a416a5099dc92dc2b4c87c8b922c114229f83b345d65f4695`)
 
@@ -157,21 +145,21 @@ public class BoltPayments : MonoBehaviour
     public string serverUrl = "https://your-server.herokuapp.com";
     
     private BoltApiService boltApi;
-    private WebViewManager webView;
+    private WebViewManager webViewManager;
 
     void Start()
     {
         // Set up the payment system
         boltApi = new BoltApiService(serverUrl);
-        webView = gameObject.AddComponent<WebViewManager>();
-        webView.OnWebViewClosed += OnPaymentComplete;
+        webViewManager = gameObject.AddComponent<WebViewManager>();
+        webViewManager.OnWebViewClosed += OnPaymentComplete;
     }
 
     // Call this when player wants to buy something
     // Ensure to style the modal to your preference and include a close button
     public void BuyItem(string paymentUrl)
     {
-        webView.OpenFullScreenWebView(paymentUrl);
+        webViewManager.OpenFullScreenWebView(paymentUrl);
     }
 
     // This runs when payment is done
@@ -196,14 +184,14 @@ public class BoltPayments : MonoBehaviour
 5. Modify the modal style to your liking. Ensure to add a close button and handle appropriately.
 
 **Congratulations 🎉**
-<br>You have a integrated Bolt Charge into your app! 
+<br>You have successfully integrated Bolt Charge into your app! 
 
 ## Next Steps
 
 Now that you have a single checkout working, you will want to adopt some best practices to make them easy to maintain.
 
 #### Configs
-Use a config for managing your collection of checkout links. We recommend using JSON and mapping links to readable names. You can swap configs based on environment. Ex:
+Use a config for managing your collection of checkout links. We recommend using JSON and mapping links to readable names. You can swap configs based on environment. Example:
 ```
 {
   GEMS_100:   'https://your-checkout-link-here.com',
@@ -216,7 +204,7 @@ Use a config for managing your collection of checkout links. We recommend using 
 ```
 
 #### Integration Tests
-We recommend setting up automated testing against the most common flows. Good test coverage may include UI or API test coverage of the following scenarios
+We recommend setting up automated testing against the most common flows. Good test coverage should include UI or API test coverage of the following scenarios:
 - Checkout is possible to open
 - Checkout is possible to close
 - User gets success state from successful transaction
@@ -226,9 +214,9 @@ We recommend setting up automated testing against the most common flows. Good te
 
 #### Translations 🚧
 
-Bolt does support translations and handles many checkouts on the global market. However, right now the SDK is tailored to the U.S. market so only english is officially provided.
+Bolt does support translations and handles many checkouts on the global market. However, right now the SDK is tailored to the U.S. market so only English is officially provided.
 
-We will be rolling out official multi region support to Bolt Charge in the very near future. If you would like a preview or are curious about the timeline you can reach out to our team directly.
+We will be rolling out official multi-region support to Bolt Charge in the very near future. If you would like a preview or are curious about the timeline, you can reach out to our team directly.
 
 ## Need help?
 
@@ -238,7 +226,7 @@ We will be rolling out official multi region support to Bolt Charge in the very 
     <a href="https://discord.gg/BSUp9qjtnc" 
     target="_blank" class="discord-link-anchor">
       <span class="discord-text mr-2">Get help and chat with 
-      us about anything Discord</span>
+      us about anything on Discord</span>
       <span class="discord-icon-wrapper">
         <img src="https://cdn.prod.website-files.com/6257adef93867e50d84d30e2/66e3d80db9971f10a9757c99_Symbol.svg"
         alt="Discord" class="discord-icon" 
