@@ -5,6 +5,10 @@ public class BoltApiService
 {
     private readonly BoltClient client;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BoltApiService"/> class.
+    /// </summary>
+    /// <param name="baseUrl">The base URL of the your game server that implemented routes for the Bolt API.</param>
     public BoltApiService(string baseUrl)
     {
         this.client = new BoltClient(baseUrl);

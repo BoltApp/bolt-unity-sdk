@@ -7,6 +7,10 @@ public class BoltClient
 {
     private readonly string baseUrl;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BoltClient"/> class.
+    /// </summary>
+    /// <param name="baseUrl">The base URL of the your game server that implemented routes for the Bolt API.</param>
     public BoltClient(string baseUrl)
     {
         this.baseUrl = baseUrl.TrimEnd('/');
