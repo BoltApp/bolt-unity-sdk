@@ -13,8 +13,7 @@ Native Unity support for [Bolt Charge](https://www.bolt.com/charge), a fully hos
 
 We also support other platforms:
 
-<!-- <div> -->
-<table>
+<table style="margin: auto">
   <tr>
     <td align="center" width="150">
       <img src="https://upload.wikimedia.org/wikipedia/commons/6/6a/JavaScript-logo.png" width="60" height="60" alt="JavaScript"/><br>
@@ -51,16 +50,13 @@ We also support other platforms:
   </tr>
 </table>
 
-<a href="https://discord.gg/BSUp9qjtnc" style="text-decoration: none;">
-  <div style="display: flex; align-items: center; justify-content: center; background: #7289DA; padding: 15px; border-radius: 8px; margin: 20px 0; color: white;">
-    <img src="https://cdn.prod.website-files.com/6257adef93867e50d84d30e2/66e3d7f4ef6498ac018f2c55_Symbol.svg" width="40" height="40" style="margin-right: 15px;">
-    <div>
-      <strong style="font-size: 18px;">Have A Request?</strong>
-      <br>
-      Chat with us on discord for help and inquiries!
-    </div>
-  </div>
-</a>
+<div align="center" style="margin-top: 40px;">
+
+[![Discord](https://img.shields.io/badge/Discord-Have%20A%20Request%3F-7289DA?style=for-the-badge&logo=discord&logoColor=white&logoWidth=60)](https://discord.gg/BSUp9qjtnc)
+
+### Chat with us on Discord for help and inquiries!
+
+</div>
 
 ## 💰 Why Bolt
 
