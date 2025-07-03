@@ -51,7 +51,6 @@ We also support other platforms:
 </table>
 
 <br>
-<br>
 
 <div align="center">
 
