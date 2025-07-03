@@ -7,6 +7,10 @@ public class WebViewManager : MonoBehaviour
     private WebViewObject webViewObject;
     public Action OnWebViewClosed;
 
+    /// <summary>
+    /// Opens a full-screen web view with the given URL.
+    /// </summary>
+    /// <param name="url">The URL to load in the web view.</param>
     public void OpenFullScreenWebView(string url)
     {
         if (webViewObject != null) return;

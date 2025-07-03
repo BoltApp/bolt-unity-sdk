@@ -2,28 +2,65 @@
 
 <div align="center" style="display:flex;justify-content:center;margin-bottom:20px">
   <img src="https://res.cloudinary.com/dugcmkito/image/upload/v1744983998/bolt_accounts_2x_6c96bccd82.png" alt="Bolt Charge Hero" height="250px">
-
   <img src="https://cdn.sanity.io/images/fuvbjjlp/production/bd6440647fa19b1863cd025fa45f8dad98d33181-2000x2000.png" height="250px" />
 </div>
 
-<br>
-<br>
+
+
+## What is this?
 
 Native Unity support for [Bolt Charge](https://www.bolt.com/charge), a fully hosted webshop for out-of-app purchases and subscriptions.
 
-<div class="discord-link">
-    Got Questions?
-    <a href="https://discord.gg/BSUp9qjtnc" target="_blank" class="discord-link-anchor">
-      <span class="discord-text mr-2">Chat with us on Discord</span>
-      <span class="discord-icon-wrapper">
-        <img src="https://help.bolt.com/images/brand/Discord-Symbol-White.svg" alt="Discord" class="discord-icon" width="15px">
-      </span>
-    </a>
+We also support other platforms:
+
+<!-- <div> -->
+<div style="display: flex; flex-wrap: wrap; justify-content: margin: 20px auto; min-width: 345px; width: 100%; align: center;">
+
+  <div style="text-align: center; min-width: 115px; width: calc(33.33% - 30px); padding: 15px; margin-bottom: 20px; ">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6a/JavaScript-logo.png" width="60" height="60" alt="JavaScript">
+    <br><strong>JavaScript</strong><br>
+    <a href="https://github.com/BoltApp/bolt-frontend-sdk">Frontend Web SDK</a>
   </div>
 
-<br>
+  <div style="text-align: center; min-width: 115px; width: calc(33.33% - 32px); padding: 15px; margin-bottom: 20px; background: #b688ff; color: black; padding: 15px; border: 1px solid black; border-radius: 4px;">
+    <img src="https://cdn.sanity.io/images/fuvbjjlp/production/bd6440647fa19b1863cd025fa45f8dad98d33181-2000x2000.png" width="60" height="60" alt="Unity">
+    <br><strong>Unity</strong><br>
+    <i style="color: #030303">This Repo</i>
+  </div>
 
-We also have [Native Unreal Engine](https://github.com/davidminin/bolt-unreal-engine-sdk) Support and a [Sample Backend](https://github.com/davidminin/bolt-gameserver-sample) for additional reference.
+  <div style="text-align: center; min-width: 115px; width: calc(33.33% - 30px); padding: 15px; margin-bottom: 20px;">
+    <img src="https://camo.githubusercontent.com/416d2f81dcfee6991a059240e349bb4dc47896c63f7a775cd4fae482cec2e7c2/68747470733a2f2f63646e322e756e7265616c656e67696e652e636f6d2f75652d6c6f676f747970652d323032332d766572746963616c2d77686974652d3136383678323034382d6262666465643236646161372e706e67" width="40" height="40" style="object-fit: contain; background: black; padding: 10px" alt="Unreal">
+    <br><strong>Unreal Engine</strong><br>
+    <a href="https://github.com/BoltApp/bolt-unreal-engine-sdk">Unreal SDK</a>
+  </div>
+
+  <div style="text-align: center; min-width: 115px; width: calc(33.33% - 30px); padding: 15px;">
+    <img src="https://developer.apple.com/assets/elements/icons/swift/swift-64x64.png" width="60" height="60" alt="iOS">
+    <br><strong>iOS</strong><br>
+    Coming Soon 🚧
+  </div>
+
+  <div style="text-align: center; min-width: 115px; width: calc(33.33% - 30px); padding: 15px;">
+    <img src="https://avatars.githubusercontent.com/u/32689599?s=200&v=4" width="60" height="60" alt="Android">
+    <br><strong>Android</strong><br>
+    Coming Soon 🚧
+  </div>
+
+  <div style="text-align: center; min-width: 115px; width: calc(33.33% - 30px); padding: 15px;">
+    <!-- filler -->
+  </div>
+</div>
+
+<a href="https://discord.gg/BSUp9qjtnc" style="text-decoration: none;">
+  <div style="display: flex; align-items: center; justify-content: center; background: #7289DA; padding: 15px; border-radius: 8px; margin: 20px 0; color: white;">
+    <img src="https://cdn.prod.website-files.com/6257adef93867e50d84d30e2/66e3d7f4ef6498ac018f2c55_Symbol.svg" width="40" height="40" style="margin-right: 15px;">
+    <div>
+      <strong style="font-size: 18px;">Have A Request?</strong>
+      <br>
+      Chat with us on discord for help and inquiries!
+    </div>
+  </div>
+</a>
 
 ## 💰 Why Bolt
 
@@ -33,99 +70,176 @@ Only with Bolt you get **2.1% + $0.30 on all transactions**. That's 10x better t
 <strong>Disclaimer:</strong> Fees are subject to change but will continue to remain highly competitive. See <a href="https://www.bolt.com/pricing">bolt.com/pricing</a> for up to date rates and visit  <a href="https://www.bolt.com/end-user-terms">bolt.com/end-user-terms</a> for end user terms and conditions.
 </p>
 
-## 🚀 Features
+## 🛠️ Prerequisites
 
-This open source package is a light-weight Unity SDK.
-- Bring your own UI
-- Open webstore links directly inside your app
-- Radically cheaper payment processing rates
-- **Future:** User session management
+You need 3 things to get started:
 
-The SDK supports Unity versions LTS 2021.3 to Unity 6. Code might work for older versions of Unity but is not officially supported.
+1. **Existing App:** You will need an application in the same platform as this SDK
+2. **Backend Server:** You will need to bring your own backend server (any language)
+3. **Bolt Merchant Account:** Dashboard access to manage your store ([signup](https://merchant.bolt.com/onboarding/get-started) or [login](https://merchant.bolt.com/))
 
-**Have a feature request?** We are constantly improving our SDKs and looking for suggestions. [Join our discord](https://discord.gg/BSUp9qjtnc) and chat directly with our development team to help with our roadmap!
+## 📚 Documentation
+
+For broad documentation and API reference visit our [documentation site](https://docs.bolt.com).
+
 
 ## 📦 Installation
 
-This project depends on [unity-webview](https://github.com/gree/unity-webview) plugin. Both the webview plugin and the bolt unity SDK require manual installations.
 
-**Note:** This project is still in early access but we plan to provide official package support in the near future.
+### Step 1: Install the Unity SDK
 
-For both the [unity-webview](https://github.com/gree/unity-webview) plugin and for the bolt-unity-sdk:
-1. Download the repo as a zip file
+<div style="border: 1px solid #b688ff; background-color: rgba(182, 136, 255, 0.1); padding: 15px; border-radius: 8px;margin-bottom: 16px;">
+<b>Note:</b> This Unity SDK is still in early access and requires a manual install. Official package support is planned for the near future.
+</div>
+
+This project depends on [unity-webview](https://github.com/gree/unity-webview) plugin.
+
+For both this Bolt Unity SDK and the [unity-webview](https://github.com/gree/unity-webview) plugin:
+1. Download the repos as a zip file:
+    - [Bolt Unity Zip](https://github.com/BoltApp/bolt-unity-sdk/archive/refs/heads/main.zip)
+    - [Unity Webview Zip](https://github.com/gree/unity-webview/archive/refs/heads/master.zip)
 2. Unpack it and drag it into your project's `Assets/` folder
-3. Follow readme steps to resolve errors
+3. The next section will help you resolve errors
 
-The `unity-webview` package is particularly complicated to install because it has an example project inside of it. 
-> Once you have the unzipped folder in your assets folder, make sure to run the `dist/unity-webview.unitypackage` file which will import the necessary files into your project. 
->
-> You can then delete the unzipped unity-webview folder you just added to `/Assets`. This should also resolve import errors from the Bolt sdk package.
->
-> If you have any issues our discord support team will be happy to help.
+#### ⚠️ Fix unity-webview issues
+The `unity-webview` package is finicky to install because it has an example project inside of it. Please follow the next steps carefully.
 
+Once you have the unzipped folder in your assets folder, make sure to run the `dist/unity-webview.unitypackage` file which will import the necessary files into your project. 
 
-## 🔧 Quick Start
+You can then delete the unzipped unity-webview folder you just added to `/Assets`. This should also resolve import errors from the Bolt sdk package.
 
-**Requirements:** You must have a backend server for proxying API requests. See our [server sample](https://github.com/davidminin/bolt-gameserver-sample) for an example integration.
+Review the [General Notes](https://github.com/gree/unity-webview?tab=readme-ov-file#general-notes) to ensure you resolve any package errors.
 
-1. Add the SDK to your project
-2. Add routes to your backend server [(see example usage)](https://github.com/davidminin/bolt-gameserver-sample/blob/main/example-usage.ts)
-3. Use the staging api configs to test purchases in your dev environment
+If you have any issues our discord support team will be happy to help.
 
-<br>
+### Step 2: Set up your backend server
 
-**Example Usage:**
+You need to bring your own server to safely handle transactions and api keys.
+1. Integrate the Bolt API
+    - This is how you will interact with the Charge API and manage digital subscriptions
+    - Docs: https://help.bolt.com/products/bolt-charge/charge-setup/ 
+    - API: https://help.bolt.com/api-subscriptions/ 
+    - Example server: https://github.com/davidminin/bolt-gameserver-sample
+2. Set up the Authorization Webhook
+    - _"Authorization"_ is an industry term for transactions
+    - This is how you will check if a user completed a transaction
+    - Webhook Docs: https://help.bolt.com/developers/webhooks/webhooks
+    - Webhook Events: https://help.bolt.com/developers/webhooks/webhooks/#authorization-events
+    - API: https://help.bolt.com/api-merchant/#tag/webhooks/POST/webhooks_transaction 
+3. Note your server URL (like `https://your-server.herokuapp.com`)
+    - You will use this URL for initializing the api client in Step 4
+    - Consider using configs for managing different environments
+
+### Step 3: Get your Bolt account
+
+1. Go to [merchant.bolt.com](https://www.merchant.bolt.com) and login to the dashboard. You can [signup here](https://merchant.bolt.com/onboarding/get-started) if you don't have an account.
+2. Set up your products in the Bolt dashboard. You can find [helpful instructions in our documentation](https://help.bolt.com/products/bolt-charge/charge-setup/#set-up-your-products).
+3. Get your checkout links (they look like: `https://digital-subscriptions-test-14-04.c-staging.bolt.com/c?u=SRZKjocdzkUmJfS2J7JNCQ&publishable_key=BQ9PKQksUGtj.Q9LwVLfV3WF4.32122926f7b9651a416a5099dc92dc2b4c87c8b922c114229f83b345d65f4695`)
+
+### Step 4: Add code to your game
+
+You may copy this code into a new script in your Unity project or use it for reference on how to initialize the bolt client and webview.
+
 ```c#
 using UnityEngine;
 
-public class BoltDemo : MonoBehaviour
+public class BoltPayments : MonoBehaviour
 {
-    [Header("Backend Config")]
-    public string backendBaseUrl = "https://your-backend-server.com";
-
+    [Header("Your Backend Server")]
+    public string serverUrl = "https://your-server.herokuapp.com";
+    
     private BoltApiService boltApi;
     private WebViewManager webViewManager;
 
     void Start()
     {
-        // Initialize Bolt SDK with your backend server URL
-        boltApi = new BoltApiService(backendBaseUrl);
-
-        // Add WebViewManager component at runtime
+        // Set up the payment system
+        boltApi = new BoltApiService(serverUrl);
         webViewManager = gameObject.AddComponent<WebViewManager>();
-        webViewManager.OnWebViewClosed += HandleWebViewClosed;
-
-        // Fetch subscription data for specific user
-        StartCoroutine(boltApi.GetUserSubscriptions("test@test.com"));
-
-        // Open full screen webview (e.g. for purchasing a product). 
-        // It's recommended to embed URLs as data attributes into your in-game objects or to maintain a list using a helper class.
-        // You can generate these links using the bolt dashboard https://help.bolt.com/products/bolt-charge/charge-setup/#set-up-your-products
-        OpenCheckoutPage("https://digital-subscriptions-test-14-04.c-staging.bolt.com/c?u=SRZKjocdzkUmJfS2J7JNCQ&publishable_key=BQ9PKQksUGtj.Q9LwVLfV3WF4.32122926f7b9651a416a5099dc92dc2b4c87c8b922c114229f83b345d65f4695");
+        webViewManager.OnWebViewClosed += OnPaymentComplete;
     }
 
-    public void OpenCheckoutPage(string webUrl)
+    // Call this when player wants to buy something
+    // Ensure to style the modal to your preference and include a close button
+    public void BuyItem(string paymentUrl)
     {
-        webViewManager.OpenFullScreenWebView(webUrl);
+        webViewManager.OpenFullScreenWebView(paymentUrl);
     }
 
-    public void CloseCheckoutPage()
+    // This runs when payment is done
+    void OnPaymentComplete()
     {
-        webViewManager.CloseWebView();
-    }
+        Debug.Log("Payment finished!");
 
-    void HandleWebViewClosed()
-    {
-        Debug.Log("WebView was closed by the user.");
-        // Trigger anything you want here (check ownership of subscription, refresh UI, resume game, etc.)
+        // Recommended: you can sync your player object by polling your backend since a transaction webhook will have hit your backend server.
+
+        // Optional: If you have a simple checkout flow, you can use Bolt's api to check if player bought the item
+        StartCoroutine(boltApi.GetUserSubscriptions("player@email.com"));
     }
 }
-
 ```
 
-## 📚 Documentation
+## Step 5: Test it
 
-For detailed documentation and API reference, visit our [documentation site](https://docs.bolt.com).
+1. Add the script to a GameObject in your scene
+2. Put your server URL in the `serverUrl` field
+3. Call `BuyItem()` with a Bolt payment link
+    - **Note:** You can use our staging url for testing purposes: https://digital-subscriptions-test-14-04.c-staging.bolt.com/c?u=SRZKjocdzkUmJfS2J7JNCQ&publishable_key=BQ9PKQksUGtj.Q9LwVLfV3WF4.32122926f7b9651a416a5099dc92dc2b4c87c8b922c114229f83b345d65f4695
+4. The payment page should open as a modal in your game
+5. Modify the modal style to your liking. Ensure to add a close button and handle appropriately.
+
+**Congratulations 🎉**
+<br>You have successfully integrated Bolt Charge into your app! 
+
+## Next Steps
+
+Now that you have a single checkout working, you will want to adopt some best practices to make them easy to maintain.
+
+#### Configs
+Use a config for managing your collection of checkout links. We recommend using JSON and mapping links to readable names. You can swap configs based on environment. Example:
+```
+{
+  GEMS_100:   'https://your-checkout-link-here.com',
+  GEMS_500:   'https://your-checkout-link-here.com',
+  GEMS_1000:  'https://your-checkout-link-here.com',
+  BUNDLE_ONE: 'https://your-checkout-link-here.com',
+  BUNDLE_TWO: 'https://your-checkout-link-here.com'
+  // etc...
+}
+```
+
+#### Integration Tests
+We recommend setting up automated testing against the most common flows. Good test coverage should include UI or API test coverage of the following scenarios:
+- Checkout is possible to open
+- Checkout is possible to close
+- User gets success state from successful transaction
+- User gets failed state from failed transaction
+- User network interrupted after good payment, is shown success screen on reboot of app
+- User network interrupted after bad payment, is shown fail screen on reboot of app
+
+#### Translations 🚧
+
+Bolt does support translations and handles many checkouts on the global market. However, right now the SDK is tailored to the U.S. market so only English is officially provided.
+
+We will be rolling out official multi-region support to Bolt Charge in the very near future. If you would like a preview or are curious about the timeline, you can reach out to our team directly.
+
+## Need help?
+
+<div class="discord-link">
+    Got questions, roadmap suggestions, or requesting new SDKs?
+    <br>
+    <a href="https://discord.gg/BSUp9qjtnc" 
+    target="_blank" class="discord-link-anchor">
+      <span class="discord-text mr-2">Get help and chat with 
+      us about anything on Discord</span>
+      <span class="discord-icon-wrapper">
+        <img src="https://cdn.prod.website-files.com/6257adef93867e50d84d30e2/66e3d80db9971f10a9757c99_Symbol.svg"
+        alt="Discord" class="discord-icon" 
+        width="16px">
+      </span>
+    </a>
+  </div>
+
 
 
 ## 📄 License
