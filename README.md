@@ -95,7 +95,9 @@ For broad documentation and API reference visit our [documentation site](https:/
 This project depends on [unity-webview](https://github.com/gree/unity-webview) plugin.
 
 For both this Bolt Unity SDK and the [unity-webview](https://github.com/gree/unity-webview) plugin:
-1. Download the repo as a zip file
+1. Download the repos as a zip file:
+    - [Bolt Unity Zip](https://github.com/BoltApp/bolt-unity-sdk/archive/refs/heads/main.zip)
+    - [Unity Webview Zip](https://github.com/gree/unity-webview/archive/refs/heads/master.zip)
 2. Unpack it and drag it into your project's `Assets/` folder
 3. The next section will help you resolve errors
 
@@ -181,7 +183,8 @@ public class BoltPayments : MonoBehaviour
 
 1. Add the script to a GameObject in your scene
 2. Put your server URL in the `serverUrl` field
-3. Call `BuyItem()` with a Bolt payment link, you can use our [staging url](https://digital-subscriptions-test-14-04.c-staging.bolt.com/c?u=SRZKjocdzkUmJfS2J7JNCQ&publishable_key=BQ9PKQksUGtj.Q9LwVLfV3WF4.32122926f7b9651a416a5099dc92dc2b4c87c8b922c114229f83b345d65f4695) for testing purposes
+3. Call `BuyItem()` with a Bolt payment link
+    - **Note:** You can use our staging url for testing purposes: https://digital-subscriptions-test-14-04.c-staging.bolt.com/c?u=SRZKjocdzkUmJfS2J7JNCQ&publishable_key=BQ9PKQksUGtj.Q9LwVLfV3WF4.32122926f7b9651a416a5099dc92dc2b4c87c8b922c114229f83b345d65f4695
 4. The payment page should open as a modal in your game
 5. Modify the modal style to your liking. Ensure to add a close button and handle appropriately.
 
