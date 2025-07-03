@@ -14,42 +14,42 @@ Native Unity support for [Bolt Charge](https://www.bolt.com/charge), a fully hos
 We also support other platforms:
 
 <!-- <div> -->
-<div style="display: flex; flex-wrap: wrap; justify-content: margin: 20px auto; min-width: 345px; width: 100%; align: center;">
-
-  <div style="text-align: center; min-width: 115px; width: calc(33.33% - 30px); padding: 15px; margin-bottom: 20px; ">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/6/6a/JavaScript-logo.png" width="60" height="60" alt="JavaScript">
-    <br><strong>JavaScript</strong><br>
-    <a href="https://github.com/BoltApp/bolt-frontend-sdk">Frontend Web SDK</a>
-  </div>
-
-  <div style="text-align: center; min-width: 115px; width: calc(33.33% - 32px); padding: 15px; margin-bottom: 20px; background: #b688ff; color: black; padding: 15px; border: 1px solid black; border-radius: 4px;">
-    <img src="https://cdn.sanity.io/images/fuvbjjlp/production/bd6440647fa19b1863cd025fa45f8dad98d33181-2000x2000.png" width="60" height="60" alt="Unity">
-    <br><strong>Unity</strong><br>
-    <i style="color: #030303">This Repo</i>
-  </div>
-
-  <div style="text-align: center; min-width: 115px; width: calc(33.33% - 30px); padding: 15px; margin-bottom: 20px;">
-    <img src="https://camo.githubusercontent.com/416d2f81dcfee6991a059240e349bb4dc47896c63f7a775cd4fae482cec2e7c2/68747470733a2f2f63646e322e756e7265616c656e67696e652e636f6d2f75652d6c6f676f747970652d323032332d766572746963616c2d77686974652d3136383678323034382d6262666465643236646161372e706e67" width="40" height="40" style="object-fit: contain; background: black; padding: 10px" alt="Unreal">
-    <br><strong>Unreal Engine</strong><br>
-    <a href="https://github.com/BoltApp/bolt-unreal-engine-sdk">Unreal SDK</a>
-  </div>
-
-  <div style="text-align: center; min-width: 115px; width: calc(33.33% - 30px); padding: 15px;">
-    <img src="https://developer.apple.com/assets/elements/icons/swift/swift-64x64.png" width="60" height="60" alt="iOS">
-    <br><strong>iOS</strong><br>
-    Coming Soon 🚧
-  </div>
-
-  <div style="text-align: center; min-width: 115px; width: calc(33.33% - 30px); padding: 15px;">
-    <img src="https://avatars.githubusercontent.com/u/32689599?s=200&v=4" width="60" height="60" alt="Android">
-    <br><strong>Android</strong><br>
-    Coming Soon 🚧
-  </div>
-
-  <div style="text-align: center; min-width: 115px; width: calc(33.33% - 30px); padding: 15px;">
-    <!-- filler -->
-  </div>
-</div>
+<table>
+  <tr>
+    <td align="center" width="150">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/6/6a/JavaScript-logo.png" width="60" height="60" alt="JavaScript"/><br>
+      <b>JavaScript</b><br>
+      <a href="https://github.com/BoltApp/bolt-frontend-sdk">Frontend Web SDK</a>
+    </td>
+    <td align="center" width="150" bgcolor="#b688ff">
+      <img src="https://cdn.sanity.io/images/fuvbjjlp/production/bd6440647fa19b1863cd025fa45f8dad98d33181-2000x2000.png" width="60" height="60" alt="Unity"/><br>
+      <div style="color: black">
+      <b>Unity</b><br>
+      <i>This Repo</i>
+      </div>
+    </td>
+    <td align="center" width="150">
+      <img src="https://camo.githubusercontent.com/416d2f81dcfee6991a059240e349bb4dc47896c63f7a775cd4fae482cec2e7c2/68747470733a2f2f63646e322e756e7265616c656e67696e652e636f6d2f75652d6c6f676f747970652d323032332d766572746963616c2d77686974652d3136383678323034382d6262666465643236646161372e706e67" width="40" height="40" style="background: black; padding: 10px" alt="Unreal"/><br>
+      <b>Unreal Engine</b><br>
+      <a href="https://github.com/BoltApp/bolt-unreal-engine-sdk">Unreal SDK</a>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="150">
+      <img src="https://developer.apple.com/assets/elements/icons/swift/swift-64x64.png" width="60" height="60" alt="iOS"/><br>
+      <b>iOS</b><br>
+      Coming Soon 🚧
+    </td>
+    <td align="center" width="150">
+      <img src="https://avatars.githubusercontent.com/u/32689599?s=200&v=4" width="60" height="60" alt="Android"/><br>
+      <b>Android</b><br>
+      Coming Soon 🚧
+    </td>
+    <td align="center" width="150">
+      <!-- filler -->
+    </td>
+  </tr>
+</table>
 
 <a href="https://discord.gg/BSUp9qjtnc" style="text-decoration: none;">
   <div style="display: flex; align-items: center; justify-content: center; background: #7289DA; padding: 15px; border-radius: 8px; margin: 20px 0; color: white;">
