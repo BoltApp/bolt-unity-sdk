@@ -13,7 +13,6 @@ Native Unity support for [Bolt Charge](https://www.bolt.com/charge), a fully hos
 
 We also support other platforms:
 
-<!-- <div> -->
 <table style="margin: auto">
   <tr>
     <td align="center" width="150">
