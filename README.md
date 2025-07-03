@@ -118,9 +118,11 @@ You need to bring your own server to safely handle transactions and api keys.
     - Docs: https://help.bolt.com/products/bolt-charge/charge-setup/ 
     - API: https://help.bolt.com/api-subscriptions/ 
     - Example server: https://github.com/davidminin/bolt-gameserver-sample
-2. Set up webhook support
+2. Set up the Authorization Webhook
+    - _"Authorization"_ is an industry term for transactions
     - This is how you will check if a user completed a transaction
-    - Docs: https://help.bolt.com/developers/webhooks/webhooks
+    - Webhook Docs: https://help.bolt.com/developers/webhooks/webhooks
+    - Webhook Events: https://help.bolt.com/developers/webhooks/webhooks/#authorization-events
     - API: https://help.bolt.com/api-merchant/#tag/webhooks/POST/webhooks_transaction 
 3. Note your server URL (like `https://your-server.herokuapp.com`)
     - You will use this URL for initializing the api client in Step 4
@@ -128,9 +130,9 @@ You need to bring your own server to safely handle transactions and api keys.
 
 ### Step 3: Get your Bolt account
 
-1. Go to [merchant.bolt.com](https://www.bolt.com) and login to the dashboard. You can signup here if you don't have an account.
-2. Set up your products in the Bolt dashboard
-3. Get your payment links (they look like: `https://digital-subscriptions-test-14-04.c-staging.bolt.com/c?u=SRZKjocdzkUmJfS2J7JNCQ&publishable_key=BQ9PKQksUGtj.Q9LwVLfV3WF4.32122926f7b9651a416a5099dc92dc2b4c87c8b922c114229f83b345d65f4695`)
+1. Go to [merchant.bolt.com](https://www.merchant.bolt.com) and login to the dashboard. You can [signup here](https://merchant.bolt.com/onboarding/get-started) if you don't have an account.
+2. Set up your products in the Bolt dashboard. You can find [helpful instructions in our documentation](https://help.bolt.com/products/bolt-charge/charge-setup/#set-up-your-products).
+3. Get your checkout links (they look like: `https://digital-subscriptions-test-14-04.c-staging.bolt.com/c?u=SRZKjocdzkUmJfS2J7JNCQ&publishable_key=BQ9PKQksUGtj.Q9LwVLfV3WF4.32122926f7b9651a416a5099dc92dc2b4c87c8b922c114229f83b345d65f4695`)
 
 ### Step 4: Add code to your game
 
