@@ -6,7 +6,6 @@
 </div>
 
 
-
 ## What is this?
 
 Native Unity support for [Bolt Charge](https://www.bolt.com/charge), a fully hosted webshop for out-of-app purchases and subscriptions.
