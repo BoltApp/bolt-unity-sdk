@@ -1,6 +1,6 @@
 # Bolt Unity SDK
 
-<img src="https://github-production-user-asset-6210df.s3.amazonaws.com/12603470/462617951-8a9e19af-6ed6-4937-86c9-374fcba36789.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20250704%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250704T190536Z&X-Amz-Expires=300&X-Amz-Signature=f52f4e4f938c3cbc860fd96f507bc7226bbb34c1cb50369a792cd46c8f0b2258&X-Amz-SignedHeaders=host" />
+<img src="https://github.com/BoltApp/bolt-gameserver-sample/blob/main/public/banner-unity.png?raw=true" />
 
 
 ## What is this?
@@ -24,7 +24,7 @@ We also support other platforms:
       </div>
     </td>
     <td align="center" width="150">
-      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUf3R8LFTgqC_8mooGEx7Fpas9kHu8OUxhLA&s" width="40" height="40" style="background: black; padding: 10px" alt="Unreal"/><br>
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUf3R8LFTgqC_8mooGEx7Fpas9kHu8OUxhLA&s" width="60" height="60" alt="Unreal"/><br>
       <b>Unreal Engine</b><br>
       <a href="https://github.com/BoltApp/bolt-unreal-engine-sdk">Unreal SDK</a>
     </td>
