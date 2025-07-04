@@ -24,7 +24,7 @@ We also support other platforms:
       </div>
     </td>
     <td align="center" width="150">
-      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUf3R8LFTgqC_8mooGEx7Fpas9kHu8OUxhLA&s" width="40" height="40" style="background: black; padding: 10px" alt="Unreal"/><br>
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRUf3R8LFTgqC_8mooGEx7Fpas9kHu8OUxhLA&s" width="60" height="60" alt="Unreal"/><br>
       <b>Unreal Engine</b><br>
       <a href="https://github.com/BoltApp/bolt-unreal-engine-sdk">Unreal SDK</a>
     </td>
