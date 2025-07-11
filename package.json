@@ -1,14 +1,17 @@
 {
   "name": "bolt-unity-sdk",
-  "version": "1.0.0",
+  "version": "0.0.2",
   "displayName": "Bolt SDK for Unity",
-  "description": "A Unity SDK for performing in-app purchases and subscriptions outside of the app store.",
+  "description": "A Unity SDK for performing in-app purchases and subscriptions outside of the app store with cross-platform WebView support.",
   "unity": "2021.3",
-  "keywords": ["bolt", "sdk", "subscription", "webview"],
+  "keywords": ["bolt", "sdk", "subscription", "webview", "payment"],
   "license": "MIT",
   "author": {
     "name": "Bolt",
     "email": "support@bolt.com",
     "url": "https://bolt.com"
+  },
+  "dependencies": {
+    "net.gree.unity-webview": "https://github.com/gree/unity-webview.git?path=/dist/package"
   }
 }
