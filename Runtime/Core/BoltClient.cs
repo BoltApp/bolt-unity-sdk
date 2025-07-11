@@ -53,7 +53,6 @@ namespace BoltSDK
                 onError?.Invoke(request.error);
         }
 
-        // WebView integration methods
         public void OpenPaymentWebView(string paymentUrl)
         {
             // Find or create WebView manager
