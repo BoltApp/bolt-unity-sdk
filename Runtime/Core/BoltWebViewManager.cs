@@ -15,7 +15,7 @@ namespace BoltSDK
         [Header("Close Button")]
         [SerializeField] private Sprite closeButtonSprite;
         [SerializeField] private Color closeButtonColor = new Color(1, 1, 1, 0.2f);
-        [SerializeField] private float closeButtonSize = 40f;
+        [SerializeField] private float closeButtonSizePercent = 0.04f; // 4% of screen size
         [SerializeField] private Vector2 closeButtonOffset = new Vector2(20, 20);
 
         private IBoltWebView webView;
@@ -95,13 +95,14 @@ namespace BoltSDK
             RectTransform closeRect = closeButton?.GetComponent<RectTransform>();
             if (closeRect != null)
             {
-                float scaledButtonSize = GetScaledValue(closeButtonSize);
+                float buttonSize = GetCloseButtonSize();
+                float scaledButtonSize = GetScaledValue(buttonSize);
                 closeRect.sizeDelta = new Vector2(scaledButtonSize, scaledButtonSize);
 
                 // Position at top-right corner of modal (right edge, top with margin)
                 Vector2 scaledSize = GetScaledSize(modalSize);
                 Vector2 scaledOffset = GetScaledSize(closeButtonOffset);
-                Vector2 closePos = new Vector2(scaledSize.x / 2 - scaledOffset.x, scaledSize.y / 2 + scaledOffset.y + closeButtonSize / 2);
+                Vector2 closePos = new Vector2(scaledSize.x / 2 - scaledOffset.x, scaledSize.y / 2 + scaledOffset.y + buttonSize / 2);
                 closeRect.anchoredPosition = closePos;
             }
         }
@@ -193,7 +194,7 @@ namespace BoltSDK
             }
 
             int maxWidth = Mathf.RoundToInt(screenWidth * 0.95f);
-            int maxHeight = screenHeight - 120 - (int)(closeButtonSize + closeButtonOffset.y);
+            int maxHeight = screenHeight - 120 - (int)(GetCloseButtonSize() + closeButtonOffset.y);
 
             int modalWidth, modalHeight;
 
@@ -303,6 +304,18 @@ namespace BoltSDK
             return scaledVector.x;
         }
 
+        private float GetCloseButtonSize()
+        {
+            // Calculate button size as a percentage of screen height
+            float screenMax = Mathf.Max(Screen.width, Screen.height);
+            float buttonSize = screenMax * closeButtonSizePercent;
+
+            // Apply minimum and maximum bounds for usability
+            float minSize = 30f;
+            float maxSize = 200f;
+            return Mathf.Clamp(buttonSize, minSize, maxSize);
+        }
+
         private void CreateModalContainer(GameObject parent)
         {
             modalContainer = new GameObject("ModalContainer");
@@ -365,7 +378,8 @@ namespace BoltSDK
                 }
             });
 
-            float scaledButtonSize = GetScaledValue(closeButtonSize);
+            float buttonSize = GetCloseButtonSize();
+            float scaledButtonSize = GetScaledValue(buttonSize);
             RectTransform closeRect = closeButton.GetComponent<RectTransform>();
             if (closeRect != null)
             {
@@ -374,7 +388,7 @@ namespace BoltSDK
                 // Position at top-right corner of modal (right edge, top with margin)
                 Vector2 scaledSize = GetScaledSize(modalSize);
                 Vector2 scaledOffset = GetScaledSize(closeButtonOffset);
-                Vector2 closePos = new Vector2(scaledSize.x / 2 - scaledOffset.x, scaledSize.y / 2 + scaledOffset.y + closeButtonSize / 2);
+                Vector2 closePos = new Vector2(scaledSize.x / 2 - scaledOffset.x, scaledSize.y / 2 + scaledOffset.y + scaledButtonSize / 2);
                 closeRect.anchoredPosition = closePos;
             }
             closeButton.SetActive(false);
@@ -391,7 +405,7 @@ namespace BoltSDK
             closeText.color = Color.white;
             closeText.alignment = TextAnchor.MiddleCenter;
             closeText.resizeTextForBestFit = true;
-            closeText.resizeTextMaxSize = Mathf.RoundToInt(closeButtonSize * 0.8f);
+            closeText.resizeTextMaxSize = Mathf.RoundToInt(buttonSize * 0.8f);
             closeText.transform.localScale = new Vector3(1, 0.8f, 1); // shorter Y scale to make more square looking X
 
             RectTransform textRect = closeText.GetComponent<RectTransform>();
