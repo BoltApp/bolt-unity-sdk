@@ -82,27 +82,9 @@ For broad documentation and API reference visit our [documentation site](https:/
 
 ### Step 1: Install the Unity SDK
 
-<div style="border: 1px solid #b688ff; background-color: rgba(182, 136, 255, 0.1); padding: 15px; border-radius: 8px;margin-bottom: 16px;">
-<b>Note:</b> This Unity SDK is still in early access and requires a manual install. Official package support is planned for the near future.
-</div>
 
-This project depends on [unity-webview](https://github.com/gree/unity-webview) plugin.
 
-For both this Bolt Unity SDK and the [unity-webview](https://github.com/gree/unity-webview) plugin:
-1. Download the repos as a zip file:
-    - [Bolt Unity Zip](https://github.com/BoltApp/bolt-unity-sdk/archive/refs/heads/main.zip)
-    - [Unity Webview Zip](https://github.com/gree/unity-webview/archive/refs/heads/master.zip)
-2. Unpack it and drag it into your project's `Assets/` folder
-3. The next section will help you resolve errors
-
-#### ⚠️ Fix unity-webview issues
-The `unity-webview` package is finicky to install because it has an example project inside of it. Please follow the next steps carefully.
-
-Once you have the unzipped folder in your assets folder, make sure to run the `dist/unity-webview.unitypackage` file which will import the necessary files into your project. 
-
-You can then delete the unzipped unity-webview folder you just added to `/Assets`. This should also resolve import errors from the Bolt sdk package.
-
-Review the [General Notes](https://github.com/gree/unity-webview?tab=readme-ov-file#general-notes) to ensure you resolve any package errors.
+// TODO
 
 If you have any issues our discord support team will be happy to help.
 
