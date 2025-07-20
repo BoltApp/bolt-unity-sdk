@@ -122,36 +122,25 @@ using UnityEngine;
 public class BoltPayments : MonoBehaviour
 {
     [Header("Your Backend Server")]
+    // TODO make this configurable from editor
     public string serverUrl = "https://your-server.herokuapp.com";
     
-    private BoltApiService boltApi;
-    private WebViewManager webViewManager;
-
-    void Start()
-    {
-        // Set up the payment system
-        boltApi = new BoltApiService(serverUrl);
-        webViewManager = gameObject.AddComponent<WebViewManager>();
-        webViewManager.OnWebViewClosed += OnPaymentComplete;
+    
+    void Start() {
+      // TODO
     }
 
-    // Call this when player wants to buy something
-    // Ensure to style the modal to your preference and include a close button
-    public void BuyItem(string paymentUrl)
-    {
-        webViewManager.OpenFullScreenWebView(paymentUrl);
-    }
-
-    // This runs when payment is done
-    void OnPaymentComplete()
-    {
-        Debug.Log("Payment finished!");
-
-        // Recommended: you can sync your player object by polling your backend since a transaction webhook will have hit your backend server.
-
-        // Optional: If you have a simple checkout flow, you can use Bolt's api to check if player bought the item
-        StartCoroutine(boltApi.GetUserSubscriptions("player@email.com"));
-    }
+    // Need code for:
+    // GET/SET player prefs
+    // -   player email
+    // -   player locale and country
+    // -   name of app (used for deeplinking, maybe a bolt specific one)
+    // -   set new transaction to be acknowledged (we open browser so don't know if it worked)
+    // -   on app load, see if last transaction was acknowledged
+    // Opening website utility code
+    // - open URL by string, append query parameters for device locale, user email, device country, app name for deeplinking back
+    // - getting products by ID (key value pairs)
+    // Deeplinking sample code to read transaction data and acknowledge the last transaction
 }
 ```
 
