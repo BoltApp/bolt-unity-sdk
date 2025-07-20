@@ -5,11 +5,10 @@ using UnityEngine.Networking;
 
 namespace BoltSDK
 {
-    public class BoltSDKManager : MonoBehaviour
+    public class BoltSDKManager : MonoBehaviour, IBoltSDKManager
     {
         private static BoltSDKManager _instance;
-        private BoltSDKConfig _config;
-        private bool _isInitialized = false;
+        private readonly BoltSDKManagerCore _core = new();
 
         public static BoltSDKManager Instance
         {
@@ -19,20 +18,20 @@ namespace BoltSDK
                 {
                     GameObject go = new GameObject("BoltSDKManager");
                     _instance = go.AddComponent<BoltSDKManager>();
-                    DontDestroyOnLoad(go);
+                    UnityEngine.Object.DontDestroyOnLoad(go);
                 }
                 return _instance;
             }
         }
 
-        public bool IsInitialized => _isInitialized;
+        public bool IsInitialized => _core.IsInitialized;
 
-        private void Awake()
+        protected override void Awake()
         {
             if (_instance == null)
             {
                 _instance = this;
-                DontDestroyOnLoad(gameObject);
+                UnityEngine.Object.DontDestroyOnLoad(gameObject);
             }
             else if (_instance != this)
             {
@@ -42,128 +41,66 @@ namespace BoltSDK
 
         public bool Initialize(BoltSDKConfig config)
         {
-            if (!config.IsValid())
+            bool result = _core.Initialize(config);
+            if (result)
+            {
+                Debug.Log("BoltSDK: Initialized successfully");
+            }
+            else
             {
                 Debug.LogError("BoltSDK: Invalid configuration provided");
-                return false;
             }
-
-            _config = config;
-            _isInitialized = true;
-            Debug.Log("BoltSDK: Initialized successfully");
-            return true;
+            return result;
         }
 
         public string GetLocale()
         {
-            return PlayerPrefs.GetString("BoltLocale", "en-US");
+            return _core.GetLocale();
         }
 
         public void SetLocale(string locale)
         {
-            PlayerPrefs.SetString("BoltLocale", locale);
-            PlayerPrefs.Save();
+            _core.SetLocale(locale);
         }
 
         public string GenerateTransactionId()
         {
-            return Guid.NewGuid().ToString();
+            return _core.GenerateTransactionId();
         }
 
         public TransactionStatus CheckTransactionStatus(string transactionId)
         {
-            if (string.IsNullOrEmpty(transactionId))
-                return TransactionStatus.Pending;
-
-            string status = PlayerPrefs.GetString($"BoltTransaction_{transactionId}", "");
-
-            switch (status.ToLower())
-            {
-                case "completed":
-                    return TransactionStatus.Completed;
-                case "failed":
-                    return TransactionStatus.Failed;
-                case "cancelled":
-                    return TransactionStatus.Cancelled;
-                default:
-                    return TransactionStatus.Pending;
-            }
+            return _core.CheckTransactionStatus(transactionId);
         }
 
         public void SaveTransactionStatus(string transactionId, TransactionStatus status)
         {
-            if (string.IsNullOrEmpty(transactionId))
-                return;
-
-            string statusString = status.ToString().ToLower();
-            PlayerPrefs.SetString($"BoltTransaction_{transactionId}", statusString);
-            PlayerPrefs.Save();
+            _core.SaveTransactionStatus(transactionId, status);
         }
 
         public string BuildCheckoutUrl(string productId, string transactionId)
         {
-            if (!_isInitialized)
+            string url = _core.BuildCheckoutUrl(productId, transactionId);
+            if (string.IsNullOrEmpty(url))
             {
-                Debug.LogError("BoltSDK: Not initialized. Call Initialize() first.");
-                return "";
+                Debug.LogError("BoltSDK: Failed to build checkout URL");
             }
-
-            if (string.IsNullOrEmpty(productId) || string.IsNullOrEmpty(transactionId))
-            {
-                Debug.LogError("BoltSDK: Product ID and Transaction ID are required");
-                return "";
-            }
-
-            string locale = GetLocale();
-            string url = $"{_config.ServerUrl}/checkout?product={Uri.EscapeDataString(productId)}&transaction={Uri.EscapeDataString(transactionId)}&locale={Uri.EscapeDataString(locale)}&app={Uri.EscapeDataString(_config.AppName)}";
-
             return url;
         }
 
         public bool HandleDeepLink(string url)
         {
-            if (string.IsNullOrEmpty(url))
-                return false;
-
-            try
+            bool result = _core.HandleDeepLink(url);
+            if (result)
             {
-                Uri uri = new Uri(url);
-
-                // Check if it's a bolt deep link
-                if (uri.Scheme != "myapp" || !uri.Host.Contains("bolt"))
-                    return false;
-
-                // Parse query parameters
-                var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
-                string status = query["status"];
-                string transactionId = query["id"];
-
-                if (string.IsNullOrEmpty(transactionId))
-                    return false;
-
-                // Convert status string to enum
-                TransactionStatus transactionStatus = TransactionStatus.Pending;
-                if (Enum.TryParse(status, true, out TransactionStatus parsedStatus))
-                {
-                    transactionStatus = parsedStatus;
-                }
-
-                // Save the transaction status
-                SaveTransactionStatus(transactionId, transactionStatus);
-
-                Debug.Log($"BoltSDK: Deep link processed - Transaction {transactionId} status: {transactionStatus}");
-                return true;
+                Debug.Log($"BoltSDK: Deep link processed successfully");
             }
-            catch (Exception ex)
-            {
-                Debug.LogError($"BoltSDK: Error processing deep link: {ex.Message}");
-                return false;
-            }
+            return result;
         }
 
         public void OpenCheckout(string productId, Action<string> onTransactionIdGenerated = null, Action<TransactionStatus> onTransactionComplete = null)
         {
-            if (!_isInitialized)
+            if (!_core.IsInitialized)
             {
                 Debug.LogError("BoltSDK: Not initialized. Call Initialize() first.");
                 return;
@@ -185,30 +122,6 @@ namespace BoltSDK
 
             // Start monitoring for transaction completion
             StartCoroutine(MonitorTransaction(transactionId, onTransactionComplete));
-        }
-
-        private IEnumerator MonitorTransaction(string transactionId, Action<TransactionStatus> onComplete)
-        {
-            float checkInterval = 1.0f; // Check every second
-            float timeout = 300.0f; // 5 minutes timeout
-            float elapsed = 0f;
-
-            while (elapsed < timeout)
-            {
-                TransactionStatus status = CheckTransactionStatus(transactionId);
-
-                if (status != TransactionStatus.Pending)
-                {
-                    onComplete?.Invoke(status);
-                    yield break;
-                }
-
-                yield return new WaitForSeconds(checkInterval);
-                elapsed += checkInterval;
-            }
-
-            // Timeout reached
-            onComplete?.Invoke(TransactionStatus.Failed);
         }
     }
 }

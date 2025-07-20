@@ -22,9 +22,21 @@ namespace BoltSDK
 
         public bool IsValid()
         {
-            return !string.IsNullOrEmpty(ServerUrl) &&
-                   !string.IsNullOrEmpty(AppName) &&
-                   Uri.IsWellFormedUriString(ServerUrl, UriKind.Absolute);
+            if (string.IsNullOrEmpty(ServerUrl) || string.IsNullOrEmpty(AppName))
+                return false;
+
+            if (!Uri.IsWellFormedUriString(ServerUrl, UriKind.Absolute))
+                return false;
+
+            try
+            {
+                var uri = new Uri(ServerUrl);
+                return uri.Scheme == "http" || uri.Scheme == "https";
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }
