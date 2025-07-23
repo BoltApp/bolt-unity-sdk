@@ -24,7 +24,7 @@ namespace BoltApp
                 }
 
                 var culture = CultureInfo.CurrentCulture;
-                return $"{culture.TwoLetterISOLanguageName}-{culture.TwoLetterISORegionName}";
+                return $"{culture.TwoLetterISOLanguageName}-{culture.Name.Split('-')[1]}";
             }
             catch
             {
@@ -47,7 +47,7 @@ namespace BoltApp
             try
             {
                 var culture = CultureInfo.CurrentCulture;
-                return culture.TwoLetterISORegionName;
+                return culture.Name.Split('-')[1];
             }
             catch
             {
@@ -219,29 +219,15 @@ namespace BoltApp
                 SystemLanguage.Thai => "th-TH",
                 SystemLanguage.Vietnamese => "vi-VN",
                 SystemLanguage.Indonesian => "id-ID",
-                SystemLanguage.Malay => "ms-MY",
                 SystemLanguage.Hebrew => "he-IL",
                 SystemLanguage.Hindi => "hi-IN",
-                SystemLanguage.Urdu => "ur-PK",
-                SystemLanguage.Bengali => "bn-BD",
-                SystemLanguage.Tamil => "ta-IN",
-                SystemLanguage.Telugu => "te-IN",
-                SystemLanguage.Marathi => "mr-IN",
-                SystemLanguage.Gujarati => "gu-IN",
-                SystemLanguage.Kannada => "kn-IN",
-                SystemLanguage.Malayalam => "ml-IN",
-                SystemLanguage.Punjabi => "pa-IN",
                 SystemLanguage.Afrikaans => "af-ZA",
                 SystemLanguage.Basque => "eu-ES",
                 SystemLanguage.Catalan => "ca-ES",
-                SystemLanguage.Croatian => "hr-HR",
                 SystemLanguage.Estonian => "et-EE",
-                SystemLanguage.Galician => "gl-ES",
                 SystemLanguage.Icelandic => "is-IS",
                 SystemLanguage.Latvian => "lv-LV",
                 SystemLanguage.Lithuanian => "lt-LT",
-                SystemLanguage.Macedonian => "mk-MK",
-                SystemLanguage.Serbian => "sr-RS",
                 SystemLanguage.Slovak => "sk-SK",
                 SystemLanguage.Slovenian => "sl-SI",
                 SystemLanguage.Ukrainian => "uk-UA",
@@ -285,29 +271,15 @@ namespace BoltApp
                 SystemLanguage.Thai => "TH",
                 SystemLanguage.Vietnamese => "VN",
                 SystemLanguage.Indonesian => "ID",
-                SystemLanguage.Malay => "MY",
                 SystemLanguage.Hebrew => "IL",
                 SystemLanguage.Hindi => "IN",
-                SystemLanguage.Urdu => "PK",
-                SystemLanguage.Bengali => "BD",
-                SystemLanguage.Tamil => "IN",
-                SystemLanguage.Telugu => "IN",
-                SystemLanguage.Marathi => "IN",
-                SystemLanguage.Gujarati => "IN",
-                SystemLanguage.Kannada => "IN",
-                SystemLanguage.Malayalam => "IN",
-                SystemLanguage.Punjabi => "IN",
                 SystemLanguage.Afrikaans => "ZA",
                 SystemLanguage.Basque => "ES",
                 SystemLanguage.Catalan => "ES",
-                SystemLanguage.Croatian => "HR",
                 SystemLanguage.Estonian => "EE",
-                SystemLanguage.Galician => "ES",
                 SystemLanguage.Icelandic => "IS",
                 SystemLanguage.Latvian => "LV",
                 SystemLanguage.Lithuanian => "LT",
-                SystemLanguage.Macedonian => "MK",
-                SystemLanguage.Serbian => "RS",
                 SystemLanguage.Slovak => "SK",
                 SystemLanguage.Slovenian => "SI",
                 SystemLanguage.Ukrainian => "UA",

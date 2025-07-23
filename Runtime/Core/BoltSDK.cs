@@ -221,7 +221,7 @@ namespace BoltApp
                 if (transaction != null)
                 {
                     transaction.Status = TransactionStatus.Completed;
-                    transaction.IsServerVerified = serverValidated;
+                    transaction.IsServerValidated = serverValidated;
                     CreateOrUpdateTransaction(transaction);
                 }
             }

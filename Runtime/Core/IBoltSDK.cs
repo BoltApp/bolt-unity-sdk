@@ -13,8 +13,8 @@ namespace BoltApp
         event Action onWebLinkOpen;
         BoltConfig Config { get; }
         void OpenCheckout(string checkoutLink, Dictionary<string, string> extraParams = null);
-        void CancelTransaction(string transactionId);
-        void CompleteTransaction(string transactionId);
+        void CancelTransaction(string transactionId, bool serverValidated = false);
+        void CompleteTransaction(string transactionId, bool serverValidated = false);
         List<TransactionResult> GetTransactions();
         TransactionResult HandleDeepLinkCallback(string callbackUrl);
     }
