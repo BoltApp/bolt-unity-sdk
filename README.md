@@ -82,27 +82,9 @@ For broad documentation and API reference visit our [documentation site](https:/
 
 ### Step 1: Install the Unity SDK
 
-<div style="border: 1px solid #b688ff; background-color: rgba(182, 136, 255, 0.1); padding: 15px; border-radius: 8px;margin-bottom: 16px;">
-<b>Note:</b> This Unity SDK is still in early access and requires a manual install. Official package support is planned for the near future.
-</div>
 
-This project depends on [unity-webview](https://github.com/gree/unity-webview) plugin.
 
-For both this Bolt Unity SDK and the [unity-webview](https://github.com/gree/unity-webview) plugin:
-1. Download the repos as a zip file:
-    - [Bolt Unity Zip](https://github.com/BoltApp/bolt-unity-sdk/archive/refs/heads/main.zip)
-    - [Unity Webview Zip](https://github.com/gree/unity-webview/archive/refs/heads/master.zip)
-2. Unpack it and drag it into your project's `Assets/` folder
-3. The next section will help you resolve errors
-
-#### ⚠️ Fix unity-webview issues
-The `unity-webview` package is finicky to install because it has an example project inside of it. Please follow the next steps carefully.
-
-Once you have the unzipped folder in your assets folder, make sure to run the `dist/unity-webview.unitypackage` file which will import the necessary files into your project. 
-
-You can then delete the unzipped unity-webview folder you just added to `/Assets`. This should also resolve import errors from the Bolt sdk package.
-
-Review the [General Notes](https://github.com/gree/unity-webview?tab=readme-ov-file#general-notes) to ensure you resolve any package errors.
+// TODO
 
 If you have any issues our discord support team will be happy to help.
 
@@ -140,36 +122,25 @@ using UnityEngine;
 public class BoltPayments : MonoBehaviour
 {
     [Header("Your Backend Server")]
+    // TODO make this configurable from editor
     public string serverUrl = "https://your-server.herokuapp.com";
     
-    private BoltApiService boltApi;
-    private WebViewManager webViewManager;
-
-    void Start()
-    {
-        // Set up the payment system
-        boltApi = new BoltApiService(serverUrl);
-        webViewManager = gameObject.AddComponent<WebViewManager>();
-        webViewManager.OnWebViewClosed += OnPaymentComplete;
+    
+    void Start() {
+      // TODO
     }
 
-    // Call this when player wants to buy something
-    // Ensure to style the modal to your preference and include a close button
-    public void BuyItem(string paymentUrl)
-    {
-        webViewManager.OpenFullScreenWebView(paymentUrl);
-    }
-
-    // This runs when payment is done
-    void OnPaymentComplete()
-    {
-        Debug.Log("Payment finished!");
-
-        // Recommended: you can sync your player object by polling your backend since a transaction webhook will have hit your backend server.
-
-        // Optional: If you have a simple checkout flow, you can use Bolt's api to check if player bought the item
-        StartCoroutine(boltApi.GetUserSubscriptions("player@email.com"));
-    }
+    // Need code for:
+    // GET/SET player prefs
+    // -   player email
+    // -   player locale and country
+    // -   name of app (used for deeplinking, maybe a bolt specific one)
+    // -   set new transaction to be acknowledged (we open browser so don't know if it worked)
+    // -   on app load, see if last transaction was acknowledged
+    // Opening website utility code
+    // - open URL by string, append query parameters for device locale, user email, device country, app name for deeplinking back
+    // - getting products by ID (key value pairs)
+    // Deeplinking sample code to read transaction data and acknowledge the last transaction
 }
 ```
 
