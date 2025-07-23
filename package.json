@@ -1,10 +1,10 @@
 {
-  "name": "com.bolt.sdk",
-  "version": "1.0.0",
+  "name": "bolt-unity-sdk",
+  "version": "0.0.1",
   "displayName": "Bolt SDK",
   "description": "A Unity SDK for performing in-app purchases and subscriptions outside of the app store.",
   "unity": "2021.3",
-  "keywords": ["bolt", "sdk", "subscription", "WebLink", "iap", "checkout"],
+  "keywords": ["bolt", "sdk", "subscription", "web payment", "iap", "checkout"],
   "license": "MIT",
   "author": {
     "name": "Bolt",
@@ -25,9 +25,9 @@
     }
   ],
   "documentationUrl": "https://docs.bolt.com/unity-sdk",
-  "changelogUrl": "https://github.com/bolt/unity-sdk/releases",
+  "changelogUrl": "https://github.com/BoltApp/bolt-unity-sdk/blobl/main/CHANGELOG.md",
   "repository": {
     "type": "git",
-    "url": "https://github.com/bolt/unity-sdk.git"
+    "url": "https://github.com/BoltApp/bolt-unity-sdk.git"
   }
 } 

@@ -13,7 +13,7 @@ namespace BoltSDK
         // Callback Events
         public event Action<TransactionResult> onTransactionComplete;
         public event Action<TransactionResult> onTransactionFailed;
-        public event Action<void> onCheckoutOpen;
+        public event Action<void> onWebLinkOpen;
 
         // Properties
         public bool IsInitialized { get; private set; }
