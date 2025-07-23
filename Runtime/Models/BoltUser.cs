@@ -8,10 +8,10 @@ namespace BoltSDK
     [Serializable]
     public class BoltUser
     {
-        public string Email { get; set; }
-        public string Locale { get; set; }
-        public string Country { get; set; }
-        public string DeviceId { get; set; }
+        public string? Email { get; set; }
+        public string? Locale { get; set; }
+        public string? Country { get; set; }
+        public string? DeviceId { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime LastActive { get; set; }
 

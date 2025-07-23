@@ -13,7 +13,7 @@ namespace BoltSDK.Samples
 
         void Start()
         {
-            // Will init using values from the BoltSDKConfig asset in the Resources folder.
+            // Will init using values from the BoltConfig asset in the Resources folder.
             _boltSDK = new BoltSDK();
 
             // Subscribe to events

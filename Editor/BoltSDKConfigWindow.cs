@@ -7,15 +7,15 @@ namespace BoltSDK.Editor
     /// <summary>
     /// Simple editor window for Bolt SDK Configuration
     /// </summary>
-    public class BoltSDKConfigWindow : EditorWindow
+    public class BoltConfigWindow : EditorWindow
     {
-        private BoltSDKConfig config;
-        private const string CONFIG_PATH = "Assets/BoltSDKConfig.asset";
+        private BoltConfig config;
+        private const string CONFIG_PATH = "Assets/BoltConfig.asset";
 
         [MenuItem("Tools/Bolt SDK/Configuration")]
         public static void ShowWindow()
         {
-            var window = GetWindow<BoltSDKConfigWindow>("Bolt SDK Configuration");
+            var window = GetWindow<BoltConfigWindow>("Bolt SDK Configuration");
             window.minSize = new Vector2(400, 250);
             window.Show();
         }
@@ -28,12 +28,12 @@ namespace BoltSDK.Editor
         private void LoadOrCreateConfig()
         {
             // Try to load existing configuration
-            config = AssetDatabase.LoadAssetAtPath<BoltSDKConfig>(CONFIG_PATH);
+            config = AssetDatabase.LoadAssetAtPath<BoltConfig>(CONFIG_PATH);
 
             if (config == null)
             {
                 // Create new configuration
-                config = ScriptableObject.CreateInstance<BoltSDKConfig>();
+                config = ScriptableObject.CreateInstance<BoltConfig>();
                 AssetDatabase.CreateAsset(config, CONFIG_PATH);
                 AssetDatabase.SaveAssets();
                 Debug.Log("Created new Bolt SDK Configuration");

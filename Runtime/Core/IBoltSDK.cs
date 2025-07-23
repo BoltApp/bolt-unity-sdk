@@ -10,7 +10,7 @@ namespace BoltSDK
     {
         event Action<TransactionResult> onTransactionComplete;
         event Action<TransactionResult> onTransactionFailed;
-        event Action<void> onWebLinkOpen;
+        event Action onWebLinkOpen;
 
         bool IsInitialized { get; }
         BoltUser BoltUser { get; }

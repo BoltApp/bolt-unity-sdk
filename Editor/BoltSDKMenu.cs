@@ -10,12 +10,12 @@ namespace BoltSDK.Editor
     public static class BoltSDKMenu
     {
         private const string MENU_ROOT = "Tools/Bolt SDK/";
-        private const string CONFIG_PATH = "Assets/BoltSDKConfig.asset";
+        private const string CONFIG_PATH = "Assets/BoltConfig.asset";
 
         [MenuItem(MENU_ROOT + "Configuration", false, 100)]
         public static void OpenConfiguration()
         {
-            BoltSDKConfigWindow.ShowWindow();
+            BoltConfigWindow.ShowWindow();
         }
 
         [MenuItem(MENU_ROOT + "Documentation", false, 600)]

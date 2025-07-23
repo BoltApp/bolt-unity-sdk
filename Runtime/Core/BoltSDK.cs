@@ -13,11 +13,11 @@ namespace BoltSDK
         // Callback Events
         public event Action<TransactionResult> onTransactionComplete;
         public event Action<TransactionResult> onTransactionFailed;
-        public event Action<void> onWebLinkOpen;
+        public event Action onWebLinkOpen;
 
         // Properties
         public bool IsInitialized { get; private set; }
-        public BoltUser boltUser { get; private set; }
+        public BoltUser BoltUser { get; private set; }
         private BoltConfig _config;
 
         // Configuration
@@ -70,19 +70,19 @@ namespace BoltSDK
         }
 
         /// <summary>
-        /// Loads the BoltSDKConfig asset from the default path
+        /// Loads the BoltConfig asset from the default path
         /// </summary>
         /// <returns>The configuration asset or null if not found</returns>
-        private BoltSDKConfig LoadConfigurationAsset()
+        private BoltConfig LoadConfigurationAsset()
         {
             // Try to load from the default path
-            var config = Resources.Load<BoltSDKConfig>("BoltSDKConfig");
+            var config = Resources.Load<BoltConfig>("BoltConfig");
 
             if (config == null)
             {
                 // Try to load from the Assets folder path
 #if UNITY_EDITOR
-                config = UnityEditor.AssetDatabase.LoadAssetAtPath<BoltSDKConfig>("Assets/BoltSDKConfig.asset");
+                config = UnityEditor.AssetDatabase.LoadAssetAtPath<BoltConfig>("Assets/BoltConfig.asset");
 #endif
             }
 
@@ -120,8 +120,8 @@ namespace BoltSDK
         /// <summary>
         /// Initialize the SDK using a configuration asset
         /// </summary>
-        /// <param name="config">The BoltSDKConfig ScriptableObject containing game settings</param>
-        public void Init(BoltSDKConfig config)
+        /// <param name="config">The BoltConfig ScriptableObject containing game settings</param>
+        public void Init(BoltConfig config)
         {
             if (config == null)
                 throw new BoltSDKException("Configuration cannot be null");

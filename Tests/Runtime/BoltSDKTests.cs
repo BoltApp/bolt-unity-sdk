@@ -276,10 +276,10 @@ namespace BoltSDK.Tests
         }
 
         [Test]
-        public void Init_WithBoltSDKConfig_ShouldInitializeSuccessfully()
+        public void Init_WithBoltConfig_ShouldInitializeSuccessfully()
         {
             // Arrange
-            var config = ScriptableObject.CreateInstance<BoltSDKConfig>();
+            var config = ScriptableObject.CreateInstance<BoltConfig>();
             config.gameId = "test-game-id";
             config.deepLinkAppName = "test-deep-link-app";
             config.environment = BoltConfig.Environment.Development;
@@ -294,18 +294,18 @@ namespace BoltSDK.Tests
         }
 
         [Test]
-        public void Init_WithNullBoltSDKConfig_ShouldThrowException()
+        public void Init_WithNullBoltConfig_ShouldThrowException()
         {
             // Act & Assert
-            var exception = Assert.Throws<BoltSDKException>(() => _boltSDK.Init((BoltSDKConfig)null));
+            var exception = Assert.Throws<BoltSDKException>(() => _boltSDK.Init((BoltConfig)null));
             Assert.AreEqual("Configuration cannot be null", exception.Message);
         }
 
         [Test]
-        public void Init_WithInvalidBoltSDKConfig_ShouldThrowException()
+        public void Init_WithInvalidBoltConfig_ShouldThrowException()
         {
             // Arrange
-            var config = ScriptableObject.CreateInstance<BoltSDKConfig>();
+            var config = ScriptableObject.CreateInstance<BoltConfig>();
             config.gameId = ""; // Invalid - empty game ID
             config.deepLinkAppName = "test-deep-link-app";
 
