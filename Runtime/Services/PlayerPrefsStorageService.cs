@@ -94,7 +94,7 @@ namespace BoltApp
         {
             try
             {
-                var json = JsonUtils.ToJson(obj);
+                var json = JsonUtility.ToJson(obj);
                 SetString(key, json);
             }
             catch (Exception ex)
@@ -111,7 +111,7 @@ namespace BoltApp
                 if (string.IsNullOrEmpty(json))
                     return defaultValue;
 
-                return JsonUtils.FromJson<T>(json);
+                return JsonUtility.FromJson<T>(json);
             }
             catch (Exception ex)
             {

@@ -99,7 +99,6 @@ namespace BoltApp
 
                 CreateOrUpdateTransaction(transactionResult);
                 onTransactionComplete?.Invoke(transactionResult);
-
                 LogDebug($"Handled weblink callback for transaction: {transactionResult.TransactionId}");
                 return transactionResult;
             }
@@ -190,7 +189,7 @@ namespace BoltApp
                     return new List<TransactionResult>();
                 }
 
-                var transactions = JsonUtils.FromJson<List<TransactionResult>>(historyData);
+                var transactions = JsonUtility.FromJson<List<TransactionResult>>(historyData);
                 return transactions ?? new List<TransactionResult>();
             }
             catch (Exception ex)
@@ -261,7 +260,7 @@ namespace BoltApp
                     transactionHistory.Add(transactionResult);
                 }
 
-                var json = JsonUtils.ToJson(transactionHistory);
+                var json = JsonUtility(transactionHistory);
                 _StorageService.SetString("transactionHistory", json);
             }
             catch (Exception ex)
