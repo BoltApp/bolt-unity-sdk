@@ -19,116 +19,21 @@ namespace BoltSDK
         // Properties
         public bool IsInitialized { get; private set; }
         public BoltUser User { get; private set; }
-
-        // Configuration
-        public string GameID { get; private set; }
-        public string DeepLinkAppName { get; private set; }
+        public BoltConfig Config { get; private set; }
 
         // Services
-        private IWebLinkService _WebLinkService;
         private IStorageService _StorageService;
 
         public BoltSDK()
         {
-            // Initialize default services
-            _WebLinkService = new UnityWebLinkService();
+            Config = new BoltConfig();
             _StorageService = new PlayerPrefsStorageService();
-
-            // Set up event handlers
-            _WebLinkService.OnWebLinkOpened += OnWebLinkOpened;
-            _WebLinkService.OnWebLinkClosed += OnWebLinkClosed;
-            _WebLinkService.OnError += OnWebLinkError;
         }
 
-        public BoltSDK(IWebLinkService WebLinkService, IStorageService storageService)
+        public BoltSDK(BoltConfig config)
         {
-            _WebLinkService = WebLinkService ?? new UnityWebLinkService();
-            _StorageService = storageService ?? new PlayerPrefsStorageService();
-
-            // Set up event handlers
-            _WebLinkService.OnWebLinkOpened += OnWebLinkOpened;
-            _WebLinkService.OnWebLinkClosed += OnWebLinkClosed;
-            _WebLinkService.OnError += OnWebLinkError;
-        }
-
-        public void Init()
-        {
-            // Load configuration from the asset
-            var config = LoadConfigurationAsset();
-
-            if (config == null)
-            {
-                throw new BoltSDKException("No Bolt SDK Configuration found. Please create one using Tools > Bolt SDK > Configuration");
-            }
-
-            if (!config.IsValid())
-            {
-                throw new BoltSDKException("Bolt SDK Configuration is not valid. Please check the configuration using Tools > Bolt SDK > Configuration");
-            }
-
-            Init(config.gameId, config.deepLinkAppName);
-        }
-
-        /// <summary>
-        /// Loads the BoltConfig asset from the default path
-        /// </summary>
-        /// <returns>The configuration asset or null if not found</returns>
-        private BoltConfig LoadConfigurationAsset()
-        {
-            // Try to load from the default path
-            var config = Resources.Load<BoltConfig>("BoltConfig");
-
-            if (config == null)
-            {
-                // Try to load from the Assets folder path
-#if UNITY_EDITOR
-                config = UnityEditor.AssetDatabase.LoadAssetAtPath<BoltConfig>("Assets/BoltConfig.asset");
-#endif
-            }
-
-            return config;
-        }
-
-        public void Init(BoltConfig config)
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(config.gameId))
-                    throw new BoltSDKException("Game ID cannot be null or empty");
-
-                GameID = config.gameId;
-                DeepLinkAppName = config.deepLinkAppName;
-
-                if (!string.IsNullOrEmpty(config.deepLinkAppName))
-                {
-                    _StorageService.SetString("deepLinkAppName", config.deepLinkAppName);
-                }
-
-                InitializeUserData();
-                IsInitialized = true;
-
-                LogDebug($"Bolt SDK initialized successfully. Game ID: {gameID}");
-            }
-            catch (Exception ex)
-            {
-                LogError($"Failed to initialize Bolt SDK: {ex.Message}");
-                throw new BoltSDKException($"Failed to initialize Bolt SDK: {ex.Message}", ex);
-            }
-        }
-
-        /// <summary>
-        /// Initialize the SDK using a configuration asset
-        /// </summary>
-        /// <param name="config">The BoltConfig ScriptableObject containing game settings</param>
-        public void Init(BoltConfig config)
-        {
-            if (config == null)
-                throw new BoltSDKException("Configuration cannot be null");
-
-            if (!config.IsValid())
-                throw new BoltSDKException("Configuration is not valid. Please check the error messages above.");
-
-            Init(config.gameId, config.deepLinkAppName);
+            Config = config;
+            _StorageService = new PlayerPrefsStorageService();
         }
 
         public void OpenCheckout(string checkoutLink, Dictionary<string, string> extraParams = null)

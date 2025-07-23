@@ -14,8 +14,8 @@ namespace BoltSDK
 
         bool IsInitialized { get; }
         BoltUser User { get; }
+        BoltConfig Config { get; }
 
-        void Init(BoltConfig config);
         void OpenCheckout(string checkoutLink, Dictionary<string, string> extraParams = null);
         TransactionResult HandleWeblinkCallback(string callbackUrl);
     }

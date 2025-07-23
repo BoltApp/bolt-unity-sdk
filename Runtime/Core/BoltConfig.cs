@@ -17,6 +17,20 @@ namespace BoltSDK
         [Header("Environment Settings")]
         public Environment environment = Environment.Development;
 
+        public BoltConfig()
+        {
+            gameId = "com.bolt.unity.test";
+            deepLinkAppName = "BoltAppTest";
+            environment = Environment.Development;
+        }
+
+        public BoltConfig(string gameId, string deepLinkAppName, Environment environment)
+        {
+            this.gameId = gameId;
+            this.deepLinkAppName = deepLinkAppName;
+            this.environment = environment;
+        }
+
 
         /// <summary>
         /// Environment types for different deployment stages
