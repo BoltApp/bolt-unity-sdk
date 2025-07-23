@@ -33,9 +33,6 @@ namespace BoltSDK
         }
     }
 
-    /// <summary>
-    /// Exception thrown when the SDK is not initialized
-    /// </summary>
     public class BoltSDKNotInitializedException : BoltSDKException
     {
         public BoltSDKNotInitializedException() : base("Bolt SDK is not initialized. Call Init() first.")
@@ -44,9 +41,6 @@ namespace BoltSDK
         }
     }
 
-    /// <summary>
-    /// Exception thrown when a product is not found in the catalog
-    /// </summary>
     public class ProductNotFoundException : BoltSDKException
     {
         public ProductNotFoundException(string productId) : base($"Product with ID '{productId}' not found in catalog.")
@@ -55,9 +49,6 @@ namespace BoltSDK
         }
     }
 
-    /// <summary>
-    /// Exception thrown when web link operations fail
-    /// </summary>
     public class WebLinkException : BoltSDKException
     {
         public WebLinkException(string message) : base(message)

@@ -6,6 +6,7 @@ namespace BoltSDK
 {
     /// <summary>
     /// Unity PlayerPrefs implementation of the storage service
+    /// TODO - This is a temporary implementation, will be replaced with a simpler solution.
     /// </summary>
     public class PlayerPrefsStorageService : IStorageService
     {

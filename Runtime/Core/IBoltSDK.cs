@@ -11,11 +11,7 @@ namespace BoltSDK
         event Action<TransactionResult> onTransactionComplete;
         event Action<TransactionResult> onTransactionFailed;
         event Action onWebLinkOpen;
-
-        bool IsInitialized { get; }
-        BoltUser User { get; }
         BoltConfig Config { get; }
-
         void OpenCheckout(string checkoutLink, Dictionary<string, string> extraParams = null);
         TransactionResult HandleWeblinkCallback(string callbackUrl);
     }

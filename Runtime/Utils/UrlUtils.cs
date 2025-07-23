@@ -10,12 +10,6 @@ namespace BoltSDK
     /// </summary>
     public static class UrlUtils
     {
-        /// <summary>
-        /// Appends query parameters to a URL
-        /// </summary>
-        /// <param name="baseUrl">The base URL</param>
-        /// <param name="parameters">The parameters to append</param>
-        /// <returns>The URL with appended parameters</returns>
         public static string AppendQueryParameters(string baseUrl, Dictionary<string, string> parameters)
         {
             if (string.IsNullOrEmpty(baseUrl))
@@ -38,11 +32,6 @@ namespace BoltSDK
             return uriBuilder.ToString();
         }
 
-        /// <summary>
-        /// Extracts query parameters from a URL
-        /// </summary>
-        /// <param name="url">The URL to extract parameters from</param>
-        /// <returns>A dictionary of query parameters</returns>
         public static Dictionary<string, string> ExtractQueryParameters(string url)
         {
             var parameters = new Dictionary<string, string>();
@@ -81,11 +70,6 @@ namespace BoltSDK
             return parameters;
         }
 
-        /// <summary>
-        /// Validates if a string is a valid URL
-        /// </summary>
-        /// <param name="url">The URL to validate</param>
-        /// <returns>True if the URL is valid, false otherwise</returns>
         public static bool IsValidUrl(string url)
         {
             if (string.IsNullOrEmpty(url))
@@ -102,11 +86,6 @@ namespace BoltSDK
             }
         }
 
-        /// <summary>
-        /// Gets the base URL without query parameters
-        /// </summary>
-        /// <param name="url">The full URL</param>
-        /// <returns>The base URL without query parameters</returns>
         public static string GetBaseUrl(string url)
         {
             if (string.IsNullOrEmpty(url))
@@ -124,11 +103,6 @@ namespace BoltSDK
             }
         }
 
-        /// <summary>
-        /// Encodes a string for use in a URL
-        /// </summary>
-        /// <param name="value">The string to encode</param>
-        /// <returns>The URL-encoded string</returns>
         public static string UrlEncode(string value)
         {
             if (string.IsNullOrEmpty(value))
@@ -137,11 +111,6 @@ namespace BoltSDK
             return Uri.EscapeDataString(value);
         }
 
-        /// <summary>
-        /// Decodes a URL-encoded string
-        /// </summary>
-        /// <param name="value">The URL-encoded string to decode</param>
-        /// <returns>The decoded string</returns>
         public static string UrlDecode(string value)
         {
             if (string.IsNullOrEmpty(value))
@@ -150,12 +119,6 @@ namespace BoltSDK
             return Uri.UnescapeDataString(value);
         }
 
-        /// <summary>
-        /// Combines URL parts safely
-        /// </summary>
-        /// <param name="baseUrl">The base URL</param>
-        /// <param name="path">The path to append</param>
-        /// <returns>The combined URL</returns>
         public static string CombineUrl(string baseUrl, string path)
         {
             if (string.IsNullOrEmpty(baseUrl))
@@ -173,12 +136,6 @@ namespace BoltSDK
             return $"{baseUrl}/{path}";
         }
 
-        /// <summary>
-        /// Checks if a URL is a deep link callback
-        /// </summary>
-        /// <param name="url">The URL to check</param>
-        /// <param name="scheme">The expected scheme</param>
-        /// <returns>True if it's a deep link callback, false otherwise</returns>
         public static bool IsDeepLinkCallback(string url, string scheme)
         {
             if (string.IsNullOrEmpty(url) || string.IsNullOrEmpty(scheme))

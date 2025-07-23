@@ -11,17 +11,10 @@ namespace BoltSDK
     /// </summary>
     public class BoltSDK : IBoltSDK
     {
-        // Callback Events
         public event Action<TransactionResult> onTransactionComplete;
         public event Action<TransactionResult> onTransactionFailed;
         public event Action onWebLinkOpen;
-
-        // Properties
-        public bool IsInitialized { get; private set; }
-        public BoltUser User { get; private set; }
         public BoltConfig Config { get; private set; }
-
-        // Services
         private IStorageService _StorageService;
 
         public BoltSDK()
@@ -40,9 +33,6 @@ namespace BoltSDK
         {
             try
             {
-                if (!IsInitialized)
-                    throw new BoltSDKNotInitializedException();
-
                 if (string.IsNullOrEmpty(checkoutLink))
                     throw new BoltSDKException("Checkout link cannot be null or empty");
 

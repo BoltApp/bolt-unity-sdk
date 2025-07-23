@@ -9,6 +9,7 @@ namespace Bolt.Unity.Utils
         {
             try
             {
+                //  TODO - Use strong types for parameters
                 var transactionId = parameters.GetValueOrDefault("transaction_id", "");
                 var status = parameters.GetValueOrDefault("status", "");
                 var amount = parameters.GetValueOrDefault("amount", "");
