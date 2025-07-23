@@ -82,9 +82,33 @@ For broad documentation and API reference visit our [documentation site](https:/
 
 ### Step 1: Install the Unity SDK
 
+#### Option 1: Using manifest.json (Recommended)
 
+1. **Open your Unity project**
+2. **Navigate to the Packages folder** in your project root
+3. **Open the `manifest.json` file** in a text editor
+4. **Add the Bolt SDK dependency** to the `dependencies` section and pin your version:
 
-// TODO
+```json
+{
+  "dependencies": {
+    "com.bolt.sdk": "https://github.com/BoltApp/bolt-unity-sdk.git#",
+    // ... other dependencies
+  }
+}
+```
+
+5. **Save the file** - Unity will automatically download and import the package
+
+#### Option 2: Using Package Manager UI
+
+1. **Open Package Manager** in Unity (Window > Package Manager)
+2. **Click the "+" button** in the top-left corner
+3. **Select "Add package from git URL"**
+4. **Enter the repository URL**: `https://github.com/BoltApp/bolt-unity-sdk.git`
+5. **Click "Add"**
+
+**Note:** You can also specify a specific version by appending it to the URL. e.g. `https://github.com/BoltApp/bolt-unity-sdk.git#v0.0.2`
 
 If you have any issues our discord support team will be happy to help.
 
