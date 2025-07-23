@@ -8,7 +8,7 @@ namespace BoltApp.Samples
     /// Basic example showing how to integrate the Bolt SDK
     /// Add this to your game manager or main controller
     /// </summary>
-    public class BoltManager : MonoBehaviour
+    public class BoltBasicExample : MonoBehaviour
     {
         private BoltSDK _boltSDK;
         private bool checkoutIsOpen = false;
@@ -34,6 +34,8 @@ namespace BoltApp.Samples
             {
                 Debug.Log("App focused again");
 
+                // The app is refocused and we previously tracked checkout open with the onWebLinkOpen callback callback
+                // Therefor, the user returned to the app after web checkout but not via deep link
                 if (checkoutIsOpen)
                 {
                     // Check status of latest transaction with backend server
@@ -45,17 +47,23 @@ namespace BoltApp.Samples
                             var transactionResult = await ServerVerifyTransaction(transaction.TransactionId);
                             if (transactionResult == null)
                             {
-                                _boltSDK.CancelTransaction(transaction.TransactionId, false);
+                                _boltSDK.CancelTransaction(transaction.TransactionId);
                                 continue;
                             }
 
                             if (transactionResult.Status == TransactionStatus.Completed)
                             {
-                                _boltSDK.CompleteTransaction(transaction.TransactionId, true);
+                                _boltSDK.CompleteTransaction(
+                                    transactionId = transaction.TransactionId,
+                                    isServerVerified = transactionResult.IsServerValidated
+                                );
                             }
                             else
                             {
-                                _boltSDK.CancelTransaction(transaction.TransactionId, true);
+                                _boltSDK.CancelTransaction(
+                                    transactionId = transaction.TransactionId,
+                                    isServerVerified = transactionResult.IsServerValidated
+                                );
                             }
                         }
                     }
@@ -66,6 +74,11 @@ namespace BoltApp.Samples
             checkoutIsOpen = false;
         }
 
+        /// <summary>
+        /// Mock helper function to verify transaction with backend server
+        /// </summary>
+        /// <param name="transactionId">The transaction ID to verify</param>
+        /// <returns>The transaction result or null if not found</returns>
         private TransactionResult ServerVerifyTransaction(string transactionId)
         {
             // TODO - Use your http client to call backend to verify
@@ -80,14 +93,6 @@ namespace BoltApp.Samples
                 Timestamp = DateTime.UtcNow
             );
             return mockResult;
-        }
-
-        /// <summary>
-        /// When redirected back from web, handle deep link here.
-        /// </summary>
-        private void HandleDeepLink(string deepLink)
-        {
-            _boltSDK.HandleDeepLinkCallback(deepLink);
         }
 
         /// <summary>

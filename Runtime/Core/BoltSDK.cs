@@ -80,6 +80,13 @@ namespace BoltApp
                     };
                 }
 
+                if (Config.DeepLinkCallbackUrl != null && !callbackUrl.Contains(Config.DeepLinkCallbackUrl))
+                {
+                    // Skip deep link callback if it does not match the provided app name
+                    LogDebug($"Deep link callback URL does not match config: {callbackUrl}. Expected: {Config.DeepLinkCallbackUrl}");
+                    return null;
+                }
+
                 var queryParameters = UrlUtils.ExtractQueryParameters(callbackUrl);
                 var transactionResult = DeepLinkUtils.ParseTransactionResult(queryParameters);
 
