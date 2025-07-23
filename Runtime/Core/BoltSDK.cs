@@ -260,7 +260,7 @@ namespace BoltApp
                     transactionHistory.Add(transactionResult);
                 }
 
-                var json = JsonUtility(transactionHistory);
+                var json = JsonUtility.ToJson(transactionHistory);
                 _StorageService.SetString("transactionHistory", json);
             }
             catch (Exception ex)
