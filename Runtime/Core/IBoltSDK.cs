@@ -16,6 +16,7 @@ namespace BoltApp
         void CancelTransaction(string transactionId, bool serverValidated = false);
         void CompleteTransaction(string transactionId, bool serverValidated = false);
         List<TransactionResult> GetTransactions();
+        List<TransactionResult> GetPendingTransactions();
         TransactionResult HandleDeepLinkCallback(string callbackUrl);
     }
 }

@@ -80,10 +80,10 @@ namespace BoltApp
                     };
                 }
 
-                if (Config.DeepLinkCallbackUrl != null && !callbackUrl.Contains(Config.DeepLinkCallbackUrl))
+                if (Config.deepLinkAppName != null && !callbackUrl.Contains(Config.deepLinkAppName))
                 {
                     // Skip deep link callback if it does not match the provided app name
-                    LogDebug($"Deep link callback URL does not match config: {callbackUrl}. Expected: {Config.DeepLinkCallbackUrl}");
+                    LogDebug($"Deep link callback URL does not match config: {callbackUrl}. Expected: {Config.deepLinkAppName}");
                     return null;
                 }
 
@@ -184,13 +184,13 @@ namespace BoltApp
         {
             try
             {
-                var pendingData = _StorageService.GetString("transactionHistory", "");
-                if (string.IsNullOrEmpty(pendingData))
+                var historyData = _StorageService.GetString("transactionHistory", "");
+                if (string.IsNullOrEmpty(historyData))
                 {
                     return new List<TransactionResult>();
                 }
 
-                var transactions = JsonUtils.FromJson<List<TransactionResult>>(pendingData);
+                var transactions = JsonUtils.FromJson<List<TransactionResult>>(historyData);
                 return transactions ?? new List<TransactionResult>();
             }
             catch (Exception ex)
@@ -198,6 +198,12 @@ namespace BoltApp
                 LogError($"Failed to load pending transactions: {ex.Message}");
                 return new List<TransactionResult>();
             }
+        }
+
+        public List<TransactionResult> GetPendingTransactions()
+        {
+            var transactions = GetTransactions();
+            return transactions.Where(t => t.Status == TransactionStatus.Pending).ToList();
         }
 
         public void CancelTransaction(string transactionId, bool serverValidated = false)

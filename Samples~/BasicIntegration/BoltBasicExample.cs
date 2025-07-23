@@ -47,12 +47,14 @@ namespace BoltApp.Samples
                             var transactionResult = await ServerVerifyTransaction(transaction.TransactionId);
                             if (transactionResult == null)
                             {
+                                // Manually mark transaction as cancelled
                                 _boltSDK.CancelTransaction(transaction.TransactionId);
                                 continue;
                             }
 
                             if (transactionResult.Status == TransactionStatus.Completed)
                             {
+                                // Manually mark transaction as completed
                                 _boltSDK.CompleteTransaction(
                                     transactionId = transaction.TransactionId,
                                     isServerVerified = transactionResult.IsServerValidated
@@ -60,6 +62,7 @@ namespace BoltApp.Samples
                             }
                             else
                             {
+                                // Manually mark transaction as cancelled
                                 _boltSDK.CancelTransaction(
                                     transactionId = transaction.TransactionId,
                                     isServerVerified = transactionResult.IsServerValidated
