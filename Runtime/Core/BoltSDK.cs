@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,12 +18,11 @@ namespace BoltSDK
 
         // Properties
         public bool IsInitialized { get; private set; }
-        public BoltUser BoltUser { get; private set; }
-        private BoltConfig _config;
+        public BoltUser User { get; private set; }
 
         // Configuration
-        private string _gameId;
-        private string _deepLinkAppName;
+        public string GameID { get; private set; }
+        public string DeepLinkAppName { get; private set; }
 
         // Services
         private IWebLinkService _WebLinkService;
@@ -89,20 +89,19 @@ namespace BoltSDK
             return config;
         }
 
-        public void Init(string gameID, string deepLinkAppName = null)
+        public void Init(BoltConfig config)
         {
             try
             {
-                if (string.IsNullOrEmpty(gameID))
+                if (string.IsNullOrEmpty(config.gameId))
                     throw new BoltSDKException("Game ID cannot be null or empty");
 
-                _gameId = gameID;
-                _deepLinkAppName = deepLinkAppName;
-                _StorageService.SetString("gameId", gameID);
+                GameID = config.gameId;
+                DeepLinkAppName = config.deepLinkAppName;
 
-                if (!string.IsNullOrEmpty(deepLinkAppName))
+                if (!string.IsNullOrEmpty(config.deepLinkAppName))
                 {
-                    _StorageService.SetString("deepLinkAppName", deepLinkAppName);
+                    _StorageService.SetString("deepLinkAppName", config.deepLinkAppName);
                 }
 
                 InitializeUserData();
@@ -159,13 +158,13 @@ namespace BoltSDK
                     }
                 }
 
-                onCheckoutOpen?.Invoke();
+                onWebLinkOpen?.Invoke();
                 _WebLinkService.OpenWebLink(checkoutLink, finalParams);
                 LogDebug($"Opened checkout for product: {checkoutLink}");
             }
             catch (Exception ex)
             {
-                LogError($"Failed to open checkout for product '{productId}': {ex.Message}");
+                LogError($"Failed to open checkout for product '{checkoutLink}': {ex.Message}");
                 throw;
             }
         }
@@ -186,12 +185,13 @@ namespace BoltSDK
                 }
 
                 var queryParameters = UrlUtils.ExtractQueryParameters(callbackUrl);
-                var transactionResult = ParseTransactionResult(queryParameters);
+                var transactionResult = DeepLinkUtils.ParseTransactionResult(queryParameters);
 
                 StoreTransaction(transactionResult);
                 onTransactionComplete?.Invoke(transactionResult);
 
                 LogDebug($"Handled weblink callback for transaction: {transactionResult.TransactionId}");
+                return transactionResult;
             }
             catch (Exception ex)
             {
@@ -203,52 +203,6 @@ namespace BoltSDK
                     ErrorMessage = errorMessage,
                     TransactionId = ""
                 };
-            }
-        }
-
-        public string[] GetUnacknowledgedTransactions()
-        {
-            try
-            {
-                return _pendingTransactions.ToArray();
-            }
-            catch (Exception ex)
-            {
-                LogError($"Failed to get unacknowledged transactions: {ex.Message}");
-                return new string[0];
-            }
-        }
-
-        public bool AcknowledgeTransactions(string[] transactionRefIDs)
-        {
-            try
-            {
-                if (transactionRefIDs == null || transactionRefIDs.Length == 0)
-                    return true;
-
-                var successCount = 0;
-                foreach (var transactionId in transactionRefIDs)
-                {
-                    if (string.IsNullOrEmpty(transactionId))
-                        continue;
-
-                    if (_pendingTransactions.Contains(transactionId))
-                    {
-                        _pendingTransactions.Remove(transactionId);
-                        _acknowledgedTransactions.Add(transactionId);
-                        successCount++;
-                    }
-                }
-
-                SavePendingTransaction();
-                SaveAcknowledgedTransactions();
-                LogDebug($"Acknowledged {successCount} out of {transactionRefIDs.Length} transactions");
-                return successCount == transactionRefIDs.Length;
-            }
-            catch (Exception ex)
-            {
-                LogError($"Failed to acknowledge transactions: {ex.Message}");
-                return false;
             }
         }
 
@@ -289,7 +243,7 @@ namespace BoltSDK
             }
         }
 
-        private TransactionResult CreatePendingTransaction(string productId, float price, string currency)
+        private TransactionResult CreateNewTransaction(string productId, float price, string currency)
         {
             try
             {
@@ -304,9 +258,7 @@ namespace BoltSDK
                     Timestamp = DateTime.UtcNow
                 };
 
-                var pendingTransactions = GetPendingTransactions();
-                pendingTransactions.Add(pendingTransaction);
-                _StorageService.SetObject("pendingTransactions", pendingTransactions);
+                SavePendingTransaction(pendingTransaction);
                 return pendingTransaction;
             }
             catch (Exception ex)
@@ -334,12 +286,24 @@ namespace BoltSDK
             }
         }
 
-        private void SavePendingTransaction(TransactionResult pendingTransaction)
+        private void SavePendingTransaction(TransactionResult transactionResult)
         {
             try
             {
                 var pendingTransactions = GetPendingTransactions();
-                pendingTransactions.Add(pendingTransaction);
+
+                // Find the transaction in the list and update it
+                var existingTransaction = pendingTransactions.FirstOrDefault(t => t.TransactionId == transactionResult.TransactionId);
+                if (existingTransaction != null)
+                {
+                    existingTransaction = transactionResult;
+                }
+                else
+                {
+                    Debug.Log($"Failed to find transaction in pending transactions: {transactionResult.TransactionId}");
+                    pendingTransactions.Add(transactionResult);
+                }
+
                 var json = JsonUtils.ToJson(pendingTransactions);
                 _StorageService.SetString("pendingTransactions", json);
             }
@@ -347,99 +311,6 @@ namespace BoltSDK
             {
                 LogError($"Failed to save pending transactions: {ex.Message}");
             }
-        }
-
-        private void StoreTransaction(TransactionResult transactionResult)
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(transactionResult.TransactionId))
-                    return;
-
-                // Add to pending transactions if not already acknowledged
-                if (!_acknowledgedTransactions.Contains(transactionResult.TransactionId))
-                {
-                    if (!_pendingTransactions.Contains(transactionResult.TransactionId))
-                    {
-                        _pendingTransactions.Add(transactionResult.TransactionId);
-                        SavePendingTransaction(transactionResult);
-                    }
-                }
-
-                // Store the transaction result
-                var transactionKey = $"transaction_{transactionResult.TransactionId}";
-                _StorageService.SetObject(transactionKey, transactionResult);
-            }
-            catch (Exception ex)
-            {
-                LogError($"Failed to store transaction: {ex.Message}");
-            }
-        }
-
-        private TransactionResult ParseTransactionResult(Dictionary<string, string> parameters)
-        {
-            try
-            {
-                var transactionId = parameters.GetValueOrDefault("transaction_id", "");
-                var status = parameters.GetValueOrDefault("status", "");
-                var amount = parameters.GetValueOrDefault("amount", "");
-                var currency = parameters.GetValueOrDefault("currency", "");
-                var productId = parameters.GetValueOrDefault("product_id", "");
-
-                return new TransactionResult
-                {
-                    TransactionId = transactionId,
-                    Status = ParseTransactionStatus(status),
-                    Amount = ParseAmount(amount),
-                    Currency = currency,
-                    ProductId = productId,
-                    UserEmail = BoltUser?.Email,
-                    Timestamp = DateTime.UtcNow
-                };
-            }
-            catch (Exception ex)
-            {
-                LogError($"Failed to parse transaction result: {ex.Message}");
-                return new TransactionResult
-                {
-                    Status = TransactionStatus.Failed,
-                    ErrorMessage = ex.Message
-                };
-            }
-        }
-
-        private TransactionStatus ParseTransactionStatus(string status)
-        {
-            if (string.IsNullOrEmpty(status))
-                return TransactionStatus.Pending;
-
-            var lowerStatus = status.ToLower();
-            switch (lowerStatus)
-            {
-                case "completed":
-                case "success":
-                case "successful":
-                    return TransactionStatus.Completed;
-                case "failed":
-                case "error":
-                    return TransactionStatus.Failed;
-                case "cancelled":
-                case "canceled":
-                    return TransactionStatus.Cancelled;
-                default:
-                    return TransactionStatus.Pending;
-            }
-        }
-
-        private decimal ParseAmount(string amount)
-        {
-            if (string.IsNullOrEmpty(amount))
-                return 0m;
-
-            if (decimal.TryParse(amount, out var result))
-                return result;
-
-            return 0m;
         }
 
         #endregion

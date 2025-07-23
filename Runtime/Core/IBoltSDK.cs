@@ -13,17 +13,10 @@ namespace BoltSDK
         event Action onWebLinkOpen;
 
         bool IsInitialized { get; }
-        BoltUser BoltUser { get; }
-        string DeviceLocale { get; }
-        string DeviceCountry { get; }
+        BoltUser User { get; }
 
-        void Init();
-        void Init(string gameID, string deepLinkAppName = null);
+        void Init(BoltConfig config);
         void OpenCheckout(string checkoutLink, Dictionary<string, string> extraParams = null);
         TransactionResult HandleWeblinkCallback(string callbackUrl);
-
-
-        // string[] GetUnAcknowledgeTransactions();
-        // bool AcknowledgeTransactions(string[] transactionRefIDs);
     }
 }
