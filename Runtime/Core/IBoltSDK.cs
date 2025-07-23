@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace BoltSDK
+namespace BoltApp
 {
     /// <summary>
     /// Main interface for the Bolt Unity SDK
@@ -13,6 +13,9 @@ namespace BoltSDK
         event Action onWebLinkOpen;
         BoltConfig Config { get; }
         void OpenCheckout(string checkoutLink, Dictionary<string, string> extraParams = null);
-        TransactionResult HandleWeblinkCallback(string callbackUrl);
+        void CancelTransaction(string transactionId);
+        void CompleteTransaction(string transactionId);
+        List<TransactionResult> GetTransactions();
+        TransactionResult HandleDeepLinkCallback(string callbackUrl);
     }
 }

@@ -2,7 +2,7 @@ using System;
 using System.Globalization;
 using UnityEngine;
 
-namespace BoltSDK
+namespace BoltApp
 {
     /// <summary>
     /// Utility class for device information

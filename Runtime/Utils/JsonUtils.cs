@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace BoltSDK
+namespace BoltApp
 {
     /// <summary>
     /// Utility class for JSON operations

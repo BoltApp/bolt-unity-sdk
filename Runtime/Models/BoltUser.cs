@@ -1,6 +1,7 @@
+#nullable enable
 using System;
 
-namespace BoltSDK
+namespace BoltApp
 {
     /// <summary>
     /// Represents a Bolt user with their information

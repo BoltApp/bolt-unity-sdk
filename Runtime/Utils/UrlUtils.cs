@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
-namespace BoltSDK
+namespace BoltApp
 {
     /// <summary>
     /// Utility class for URL operations

@@ -1,6 +1,6 @@
 using System;
 
-namespace BoltSDK
+namespace BoltApp
 {
     /// <summary>
     /// Static class containing all PlayerPrefs keys used throughout the Bolt SDK

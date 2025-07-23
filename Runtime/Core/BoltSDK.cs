@@ -1,10 +1,9 @@
-using System.Diagnostics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace BoltSDK
+namespace BoltApp
 {
     /// <summary>
     /// Main implementation of the Bolt Unity SDK
@@ -36,10 +35,12 @@ namespace BoltSDK
                 if (string.IsNullOrEmpty(checkoutLink))
                     throw new BoltSDKException("Checkout link cannot be null or empty");
 
+                BoltUser boltUser = GetUserData();
+
                 var finalParams = new Dictionary<string, string>
                 {
                     { "device_locale", DeviceUtils.GetDeviceLocale() },
-                    { "user_email", BoltUser?.Email ?? "" },
+                    { "user_email", boltUser.Email },
                     { "device_country", DeviceUtils.GetDeviceCountry() },
                     { "app_name", Application.productName },
                     { "device_id", DeviceUtils.GetDeviceId() }
@@ -53,9 +54,9 @@ namespace BoltSDK
                     }
                 }
 
+                LogDebug($"Opening checkout for product: {checkoutLink}");
                 onWebLinkOpen?.Invoke();
-                _WebLinkService.OpenWebLink(checkoutLink, finalParams);
-                LogDebug($"Opened checkout for product: {checkoutLink}");
+                Application.OpenURL(checkoutLink);
             }
             catch (Exception ex)
             {
@@ -64,7 +65,7 @@ namespace BoltSDK
             }
         }
 
-        public TransactionResult HandleWeblinkCallback(string callbackUrl)
+        public TransactionResult HandleDeepLinkCallback(string callbackUrl)
         {
             try
             {
@@ -82,7 +83,14 @@ namespace BoltSDK
                 var queryParameters = UrlUtils.ExtractQueryParameters(callbackUrl);
                 var transactionResult = DeepLinkUtils.ParseTransactionResult(queryParameters);
 
-                StoreTransaction(transactionResult);
+                if (transactionResult.IsFailed)
+                {
+                    onTransactionFailed?.Invoke(transactionResult);
+                    LogError($"Transaction failed: {transactionResult.ErrorMessage}");
+                    return transactionResult;
+                }
+
+                CreateOrUpdateTransaction(transactionResult);
                 onTransactionComplete?.Invoke(transactionResult);
 
                 LogDebug($"Handled weblink callback for transaction: {transactionResult.TransactionId}");
@@ -103,33 +111,33 @@ namespace BoltSDK
 
         #region Private Methods
 
-        private void InitializeUserData()
+        private BoltUser GetUserData()
         {
             try
             {
                 var existingUser = _StorageService.GetObject<BoltUser>("userData");
                 if (existingUser != null)
                 {
-                    boltUser = existingUser;
-                    boltUser.LastActive = DateTime.UtcNow;
+                    existingUser.LastActive = DateTime.UtcNow;
+                    return existingUser;
                 }
                 else
                 {
-                    boltUser = new BoltUser
+                    var newUser = new BoltUser
                     {
                         Email = _StorageService.GetString("userEmail", ""),
                         Locale = DeviceUtils.GetDeviceLocale(),
                         Country = DeviceUtils.GetDeviceCountry(),
                         DeviceId = DeviceUtils.GetDeviceId()
                     };
+                    _StorageService.SetObject("userData", newUser);
+                    return newUser;
                 }
-
-                _StorageService.SetObject("userData", boltUser);
             }
             catch (Exception ex)
             {
                 LogError($"Failed to initialize user data: {ex.Message}");
-                boltUser = new BoltUser
+                return new BoltUser
                 {
                     Locale = DeviceUtils.GetDeviceLocale(),
                     Country = DeviceUtils.GetDeviceCountry(),
@@ -142,65 +150,106 @@ namespace BoltSDK
         {
             try
             {
+                BoltUser boltUser = GetUserData();
                 var pendingTransaction = new TransactionResult
                 {
                     TransactionId = Guid.NewGuid().ToString(),
                     Status = TransactionStatus.Pending,
-                    Amount = price,
+                    Amount = (decimal)price,
                     Currency = currency,
                     ProductId = productId,
                     UserEmail = boltUser.Email,
+                    IsServerValidated = false,
                     Timestamp = DateTime.UtcNow
                 };
 
-                SavePendingTransaction(pendingTransaction);
+                CreateOrUpdateTransaction(pendingTransaction);
                 return pendingTransaction;
             }
             catch (Exception ex)
             {
-                LogError($"Failed to load pending transactions: {ex.Message}");
-                _pendingTransactions = new List<string>();
+                LogError($"Failed to create new transaction: {ex.Message}");
+                return null;
             }
         }
 
-        private TransactionResult[] GetPendingTransactions()
+        public List<TransactionResult> GetTransactions()
         {
             try
             {
-                var pendingData = _StorageService.GetString("pendingTransactions", "");
-                if (!string.IsNullOrEmpty(pendingData))
+                var pendingData = _StorageService.GetString("transactionHistory", "");
+                if (string.IsNullOrEmpty(pendingData))
                 {
-                    var transactions = JsonUtils.FromJson<TransactionResult[]>(pendingData);
-                    return transactions ?? new TransactionResult[0];
+                    return new List<TransactionResult>();
                 }
+
+                var transactions = JsonUtils.FromJson<List<TransactionResult>>(pendingData);
+                return transactions ?? new List<TransactionResult>();
             }
             catch (Exception ex)
             {
                 LogError($"Failed to load pending transactions: {ex.Message}");
-                return new TransactionResult[0];
+                return new List<TransactionResult>();
             }
         }
 
-        private void SavePendingTransaction(TransactionResult transactionResult)
+        public void CancelTransaction(string transactionId, bool serverValidated = false)
         {
             try
             {
-                var pendingTransactions = GetPendingTransactions();
+                var transactionHistory = GetTransactions();
+                var transaction = transactionHistory.FirstOrDefault(t => t.TransactionId == transactionId);
+                if (transaction != null)
+                {
+                    transaction.Status = TransactionStatus.Cancelled;
+                    transaction.IsServerValidated = serverValidated;
+                    CreateOrUpdateTransaction(transaction);
+                }
+            }
+            catch (Exception ex)
+            {
+                LogError($"Failed to cancel transaction: {ex.Message}");
+            }
+        }
+
+        public void CompleteTransaction(string transactionId, bool serverValidated = false)
+        {
+            try
+            {
+                var transactionHistory = GetTransactions();
+                var transaction = transactionHistory.FirstOrDefault(t => t.TransactionId == transactionId);
+                if (transaction != null)
+                {
+                    transaction.Status = TransactionStatus.Completed;
+                    transaction.IsServerVerified = serverValidated;
+                    CreateOrUpdateTransaction(transaction);
+                }
+            }
+            catch (Exception ex)
+            {
+                LogError($"Failed to complete transaction: {ex.Message}");
+            }
+        }
+
+        private void CreateOrUpdateTransaction(TransactionResult transactionResult)
+        {
+            try
+            {
+                var transactionHistory = GetTransactions();
 
                 // Find the transaction in the list and update it
-                var existingTransaction = pendingTransactions.FirstOrDefault(t => t.TransactionId == transactionResult.TransactionId);
+                var existingTransaction = transactionHistory.FirstOrDefault(t => t.TransactionId == transactionResult.TransactionId);
                 if (existingTransaction != null)
                 {
                     existingTransaction = transactionResult;
                 }
                 else
                 {
-                    Debug.Log($"Failed to find transaction in pending transactions: {transactionResult.TransactionId}");
-                    pendingTransactions.Add(transactionResult);
+                    transactionHistory.Add(transactionResult);
                 }
 
-                var json = JsonUtils.ToJson(pendingTransactions);
-                _StorageService.SetString("pendingTransactions", json);
+                var json = JsonUtils.ToJson(transactionHistory);
+                _StorageService.SetString("transactionHistory", json);
             }
             catch (Exception ex)
             {
@@ -233,39 +282,12 @@ namespace BoltSDK
 
         private void LogDebug(string message)
         {
-            if (_debugMode)
-            {
-                Debug.Log($"[BoltSDK] {message}");
-            }
+            Debug.Log($"[BoltSDK] {message}");
         }
 
         private void LogError(string message)
         {
             Debug.LogError($"[BoltSDK] {message}");
-        }
-
-        #endregion
-
-        #region Cleanup
-
-        public void Dispose()
-        {
-            try
-            {
-                // Unsubscribe from events
-                if (_WebLinkService != null)
-                {
-                    _WebLinkService.OnWebLinkOpened -= OnWebLinkOpened;
-                    _WebLinkService.OnWebLinkClosed -= OnWebLinkClosed;
-                    _WebLinkService.OnError -= OnWebLinkError;
-                }
-
-                IsInitialized = false;
-            }
-            catch (Exception ex)
-            {
-                LogError($"Error during disposal: {ex.Message}");
-            }
         }
 
         #endregion

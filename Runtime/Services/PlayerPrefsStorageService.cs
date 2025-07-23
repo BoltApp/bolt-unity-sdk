@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace BoltSDK
+namespace BoltApp
 {
     /// <summary>
     /// Unity PlayerPrefs implementation of the storage service
@@ -207,8 +207,7 @@ namespace BoltSDK
                 "userLocale",
                 "userCountry",
                 "deviceId",
-                "lastTransactionId",
-                "pendingTransactions",
+                "transactionHistory",
                 "acknowledgedTransactions",
                 "catalogData",
                 "sessionId"

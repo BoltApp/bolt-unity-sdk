@@ -1,14 +1,14 @@
 using System;
 
-namespace BoltSDK
+namespace BoltApp
 {
     /// <summary>
     /// Custom exception for Bolt SDK specific errors
     /// </summary>
     public class BoltSDKException : Exception
     {
-        public string ErrorCode { get; }
-        public string ErrorType { get; }
+        public string ErrorCode { get; protected set; }
+        public string ErrorType { get; protected set; }
 
         public BoltSDKException(string message) : base(message)
         {

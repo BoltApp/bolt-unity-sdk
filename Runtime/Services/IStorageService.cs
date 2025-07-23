@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace BoltSDK
+namespace BoltApp
 {
     /// <summary>
     /// Interface for data storage operations

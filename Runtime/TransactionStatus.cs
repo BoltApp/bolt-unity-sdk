@@ -1,4 +1,4 @@
-namespace BoltSDK
+namespace BoltApp
 {
     public enum TransactionStatus
     {

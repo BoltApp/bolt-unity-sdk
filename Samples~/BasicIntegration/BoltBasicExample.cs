@@ -1,7 +1,8 @@
-using BoltSDK;
+using System.Threading.Tasks;
+using BoltApp;
 using UnityEngine;
 
-namespace BoltSDK.Samples
+namespace BoltApp.Samples
 {
     /// <summary>
     /// Basic example showing how to integrate the Bolt SDK
@@ -10,23 +11,75 @@ namespace BoltSDK.Samples
     public class BoltManager : MonoBehaviour
     {
         private BoltSDK _boltSDK;
+        private bool checkoutIsOpen = false;
 
         void Start()
         {
-            // Will init using values from the BoltConfig asset in the Resources folder.
-            _boltSDK = new BoltSDK();
-
-            // Subscribe to events
+            var boltConfig = new BoltConfig(
+                "com.myapp.test",
+                "MyAppNameForDeepLinks",
+                BoltConfig.Environment.Development);
+            _boltSDK = new BoltSDK(boltConfig);
             _boltSDK.onTransactionComplete += OnTransactionComplete;
             _boltSDK.onTransactionFailed += OnTransactionFailed;
-
-            // Optional: Subscribe to web link open event for analytics.
             _boltSDK.onWebLinkOpen += onWebLinkOpen;
         }
 
-        void OnDestroy()
+        /// <summary>
+        /// If user manually opens the app again, check the status of the latest transactions.
+        /// </summary>
+        async Task OnApplicationFocus(bool hasFocus)
         {
-            _boltSDK?.Dispose();
+            if (hasFocus)
+            {
+                Debug.Log("App focused again");
+
+                if (checkoutIsOpen)
+                {
+                    // Check status of latest transaction with backend server
+                    var pendingTransactions = _boltSDK.GetPendingTransactions();
+                    if (pendingTransactions.Count > 0)
+                    {
+                        foreach (var transaction in pendingTransactions)
+                        {
+                            var transactionResult = await ServerVerifyTransaction(transaction.TransactionId);
+                            if (transactionResult == null)
+                            {
+                                _boltSDK.CancelTransaction(transaction.TransactionId, false);
+                                continue;
+                            }
+
+                            if (transactionResult.Status == TransactionStatus.Completed)
+                            {
+                                _boltSDK.CompleteTransaction(transaction.TransactionId, true);
+                            }
+                            else
+                            {
+                                _boltSDK.CancelTransaction(transaction.TransactionId, true);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Web checkout is closed, make sure to set any tracking variables
+            checkoutIsOpen = false;
+        }
+
+        private TransactionResult ServerVerifyTransaction(string transactionId)
+        {
+            // TODO - Use your http client to call backend to verify
+            var mockResult = new TransactionResult(
+                TransactionId = transactionId,
+                Status = TransactionStatus.Completed,
+                IsServerValidated = true,
+                Amount = 100,
+                Currency = "USD",
+                ProductId = "example_product_id",
+                UserEmail = "example@example.com",
+                Timestamp = DateTime.UtcNow
+            );
+            return mockResult;
         }
 
         /// <summary>
@@ -34,7 +87,7 @@ namespace BoltSDK.Samples
         /// </summary>
         private void HandleDeepLink(string deepLink)
         {
-            _boltSDK.HandleWeblinkCallback(deepLink);
+            _boltSDK.HandleDeepLinkCallback(deepLink);
         }
 
         /// <summary>
@@ -63,6 +116,7 @@ namespace BoltSDK.Samples
         {
             // Consider firing analytic event here.
             Debug.Log("Checkout open.");
+            checkoutIsOpen = true;
         }
     }
 }

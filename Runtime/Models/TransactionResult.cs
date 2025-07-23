@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace BoltSDK
+namespace BoltApp
 {
     /// <summary>
     /// Represents the result of a Bolt transaction
@@ -11,7 +11,7 @@ namespace BoltSDK
     {
         public string TransactionId { get; set; }
         public TransactionStatus Status { get; set; }
-        public bool IsServerVerified { get; set; }
+        public bool IsServerValidated { get; set; }
         public decimal Amount { get; set; }
         public string Currency { get; set; }
         public DateTime Timestamp { get; set; }
@@ -22,17 +22,25 @@ namespace BoltSDK
 
         public TransactionResult()
         {
+            TransactionId = Guid.NewGuid().ToString();
+            Status = TransactionStatus.Pending;
+            IsServerValidated = false;
+            Amount = 0;
+            Currency = "USD";
             Timestamp = DateTime.UtcNow;
+            ProductId = "example_product_id";
+            UserEmail = "example@example.com";
             Metadata = new Dictionary<string, object>();
         }
 
-        public TransactionResult(string transactionId, TransactionStatus status, decimal amount, string currency)
+        public TransactionResult(string transactionId, TransactionStatus status, decimal amount, string currency, bool isServerValidated)
         {
             TransactionId = transactionId;
             Status = status;
             Amount = amount;
             Currency = currency;
             Timestamp = DateTime.UtcNow;
+            IsServerValidated = isServerValidated;
             Metadata = new Dictionary<string, object>();
         }
 
@@ -40,6 +48,5 @@ namespace BoltSDK
         public bool IsFailed => Status == TransactionStatus.Failed;
         public bool IsPending => Status == TransactionStatus.Pending;
         public bool IsCancelled => Status == TransactionStatus.Cancelled;
-        public bool IsServerVerified => IsServerVerified;
     }
 }
