@@ -9,7 +9,8 @@ namespace BoltSDK
     public interface IBoltSDK
     {
         event Action<TransactionResult> onTransactionComplete;
-        event Action<void> onCheckoutOpen;
+        event Action<TransactionResult> onTransactionFailed;
+        event Action<void> onWebLinkOpen;
 
         bool IsInitialized { get; }
         BoltUser BoltUser { get; }
@@ -18,8 +19,8 @@ namespace BoltSDK
 
         void Init();
         void Init(string gameID, string deepLinkAppName = null);
-        void OpenCheckout(string productId, Dictionary<string, string> extraParams = null);
-        void HandleWeblinkCallback(string callbackUrl, Action<TransactionResult> onResult);
+        void OpenCheckout(string checkoutLink, Dictionary<string, string> extraParams = null);
+        TransactionResult HandleWeblinkCallback(string callbackUrl);
 
 
         // string[] GetUnAcknowledgeTransactions();
