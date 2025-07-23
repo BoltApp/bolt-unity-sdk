@@ -2,7 +2,6 @@
 
 <img src="https://github.com/BoltApp/bolt-gameserver-sample/blob/main/public/banner-unity.png?raw=true" />
 
-
 ## What is this?
 
 Native Unity support for [Bolt Charge](https://www.bolt.com/charge), a fully hosted webshop for out-of-app purchases and subscriptions.
@@ -76,17 +75,13 @@ You need 3 things to get started:
 
 For broad documentation and API reference visit our [documentation site](https://docs.bolt.com).
 
-
 ## 📦 Installation
-
 
 ### Step 1: Install the Unity SDK
 
-
-
-// TODO
-
-If you have any issues our discord support team will be happy to help.
+1. Download the latest release from this repository
+2. Import the Unity package into your project
+3. The SDK will be available in the `BoltSDK` namespace
 
 ### Step 2: Set up your backend server
 
@@ -112,83 +107,413 @@ You need to bring your own server to safely handle transactions and api keys.
 2. Set up your products in the Bolt dashboard. You can find [helpful instructions in our documentation](https://help.bolt.com/products/bolt-charge/charge-setup/#set-up-your-products).
 3. Get your checkout links (they look like: `https://digital-subscriptions-test-14-04.c-staging.bolt.com/c?u=SRZKjocdzkUmJfS2J7JNCQ&publishable_key=BQ9PKQksUGtj.Q9LwVLfV3WF4.32122926f7b9651a416a5099dc92dc2b4c87c8b922c114229f83b345d65f4695`)
 
-### Step 4: Add code to your game
+## 🚀 Quick Start
 
-You may copy this code into a new script in your Unity project or use it for reference on how to initialize the bolt client and webview.
+### Basic Usage
 
-```c#
+#### Option 1: Using Configuration Asset (Recommended)
+
+1. Create a configuration asset:
+   - Go to `Tools > Bolt SDK > Configuration`
+   - This opens the configuration window where you can set your `Game ID` and `Deep Link App Name`
+   - Changes are automatically saved
+
+2. Use the configuration in your code:
+
+```csharp
+using BoltSDK;
 using UnityEngine;
 
-public class BoltPayments : MonoBehaviour
+public class BoltExample : MonoBehaviour
 {
-    [Header("Your Backend Server")]
-    // TODO make this configurable from editor
-    public string serverUrl = "https://your-server.herokuapp.com";
+    private IBoltSDK boltSDK;
     
-    
-    void Start() {
-      // TODO
+    void Start()
+    {
+        // Initialize the SDK - it will automatically load the configuration asset
+        boltSDK = new BoltSDK.BoltSDK();
+        boltSDK.Init(); // No parameters needed!
+        
+        // Subscribe to events
+        boltSDK.onTransactionComplete += OnTransactionComplete;
+        boltSDK.onCheckoutOpen += OnCheckoutOpen;
     }
-
-    // Need code for:
-    // GET/SET player prefs
-    // -   player email
-    // -   player locale and country
-    // -   name of app (used for deeplinking, maybe a bolt specific one)
-    // -   set new transaction to be acknowledged (we open browser so don't know if it worked)
-    // -   on app load, see if last transaction was acknowledged
-    // Opening website utility code
-    // - open URL by string, append query parameters for device locale, user email, device country, app name for deeplinking back
-    // - getting products by ID (key value pairs)
-    // Deeplinking sample code to read transaction data and acknowledge the last transaction
+    
+    public void PurchaseItem(string checkoutLink)
+    {
+        if (boltSDK.IsInitialized)
+        {
+            boltSDK.OpenCheckout(checkoutLink);
+        }
+    }
+    
+    private void OnTransactionComplete(TransactionResult result)
+    {
+        Debug.Log($"Transaction completed: {result.Status}");
+    }
+    
+    private void OnCheckoutOpen()
+    {
+        Debug.Log("Checkout opened");
+    }
 }
 ```
 
-## Step 5: Test it
+#### Option 2: Direct Initialization
 
-1. Add the script to a GameObject in your scene
-2. Put your server URL in the `serverUrl` field
-3. Call `BuyItem()` with a Bolt payment link
-    - **Note:** You can use our staging url for testing purposes: https://digital-subscriptions-test-14-04.c-staging.bolt.com/c?u=SRZKjocdzkUmJfS2J7JNCQ&publishable_key=BQ9PKQksUGtj.Q9LwVLfV3WF4.32122926f7b9651a416a5099dc92dc2b4c87c8b922c114229f83b345d65f4695
-4. The payment page should open as a modal in your game
-5. Modify the modal style to your liking. Ensure to add a close button and handle appropriately.
+```csharp
+using BoltSDK;
+using UnityEngine;
 
-**Congratulations 🎉**
-<br>You have successfully integrated Bolt Charge into your app! 
-
-## Next Steps
-
-Now that you have a single checkout working, you will want to adopt some best practices to make them easy to maintain.
-
-#### Configs
-Use a config for managing your collection of checkout links. We recommend using JSON and mapping links to readable names. You can swap configs based on environment. Example:
-```
+public class BoltExample : MonoBehaviour
 {
-  GEMS_100:   'https://your-checkout-link-here.com',
-  GEMS_500:   'https://your-checkout-link-here.com',
-  GEMS_1000:  'https://your-checkout-link-here.com',
-  BUNDLE_ONE: 'https://your-checkout-link-here.com',
-  BUNDLE_TWO: 'https://your-checkout-link-here.com'
-  // etc...
+    private IBoltSDK boltSDK;
+    
+    void Start()
+    {
+        // Initialize the SDK with your game ID and deep link app name
+        boltSDK = new BoltSDK.BoltSDK();
+        boltSDK.Init("your-game-id", "your-deep-link-app-name");
+        
+        // Subscribe to events
+        boltSDK.onTransactionComplete += OnTransactionComplete;
+        boltSDK.onCheckoutOpen += OnCheckoutOpen;
+    }
+    
+    public void PurchaseItem(string productId)
+    {
+        if (boltSDK.IsInitialized)
+        {
+            boltSDK.OpenCheckout(productId);
+        }
+    }
+    
+    private void OnTransactionComplete(TransactionResult result)
+    {
+        Debug.Log($"Transaction completed: {result.Status}");
+    }
+    
+    private void OnCheckoutOpen()
+    {
+        Debug.Log("Checkout opened");
+    }
 }
 ```
 
-#### Integration Tests
-We recommend setting up automated testing against the most common flows. Good test coverage should include UI or API test coverage of the following scenarios:
-- Checkout is possible to open
-- Checkout is possible to close
-- User gets success state from successful transaction
-- User gets failed state from failed transaction
-- User network interrupted after good payment, is shown success screen on reboot of app
-- User network interrupted after bad payment, is shown fail screen on reboot of app
+### Advanced Usage with Extra Parameters
 
-#### Translations 🚧
+```csharp
+using BoltSDK;
+using UnityEngine;
+using System.Collections.Generic;
 
-Bolt does support translations and handles many checkouts on the global market. However, right now the SDK is tailored to the U.S. market so only English is officially provided.
+public class BoltAdvancedExample : MonoBehaviour
+{
+    private IBoltSDK boltSDK;
+    
+    void Start()
+    {
+        boltSDK = new BoltSDK.BoltSDK();
+        boltSDK.Init(); // Automatically loads configuration
+        
+        // Load your checkout links from JSON or other sources
+        LoadCheckoutLinks();
+    }
+    
+    private void LoadCheckoutLinks()
+    {
+        // Load checkout links from JSON file
+        TextAsset linksJson = Resources.Load<TextAsset>("checkout_links");
+        if (linksJson != null)
+        {
+            // Parse checkout links JSON
+            // Implementation depends on your data structure
+        }
+    }
+    
+    public void PurchaseWithExtraParams(string checkoutLink)
+    {
+        var extraParams = new Dictionary<string, string>
+        {
+            {"user_level", "10"},
+            {"currency", "USD"},
+            {"item_id", "premium_gems"}
+        };
+        
+        boltSDK.OpenCheckout(checkoutLink, extraParams);
+    }
+}
+```
 
-We will be rolling out official multi-region support to Bolt Charge in the very near future. If you would like a preview or are curious about the timeline, you can reach out to our team directly.
+## 📋 API Reference
 
-## Need help?
+### IBoltSDK Interface
+
+The main interface for the Bolt Unity SDK:
+
+```csharp
+public interface IBoltSDK
+{
+    // Events
+    event Action<TransactionResult> onTransactionComplete;
+    event Action<void> onCheckoutOpen;
+
+    // Status Properties
+    bool IsInitialized { get; }
+    BoltUser BoltUser { get; }
+    string DeviceLocale { get; }
+    string DeviceCountry { get; }
+
+    // Initialization
+    void Init(); // Automatically loads configuration asset
+    void Init(string gameID, string deepLinkAppName = null);
+
+    // Checkout Flow
+    void OpenCheckout(string checkoutLink, Dictionary<string, string> extraParams = null);
+    void HandleWeblinkCallback(string callbackUrl, Action<TransactionResult> onResult);
+}
+```
+
+### Core Classes
+
+#### BoltUser
+```csharp
+public class BoltUser
+{
+    public string Email { get; set; }
+    public string Locale { get; set; }
+    public string Country { get; set; }
+    // Additional user properties
+}
+```
+
+#### Catalog
+```csharp
+public class Catalog
+{
+    public string ProductId { get; set; }
+    public string Name { get; set; }
+    public string Description { get; set; }
+    public decimal Price { get; set; }
+    public string Currency { get; set; }
+    public string CheckoutUrl { get; set; }
+}
+```
+
+#### TransactionResult
+```csharp
+public class TransactionResult
+{
+    public string TransactionId { get; set; }
+    public TransactionStatus Status { get; set; }
+    public decimal Amount { get; set; }
+    public string Currency { get; set; }
+    public DateTime Timestamp { get; set; }
+}
+```
+
+#### BoltAnalyticEvent
+```csharp
+public class BoltAnalyticEvent
+{
+    public string EventType { get; set; }
+    public Dictionary<string, object> Properties { get; set; }
+    public DateTime Timestamp { get; set; }
+}
+```
+
+## 🧪 Testing
+
+The SDK includes comprehensive test coverage. Run tests using Unity's Test Runner:
+
+1. Open Window > General > Test Runner
+2. Select the test assembly
+3. Run all tests or specific test categories
+
+### Test Categories
+
+- **Unit Tests**: Core functionality testing
+- **Integration Tests**: End-to-end flow testing
+- **Mock Tests**: Network and external service mocking
+
+## 📁 Project Structure
+
+```
+Runtime/
+├── Core/
+│   ├── IBoltSDK.cs              # Main interface
+│   ├── BoltSDK.cs               # Main implementation
+│   └── BoltConfig.cs            # Configuration
+├── Models/
+│   ├── BoltUser.cs              # User data model
+│   ├── Catalog.cs               # Product catalog
+│   ├── TransactionResult.cs     # Transaction data
+│   └── BoltAnalyticEvent.cs    # Analytics events
+├── Services/
+│   ├── IWebLinkService.cs       # web link abstraction
+│   ├── UnityWebLinkService.cs   # Unity web link implementation
+│   ├── IStorageService.cs       # Data storage abstraction
+│   ├── PlayerPrefsStorageService.cs # Unity storage implementation
+│   └── INetworkService.cs       # Network operations
+├── Utils/
+│   ├── JsonUtils.cs             # JSON utilities
+│   ├── UrlUtils.cs              # URL handling
+│   └── DeviceUtils.cs           # Device information
+└── TransactionStatus.cs         # Transaction status enum
+
+Tests/
+├── Runtime/
+│   ├── BoltSDKTests.cs          # Main SDK tests
+│   ├── WebLinkServiceTests.cs   # web link tests
+│   ├── StorageServiceTests.cs   # Storage tests
+│   └── NetworkServiceTests.cs   # Network tests
+└── EditMode/
+    └── EditorTests.cs           # Editor-specific tests
+```
+
+## 🔧 Configuration
+
+### Using Configuration Asset (Recommended)
+
+The easiest way to configure the Bolt SDK is using the configuration asset:
+
+1. **Create Configuration Asset:**
+   - Go to `Tools > Bolt SDK > Configuration`
+   - This opens the configuration window where you can set your settings
+
+2. **Configure Settings:**
+   - **Game ID**: Your unique game identifier from Bolt
+   - **Deep Link App Name**: Your deep link app name for handling callbacks
+   - **Environment**: Select Development, Staging, or Production
+
+3. **Use in Code:**
+   ```csharp
+   void Start()
+   {
+       var boltSDK = new BoltSDK.BoltSDK();
+       boltSDK.Init(); // Automatically loads the configuration!
+   }
+   ```
+
+### Environment Setup
+
+For different environments, you can create multiple configuration assets:
+
+- `BoltSDKConfig_Dev.asset` - Development settings
+- `BoltSDKConfig_Staging.asset` - Staging settings  
+- `BoltSDKConfig_Prod.asset` - Production settings
+
+Switch between them by changing the reference in your MonoBehaviour or by loading them dynamically:
+
+```csharp
+#if DEVELOPMENT_BUILD
+    var config = Resources.Load<BoltSDKConfig>("BoltSDKConfig_Dev");
+#elif UNITY_EDITOR
+    var config = Resources.Load<BoltSDKConfig>("BoltSDKConfig_Dev");
+#else
+    var config = Resources.Load<BoltSDKConfig>("BoltSDKConfig_Prod");
+#endif
+```
+
+### Catalog Management
+
+Store your product catalog as JSON:
+
+```json
+{
+  "products": [
+    {
+      "productId": "gems_100",
+      "name": "100 Gems",
+      "description": "Get 100 gems for your game",
+      "price": 0.99,
+      "currency": "USD",
+      "checkoutUrl": "https://your-checkout-link.com"
+    }
+  ]
+}
+```
+
+## 🚨 Error Handling
+
+The SDK provides comprehensive error handling:
+
+```csharp
+try
+{
+    boltSDK.OpenCheckout("product_id");
+}
+catch (BoltSDKException ex)
+{
+    Debug.LogError($"Bolt SDK Error: {ex.Message}");
+}
+catch (Exception ex)
+{
+    Debug.LogError($"Unexpected error: {ex.Message}");
+}
+```
+
+## 🔄 Best Practices
+
+### 1. Initialization
+- Always check `IsInitialized` before making calls
+- Initialize early in your app lifecycle
+- Handle initialization errors gracefully
+
+### 2. Event Handling
+- Subscribe to events in `Start()` or `Awake()`
+- Unsubscribe in `OnDestroy()` to prevent memory leaks
+- Use try-catch blocks in event handlers
+
+### 3. Transaction Management
+- Always acknowledge transactions after successful completion
+- Implement retry logic for failed acknowledgments
+- Store transaction state locally for offline scenarios
+
+### 4. Testing
+- Use mock services for unit testing
+- Test all error scenarios
+- Validate transaction flows end-to-end
+
+## 🆘 Troubleshooting
+
+### Common Issues
+
+1. **SDK not initialized**
+   - Ensure `Init()` is called before any other methods
+   - Check that API key and game ID are valid
+
+2. **web link not opening**
+   - Verify internet connectivity
+   - Check URL format and validity
+   - Ensure proper platform permissions
+
+3. **Transactions not completing**
+   - Verify webhook configuration
+   - Check server endpoint availability
+   - Validate transaction acknowledgment
+
+### Debug Mode
+
+Enable debug logging:
+
+```csharp
+BoltSDK.EnableDebugMode(true);
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Add tests for new functionality
+4. Ensure all tests pass
+5. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🆘 Need help?
 
 <div class="discord-link">
     Got questions, roadmap suggestions, or requesting new SDKs?
@@ -204,9 +529,3 @@ We will be rolling out official multi-region support to Bolt Charge in the very 
       </span>
     </a>
   </div>
-
-
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

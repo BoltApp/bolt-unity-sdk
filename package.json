@@ -1,10 +1,10 @@
 {
   "name": "com.bolt.sdk",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "displayName": "Bolt SDK",
   "description": "A Unity SDK for performing in-app purchases and subscriptions outside of the app store.",
   "unity": "2021.3",
-  "keywords": ["bolt", "sdk", "subscription", "webview", "iap", "checkout"],
+  "keywords": ["bolt", "sdk", "subscription", "WebLink", "iap", "checkout"],
   "license": "MIT",
   "author": {
     "name": "Bolt",
@@ -14,11 +14,25 @@
   "dependencies": {
     "com.unity.nuget.newtonsoft-json": "3.0.2"
   },
+  "testables": [
+    "com.unity.test-framework"
+  ],
   "samples": [
     {
       "displayName": "Basic Integration",
       "description": "Basic integration example showing how to use the Bolt SDK",
       "path": "Samples~/BasicIntegration"
+    },
+    {
+      "displayName": "Advanced Integration",
+      "description": "Advanced integration example with catalog management and analytics",
+      "path": "Samples~/AdvancedIntegration"
     }
-  ]
+  ],
+  "documentationUrl": "https://docs.bolt.com/unity-sdk",
+  "changelogUrl": "https://github.com/bolt/unity-sdk/releases",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bolt/unity-sdk.git"
+  }
 } 
