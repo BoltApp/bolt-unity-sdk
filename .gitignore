@@ -46,7 +46,6 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
-*~
 
 # Logs
 *.log

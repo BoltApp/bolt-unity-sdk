@@ -23,11 +23,6 @@
       "description": "Basic integration example showing how to use the Bolt SDK",
       "path": "Samples~/BasicIntegration"
     },
-    {
-      "displayName": "Advanced Integration",
-      "description": "Advanced integration example with catalog management and analytics",
-      "path": "Samples~/AdvancedIntegration"
-    }
   ],
   "documentationUrl": "https://docs.bolt.com/unity-sdk",
   "changelogUrl": "https://github.com/bolt/unity-sdk/releases",
