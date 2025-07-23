@@ -43,7 +43,7 @@ namespace BoltSDK
         public BoltSDK(IWebLinkService WebLinkService, IStorageService storageService)
         {
             _WebLinkService = WebLinkService ?? new UnityWebLinkService();
-            _storageService = storageService ?? new PlayerPrefsStorageService();
+            _StorageService = storageService ?? new PlayerPrefsStorageService();
 
             // Set up event handlers
             _WebLinkService.OnWebLinkOpened += OnWebLinkOpened;
@@ -98,11 +98,11 @@ namespace BoltSDK
 
                 _gameId = gameID;
                 _deepLinkAppName = deepLinkAppName;
-                _storageService.SetString("gameId", gameID);
+                _StorageService.SetString("gameId", gameID);
 
                 if (!string.IsNullOrEmpty(deepLinkAppName))
                 {
-                    _storageService.SetString("deepLinkAppName", deepLinkAppName);
+                    _StorageService.SetString("deepLinkAppName", deepLinkAppName);
                 }
 
                 InitializeUserData();
@@ -240,7 +240,7 @@ namespace BoltSDK
                     }
                 }
 
-                SavePendingTransactions();
+                SavePendingTransaction();
                 SaveAcknowledgedTransactions();
                 LogDebug($"Acknowledged {successCount} out of {transactionRefIDs.Length} transactions");
                 return successCount == transactionRefIDs.Length;
@@ -252,24 +252,13 @@ namespace BoltSDK
             }
         }
 
-        /// <summary>
-        /// Enables or disables debug mode
-        /// </summary>
-        /// <param name="enabled">Whether debug mode should be enabled</param>
-        public static void EnableDebugMode(bool enabled)
-        {
-            // This would be implemented as a static setting
-            // For now, we'll use a simple approach
-            Debug.unityLogger.logEnabled = enabled;
-        }
-
         #region Private Methods
 
         private void InitializeUserData()
         {
             try
             {
-                var existingUser = _storageService.GetObject<BoltUser>("userData");
+                var existingUser = _StorageService.GetObject<BoltUser>("userData");
                 if (existingUser != null)
                 {
                     boltUser = existingUser;
@@ -279,14 +268,14 @@ namespace BoltSDK
                 {
                     boltUser = new BoltUser
                     {
-                        Email = _storageService.GetString("userEmail", ""),
+                        Email = _StorageService.GetString("userEmail", ""),
                         Locale = DeviceUtils.GetDeviceLocale(),
                         Country = DeviceUtils.GetDeviceCountry(),
                         DeviceId = DeviceUtils.GetDeviceId()
                     };
                 }
 
-                _storageService.SetObject("userData", boltUser);
+                _StorageService.SetObject("userData", boltUser);
             }
             catch (Exception ex)
             {
@@ -317,7 +306,7 @@ namespace BoltSDK
 
                 var pendingTransactions = GetPendingTransactions();
                 pendingTransactions.Add(pendingTransaction);
-                _storageService.SetObject("pendingTransactions", pendingTransactions);
+                _StorageService.SetObject("pendingTransactions", pendingTransactions);
                 return pendingTransaction;
             }
             catch (Exception ex)
@@ -331,7 +320,7 @@ namespace BoltSDK
         {
             try
             {
-                var pendingData = _storageService.GetString("pendingTransactions", "");
+                var pendingData = _StorageService.GetString("pendingTransactions", "");
                 if (!string.IsNullOrEmpty(pendingData))
                 {
                     var transactions = JsonUtils.FromJson<TransactionResult[]>(pendingData);
@@ -345,12 +334,14 @@ namespace BoltSDK
             }
         }
 
-        private void SavePendingTransactions(TransactionResult[] pendingTransactions)
+        private void SavePendingTransaction(TransactionResult pendingTransaction)
         {
             try
             {
-                var json = JsonUtils.ToJson(_pendingTransactions.ToArray());
-                _storageService.SetString("pendingTransactions", json);
+                var pendingTransactions = GetPendingTransactions();
+                pendingTransactions.Add(pendingTransaction);
+                var json = JsonUtils.ToJson(pendingTransactions);
+                _StorageService.SetString("pendingTransactions", json);
             }
             catch (Exception ex)
             {
@@ -371,13 +362,13 @@ namespace BoltSDK
                     if (!_pendingTransactions.Contains(transactionResult.TransactionId))
                     {
                         _pendingTransactions.Add(transactionResult.TransactionId);
-                        SavePendingTransactions();
+                        SavePendingTransaction(transactionResult);
                     }
                 }
 
                 // Store the transaction result
                 var transactionKey = $"transaction_{transactionResult.TransactionId}";
-                _storageService.SetObject(transactionKey, transactionResult);
+                _StorageService.SetObject(transactionKey, transactionResult);
             }
             catch (Exception ex)
             {
@@ -502,10 +493,6 @@ namespace BoltSDK
                     _WebLinkService.OnWebLinkClosed -= OnWebLinkClosed;
                     _WebLinkService.OnError -= OnWebLinkError;
                 }
-
-                // Save any pending data
-                SavePendingTransactions();
-                SaveAcknowledgedTransactions();
 
                 IsInitialized = false;
             }
