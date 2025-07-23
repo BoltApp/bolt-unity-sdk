@@ -87,12 +87,12 @@ For broad documentation and API reference visit our [documentation site](https:/
 1. **Open your Unity project**
 2. **Navigate to the Packages folder** in your project root
 3. **Open the `manifest.json` file** in a text editor
-4. **Add the Bolt SDK dependency** to the `dependencies` section:
+4. **Add the Bolt SDK dependency** to the `dependencies` section and pin your version:
 
 ```json
 {
   "dependencies": {
-    "com.bolt.sdk": "https://github.com/BoltApp/bolt-unity-sdk.git#v0.0.1",
+    "com.bolt.sdk": "https://github.com/BoltApp/bolt-unity-sdk.git#",
     // ... other dependencies
   }
 }
@@ -108,17 +108,7 @@ For broad documentation and API reference visit our [documentation site](https:/
 4. **Enter the repository URL**: `https://github.com/BoltApp/bolt-unity-sdk.git`
 5. **Click "Add"**
 
-#### Option 3: Using Git URL
-
-1. **Open Package Manager** in Unity (Window > Package Manager)
-2. **Click the "+" button** in the top-left corner
-3. **Select "Add package from git URL"**
-4. **Enter the repository URL**: `https://github.com/BoltApp/bolt-unity-sdk.git`
-5. **Click "Add"**
-
-**Note:** You can also specify a specific version by adding `#v0.0.1` to the URL.
-
-For detailed installation instructions and troubleshooting, see [INSTALLATION.md](INSTALLATION.md).
+**Note:** You can also specify a specific version by appending it to the URL. e.g. `https://github.com/BoltApp/bolt-unity-sdk.git#v0.0.2`
 
 If you have any issues our discord support team will be happy to help.
 
