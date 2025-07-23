@@ -22,7 +22,7 @@
       "displayName": "Basic Integration",
       "description": "Basic integration example showing how to use the Bolt SDK",
       "path": "Samples~/BasicIntegration"
-    },
+    }
   ],
   "documentationUrl": "https://docs.bolt.com/unity-sdk",
   "changelogUrl": "https://github.com/bolt/unity-sdk/releases",
