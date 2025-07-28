@@ -33,7 +33,7 @@ namespace BoltApp
 
         public override string ToString()
         {
-            var nullString = (string s) => s == null ? "null" : s;
+            Func<string, string> nullString = (string s) => s == null ? "null" : s;
             return $"BoltUser(Email: {nullString(Email)}," +
                 $" DeviceId: {nullString(DeviceId)}," +
                 $" Locale: {nullString(Locale)}," +

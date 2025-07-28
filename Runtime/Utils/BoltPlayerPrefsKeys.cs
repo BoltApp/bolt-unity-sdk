@@ -27,5 +27,10 @@ namespace BoltApp
         /// Key for storing user device country
         /// </summary>
         public const string DEVICE_COUNTRY = PREFIX + "device_country";
+
+        /// <summary>
+        /// Key for storing transaction history
+        /// </summary>
+        public const string TRANSACTION_HISTORY = PREFIX + "transaction_history";
     }
 }

@@ -153,12 +153,12 @@ namespace BoltApp
                 {
                     var newUser = new BoltUser
                     {
-                        Email = _StorageService.GetString(BoltPlayerPrefsKeys.USER_EMAIL, ""),
+                        Email = "",
                         Locale = DeviceUtils.GetDeviceLocale(),
                         Country = DeviceUtils.GetDeviceCountry(),
                         DeviceId = DeviceUtils.GetDeviceId()
                     };
-                    _StorageService.SetObject("userData", newUser);
+                    _StorageService.SetObject(BoltPlayerPrefsKeys.USER_DATA, newUser);
                     return newUser;
                 }
             }
@@ -169,7 +169,7 @@ namespace BoltApp
                 {
                     DeviceId = DeviceUtils.GetDeviceId()
                 };
-                _StorageService.SetObject("userData", newUser);
+                _StorageService.SetObject(BoltPlayerPrefsKeys.USER_DATA, newUser);
                 return newUser;
             }
         }
@@ -205,7 +205,7 @@ namespace BoltApp
         {
             try
             {
-                var historyData = _StorageService.GetString("transactionHistory", "");
+                var historyData = _StorageService.GetString(BoltPlayerPrefsKeys.TRANSACTION_HISTORY, "");
                 if (string.IsNullOrEmpty(historyData))
                 {
                     return new List<TransactionResult>();
@@ -283,7 +283,7 @@ namespace BoltApp
                 }
 
                 var json = JsonUtility.ToJson(transactionHistory);
-                _StorageService.SetString("transactionHistory", json);
+                _StorageService.SetString(BoltPlayerPrefsKeys.TRANSACTION_HISTORY, json);
             }
             catch (Exception ex)
             {
