@@ -73,7 +73,7 @@ namespace BoltApp.Samples
                 }
             }
 
-            // Web checkout is closed, make sure to set any tracking variables
+            // Web checkout is closed, make sure to update any of your UI variables
             checkoutIsOpen = false;
         }
 
@@ -84,7 +84,7 @@ namespace BoltApp.Samples
         /// <returns>The transaction result or null if not found</returns>
         private TransactionResult ServerVerifyTransaction(string transactionId)
         {
-            // TODO - Use your http client to call backend to verify
+            // TODO - Use your http client to call backend to verify and get the following object back:
             var mockResult = new TransactionResult(
                 TransactionId = transactionId,
                 Status = TransactionStatus.Completed,
@@ -123,7 +123,7 @@ namespace BoltApp.Samples
         private void onWebLinkOpen()
         {
             // Consider firing analytic event here.
-            Debug.Log("Checkout open.");
+            Debug.Log("Checkout open for user: " + _boltSDK.GetBoltUser().ToString());
             checkoutIsOpen = true;
         }
     }

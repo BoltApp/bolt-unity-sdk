@@ -12,6 +12,8 @@ namespace BoltApp
         event Action<TransactionResult> onTransactionFailed;
         event Action onWebLinkOpen;
         BoltConfig Config { get; }
+        BoltUser GetBoltUser();
+        BoltUser SetBoltUserData(string email = null, string locale = null, string country = null);
         void OpenCheckout(string checkoutLink, Dictionary<string, string> extraParams = null);
         void CancelTransaction(string transactionId, bool serverValidated = false);
         void CompleteTransaction(string transactionId, bool serverValidated = false);

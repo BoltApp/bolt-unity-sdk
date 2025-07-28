@@ -28,6 +28,27 @@ namespace BoltApp
             _StorageService = new PlayerPrefsStorageService();
         }
 
+        public BoltUser SetBoltUserData(string email = null, string locale = null, string country = null)
+        {
+            var user = GetUserData();
+
+            // TODO - provide type validation safety
+            if (email != null)
+                user.Email = email;
+            if (locale != null)
+                user.Locale = locale;
+            if (country != null)
+                user.Country = country;
+
+            _StorageService.SetObject(BoltPlayerPrefsKeys.USER_DATA, user);
+            return user;
+        }
+
+        public BoltUser GetBoltUser()
+        {
+            return GetUserData();
+        }
+
         public void OpenCheckout(string checkoutLink, Dictionary<string, string> extraParams = null)
         {
             try
@@ -71,11 +92,12 @@ namespace BoltApp
             {
                 if (string.IsNullOrEmpty(callbackUrl))
                 {
-                    LogError("Callback URL cannot be null or empty");
+                    var errorMessage = "Failed to parse transaction. 'callbackUrl' cannot be null or empty";
+                    LogError(errorMessage);
                     return new TransactionResult
                     {
                         Status = TransactionStatus.Failed,
-                        ErrorMessage = "Failed to parse transaction. Callback URL cannot be null or empty",
+                        ErrorMessage = errorMessage,
                         TransactionId = ""
                     };
                 }
@@ -93,18 +115,18 @@ namespace BoltApp
                 if (transactionResult.IsFailed)
                 {
                     onTransactionFailed?.Invoke(transactionResult);
-                    LogError($"Transaction failed: {transactionResult.ErrorMessage}");
+                    LogError($"Failed weblink callback for transaction: {transactionResult.ErrorMessage}");
                     return transactionResult;
                 }
 
                 CreateOrUpdateTransaction(transactionResult);
                 onTransactionComplete?.Invoke(transactionResult);
-                LogDebug($"Handled weblink callback for transaction: {transactionResult.TransactionId}");
+                LogDebug($"Successful weblink callback for transaction: {transactionResult.TransactionId}");
                 return transactionResult;
             }
             catch (Exception ex)
             {
-                string errorMessage = $"Failed to handle weblink callback: {ex.Message}";
+                string errorMessage = $"Error during weblink callback: {ex.Message}";
                 LogError(errorMessage);
                 return new TransactionResult
                 {
@@ -121,7 +143,7 @@ namespace BoltApp
         {
             try
             {
-                var existingUser = _StorageService.GetObject<BoltUser>("userData");
+                var existingUser = _StorageService.GetObject<BoltUser>(BoltPlayerPrefsKeys.USER_DATA);
                 if (existingUser != null)
                 {
                     existingUser.LastActive = DateTime.UtcNow;
@@ -131,7 +153,7 @@ namespace BoltApp
                 {
                     var newUser = new BoltUser
                     {
-                        Email = _StorageService.GetString("userEmail", ""),
+                        Email = _StorageService.GetString(BoltPlayerPrefsKeys.USER_EMAIL, ""),
                         Locale = DeviceUtils.GetDeviceLocale(),
                         Country = DeviceUtils.GetDeviceCountry(),
                         DeviceId = DeviceUtils.GetDeviceId()
@@ -143,12 +165,12 @@ namespace BoltApp
             catch (Exception ex)
             {
                 LogError($"Failed to initialize user data: {ex.Message}");
-                return new BoltUser
+                var newUser = new BoltUser
                 {
-                    Locale = DeviceUtils.GetDeviceLocale(),
-                    Country = DeviceUtils.GetDeviceCountry(),
                     DeviceId = DeviceUtils.GetDeviceId()
                 };
+                _StorageService.SetObject("userData", newUser);
+                return newUser;
             }
         }
 

@@ -82,17 +82,19 @@ For broad documentation and API reference visit our [documentation site](https:/
 
 ### Step 1: Install the Unity SDK
 
+**Note:** For any of these options you can specify a specific version by appending it to the URL with a hashtag, e.g. `https://github.com/BoltApp/bolt-unity-sdk.git#v0.0.2` will pin `v0.0.2`
+
 #### Option 1: Using manifest.json (Recommended)
 
-1. **Open your Unity project**
-2. **Navigate to the Packages folder** in your project root
-3. **Open the `manifest.json` file** in a text editor
-4. **Add the Bolt SDK dependency** to the `dependencies` section and pin your version:
+1. Open your Unity project
+2. Navigate to the Packages folder in your project root
+3. Open the `manifest.json` file in a text editor
+4. Add the Bolt SDK dependency to the `dependencies` section:
 
 ```json
 {
   "dependencies": {
-    "com.bolt.sdk": "https://github.com/BoltApp/bolt-unity-sdk.git#",
+    "com.bolt.sdk": "https://github.com/BoltApp/bolt-unity-sdk.git#main",
     // ... other dependencies
   }
 }
@@ -102,13 +104,11 @@ For broad documentation and API reference visit our [documentation site](https:/
 
 #### Option 2: Using Package Manager UI
 
-1. **Open Package Manager** in Unity (Window > Package Manager)
-2. **Click the "+" button** in the top-left corner
-3. **Select "Add package from git URL"**
-4. **Enter the repository URL**: `https://github.com/BoltApp/bolt-unity-sdk.git`
-5. **Click "Add"**
-
-**Note:** You can also specify a specific version by appending it to the URL. e.g. `https://github.com/BoltApp/bolt-unity-sdk.git#v0.0.2`
+1. Open Package Manager in Unity (Window > Package Manager)
+2. Click the "+" button in the top-left corner
+3. Select "Add package from git URL"
+4. Enter the repository URL: `https://github.com/BoltApp/bolt-unity-sdk.git#main`
+5. Click "Add"
 
 If you have any issues our discord support team will be happy to help.
 
@@ -151,7 +151,7 @@ public class BoltPayments : MonoBehaviour
     
     
     void Start() {
-      // TODO
+      // Setup your api client
     }
 
     // Need code for:

@@ -12,6 +12,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Player pref handling will be reworked
 - Demo scene with Bolt implemented
 
+## [0.0.3] - 2025-07-28
+
+### Added
+- Bolt user object handling
+- Query fields on web link with player preferences
+
 ## [0.0.2] - 2025-07-23
 
 ### Added

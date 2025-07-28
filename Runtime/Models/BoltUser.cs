@@ -30,5 +30,16 @@ namespace BoltApp
             CreatedAt = DateTime.UtcNow;
             LastActive = DateTime.UtcNow;
         }
+
+        public override string ToString()
+        {
+            var nullString = (string s) => s == null ? "null" : s;
+            return $"BoltUser(Email: {nullString(Email)}," +
+                $" DeviceId: {nullString(DeviceId)}," +
+                $" Locale: {nullString(Locale)}," +
+                $" Country: {nullString(Country)}," +
+                $" CreatedAt: {CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")}," +
+                $" LastActive: {LastActive.ToString("yyyy-MM-dd HH:mm:ss")})";
+        }
     }
 }

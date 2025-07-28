@@ -11,27 +11,21 @@ namespace BoltApp
         /// <summary>
         /// Prefix used for all Bolt SDK PlayerPrefs keys
         /// </summary>
-        public const string PREFIX = "BoltSDK_";
+        public const string PREFIX = "boltsdk_";
 
         /// <summary>
-        /// User-specific prefix for user-related PlayerPrefs keys
+        /// Key for storing user data
         /// </summary>
-        public const string USER_PREFIX = "bolt_user_";
-
-        // Device-related keys
-        /// <summary>
-        /// Key for storing device locale
-        /// </summary>
-        public const string DEVICE_LOCALE = "deviceLocale";
+        public const string USER_DATA = PREFIX + "user_data";
 
         /// <summary>
-        /// Key for storing user device locale (with user prefix)
+        /// Key for storing user device locale
         /// </summary>
-        public const string USER_DEVICE_LOCALE = USER_PREFIX + "deviceLocale";
+        public const string DEVICE_LOCALE = PREFIX + "device_locale";
 
         /// <summary>
-        /// Key for storing user device country (with user prefix)
+        /// Key for storing user device country
         /// </summary>
-        public const string USER_DEVICE_COUNTRY = USER_PREFIX + "deviceCountry";
+        public const string DEVICE_COUNTRY = PREFIX + "device_country";
     }
 }
