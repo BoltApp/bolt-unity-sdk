@@ -60,24 +60,27 @@ namespace BoltApp
 
                 var finalParams = new Dictionary<string, string>
                 {
-                    { "device_locale", DeviceUtils.GetDeviceLocale() },
+                    { "device_locale", boltUser.Locale },
                     { "user_email", boltUser.Email },
-                    { "device_country", DeviceUtils.GetDeviceCountry() },
-                    { "app_name", Application.productName },
-                    { "device_id", DeviceUtils.GetDeviceId() }
+                    { "device_country", boltUser.Country },
+                    { "app_name", Config.gameId },
+                    { "device_id", boltUser.DeviceId }
                 };
 
                 if (extraParams != null)
                 {
+                    var metaDataParams = new Dictionary<string, string>();
                     foreach (var param in extraParams)
                     {
-                        finalParams[param.Key] = param.Value;
+                        metaDataParams[param.Key] = param.Value;
                     }
+                    finalParams["meta_data"] = JsonUtility.ToJson(metaDataParams);
                 }
 
-                LogDebug($"Opening checkout for product: {checkoutLink}");
+                var finalCheckoutLink = UrlUtils.AppendQueryParameters(checkoutLink, finalParams);
+                LogDebug($"Opening checkout link: {finalCheckoutLink}");
                 onWebLinkOpen?.Invoke();
-                Application.OpenURL(checkoutLink);
+                Application.OpenURL(finalCheckoutLink);
             }
             catch (Exception ex)
             {
