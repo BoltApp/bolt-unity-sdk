@@ -49,6 +49,17 @@ namespace BoltApp
             return GetUserData();
         }
 
+        private void SafelyAddToDictionary(Dictionary<string, string> dict, string key, string value)
+        {
+            if (dict == null)
+                return;
+
+            if (string.IsNullOrEmpty(value))
+                return;
+
+            dict[key] = value;
+        }
+
         public void OpenCheckout(string checkoutLink, Dictionary<string, string> extraParams = null)
         {
             try
@@ -57,34 +68,15 @@ namespace BoltApp
                     throw new BoltSDKException("Checkout link cannot be null or empty");
 
                 BoltUser boltUser = GetUserData();
+                var finalCheckoutLink = UrlUtils.BuildCheckoutLink(checkoutLink, boltUser, extraParams);
 
-                var finalParams = new Dictionary<string, string>
-                {
-                    { "device_locale", boltUser.Locale },
-                    { "user_email", boltUser.Email },
-                    { "device_country", boltUser.Country },
-                    { "app_name", Config.gameId },
-                    { "device_id", boltUser.DeviceId }
-                };
-
-                if (extraParams != null)
-                {
-                    var metaDataParams = new Dictionary<string, string>();
-                    foreach (var param in extraParams)
-                    {
-                        metaDataParams[param.Key] = param.Value;
-                    }
-                    finalParams["meta_data"] = JsonUtility.ToJson(metaDataParams);
-                }
-
-                var finalCheckoutLink = UrlUtils.AppendQueryParameters(checkoutLink, finalParams);
                 LogDebug($"Opening checkout link: {finalCheckoutLink}");
                 onWebLinkOpen?.Invoke();
-                Application.OpenURL(finalCheckoutLink);
+                Application.OpenURL(finalCheckoutLink.ToString());
             }
             catch (Exception ex)
             {
-                LogError($"Failed to open checkout for product '{checkoutLink}': {ex.Message}");
+                LogError($"Failed to open checkout link'{checkoutLink}': {ex.Message}");
                 throw;
             }
         }

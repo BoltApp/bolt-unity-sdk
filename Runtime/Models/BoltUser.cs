@@ -41,5 +41,18 @@ namespace BoltApp
                 $" CreatedAt: {CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")}," +
                 $" LastActive: {LastActive.ToString("yyyy-MM-dd HH:mm:ss")})";
         }
+
+        public Dictionary<string, string> ToDictionary()
+        {
+            return new Dictionary<string, string>
+            {
+                { "email", Email ?? "" },
+                { "device_id", DeviceId ?? "" },
+                { "locale", Locale ?? "" },
+                { "country", Country ?? "" },
+                { "created_at", CreatedAt.ToString("yyyy-MM-dd HH:mm:ss") },
+                { "last_active", LastActive.ToString("yyyy-MM-dd HH:mm:ss") }
+            };
+        }
     }
 }
