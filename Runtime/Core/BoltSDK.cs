@@ -68,7 +68,7 @@ namespace BoltApp
                     throw new BoltSDKException("Checkout link cannot be null or empty");
 
                 BoltUser boltUser = GetUserData();
-                string finalCheckoutLink = UrlUtils.BuildCheckoutLink(checkoutLink, boltUser, extraParams);
+                string finalCheckoutLink = UrlUtils.BuildCheckoutLink(checkoutLink, Config, boltUser, extraParams);
 
                 LogDebug($"Opening checkout link: {finalCheckoutLink}");
                 onWebLinkOpen?.Invoke();

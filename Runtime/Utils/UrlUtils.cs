@@ -11,7 +11,7 @@ namespace BoltApp
     public static class UrlUtils
     {
 
-        public static string BuildCheckoutLink(string baseUrl, BoltUser boltUser, Dictionary<string, string> extraParams)
+        public static string BuildCheckoutLink(string baseUrl, BoltConfig config, BoltUser boltUser, Dictionary<string, string> extraParams)
         {
             if (string.IsNullOrEmpty(baseUrl))
                 return baseUrl;
@@ -52,6 +52,17 @@ namespace BoltApp
             catch (Exception ex)
             {
                 Debug.LogError($"[BoltSDK] Failed to add user data to checkout link: {ex.Message}");
+            }
+
+            // Add app name and redirect url
+            try
+            {
+                query.Append($"&game_id={config.gameId}");
+                query.Append($"&redirect_url={config.deepLinkAppName}");
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[BoltSDK] Failed to add app name and redirect url to checkout link: {ex.Message}");
             }
 
             uriBuilder.Query = query.ToString();
