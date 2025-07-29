@@ -11,7 +11,7 @@ namespace BoltApp
     public static class UrlUtils
     {
 
-        public static string BuildCheckoutLink(string baseUrl, BoltConfig config, BoltUser boltUser, Dictionary<string, string> extraParams)
+        public static string BuildCheckoutLink(string baseUrl, BoltConfig config, BoltUser boltUser, IReadOnlyDictionary<string, string> extraParams)
         {
             if (string.IsNullOrEmpty(baseUrl))
                 return baseUrl;

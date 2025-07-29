@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using UnityEngine;
 
@@ -49,18 +50,7 @@ namespace BoltApp
             return GetUserData();
         }
 
-        private void SafelyAddToDictionary(Dictionary<string, string> dict, string key, string value)
-        {
-            if (dict == null)
-                return;
-
-            if (string.IsNullOrEmpty(value))
-                return;
-
-            dict[key] = value;
-        }
-
-        public void OpenCheckout(string checkoutLink, Dictionary<string, string> extraParams = null)
+        public void OpenCheckout(string checkoutLink, IReadOnlyDictionary<string, string> extraParams = null)
         {
             try
             {
