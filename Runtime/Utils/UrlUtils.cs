@@ -24,12 +24,8 @@ namespace BoltApp
             {
                 if (extraParams != null)
                 {
-                    foreach (var param in extraParams)
-                    {
-                        if (query.Length > 0)
-                            query.Append('&');
-                        query.Append($"{Uri.EscapeDataString(param.Key)}={Uri.EscapeDataString(param.Value)}");
-                    }
+                    query.Append('&');
+                    query.Append($"meta_data={JsonUtility.ToJson(extraParams)}");
                 }
             }
             catch (Exception ex)
