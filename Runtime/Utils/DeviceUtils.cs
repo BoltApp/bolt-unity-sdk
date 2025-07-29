@@ -34,7 +34,7 @@ namespace BoltApp
 
         public static void SetDeviceLocale(string locale)
         {
-            PlayerPrefs.SetString(BoltPlayerPrefsKeys.USER_DEVICE_LOCALE, locale);
+            PlayerPrefs.SetString(BoltPlayerPrefsKeys.DEVICE_LOCALE, locale);
             PlayerPrefs.Save();
         }
 
@@ -58,7 +58,7 @@ namespace BoltApp
 
         public static void SetDeviceCountry(string country)
         {
-            PlayerPrefs.SetString(BoltPlayerPrefsKeys.USER_DEVICE_COUNTRY, country);
+            PlayerPrefs.SetString(BoltPlayerPrefsKeys.DEVICE_COUNTRY, country);
             PlayerPrefs.Save();
         }
 

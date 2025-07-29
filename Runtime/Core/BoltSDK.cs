@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using UnityEngine;
 
@@ -28,7 +29,28 @@ namespace BoltApp
             _StorageService = new PlayerPrefsStorageService();
         }
 
-        public void OpenCheckout(string checkoutLink, Dictionary<string, string> extraParams = null)
+        public BoltUser SetBoltUserData(string email = null, string locale = null, string country = null)
+        {
+            var user = GetUserData();
+
+            // TODO - provide type validation safety
+            if (email != null)
+                user.Email = email;
+            if (locale != null)
+                user.Locale = locale;
+            if (country != null)
+                user.Country = country;
+
+            _StorageService.SetObject(BoltPlayerPrefsKeys.USER_DATA, user);
+            return user;
+        }
+
+        public BoltUser GetBoltUser()
+        {
+            return GetUserData();
+        }
+
+        public void OpenCheckout(string checkoutLink, IReadOnlyDictionary<string, string> extraParams = null)
         {
             try
             {
@@ -36,31 +58,15 @@ namespace BoltApp
                     throw new BoltSDKException("Checkout link cannot be null or empty");
 
                 BoltUser boltUser = GetUserData();
+                string finalCheckoutLink = UrlUtils.BuildCheckoutLink(checkoutLink, Config, boltUser, extraParams);
 
-                var finalParams = new Dictionary<string, string>
-                {
-                    { "device_locale", DeviceUtils.GetDeviceLocale() },
-                    { "user_email", boltUser.Email },
-                    { "device_country", DeviceUtils.GetDeviceCountry() },
-                    { "app_name", Application.productName },
-                    { "device_id", DeviceUtils.GetDeviceId() }
-                };
-
-                if (extraParams != null)
-                {
-                    foreach (var param in extraParams)
-                    {
-                        finalParams[param.Key] = param.Value;
-                    }
-                }
-
-                LogDebug($"Opening checkout for product: {checkoutLink}");
+                LogDebug($"Opening checkout link: {finalCheckoutLink}");
                 onWebLinkOpen?.Invoke();
-                Application.OpenURL(checkoutLink);
+                Application.OpenURL(finalCheckoutLink.ToString());
             }
             catch (Exception ex)
             {
-                LogError($"Failed to open checkout for product '{checkoutLink}': {ex.Message}");
+                LogError($"Failed to open checkout link'{checkoutLink}': {ex.Message}");
                 throw;
             }
         }
@@ -71,11 +77,12 @@ namespace BoltApp
             {
                 if (string.IsNullOrEmpty(callbackUrl))
                 {
-                    LogError("Callback URL cannot be null or empty");
+                    var errorMessage = "Failed to parse transaction. 'callbackUrl' cannot be null or empty";
+                    LogError(errorMessage);
                     return new TransactionResult
                     {
                         Status = TransactionStatus.Failed,
-                        ErrorMessage = "Failed to parse transaction. Callback URL cannot be null or empty",
+                        ErrorMessage = errorMessage,
                         TransactionId = ""
                     };
                 }
@@ -93,18 +100,18 @@ namespace BoltApp
                 if (transactionResult.IsFailed)
                 {
                     onTransactionFailed?.Invoke(transactionResult);
-                    LogError($"Transaction failed: {transactionResult.ErrorMessage}");
+                    LogError($"Failed weblink callback for transaction: {transactionResult.ErrorMessage}");
                     return transactionResult;
                 }
 
                 CreateOrUpdateTransaction(transactionResult);
                 onTransactionComplete?.Invoke(transactionResult);
-                LogDebug($"Handled weblink callback for transaction: {transactionResult.TransactionId}");
+                LogDebug($"Successful weblink callback for transaction: {transactionResult.TransactionId}");
                 return transactionResult;
             }
             catch (Exception ex)
             {
-                string errorMessage = $"Failed to handle weblink callback: {ex.Message}";
+                string errorMessage = $"Error during weblink callback: {ex.Message}";
                 LogError(errorMessage);
                 return new TransactionResult
                 {
@@ -119,36 +126,27 @@ namespace BoltApp
 
         private BoltUser GetUserData()
         {
+            var locale = DeviceUtils.GetDeviceLocale();
+            var country = DeviceUtils.GetDeviceCountry();
+            var deviceId = DeviceUtils.GetDeviceId();
+
             try
             {
-                var existingUser = _StorageService.GetObject<BoltUser>("userData");
-                if (existingUser != null)
+                var user = _StorageService.GetObject<BoltUser>(BoltPlayerPrefsKeys.USER_DATA);
+                if (user == null || user.DeviceId != deviceId || user.Locale != locale || user.Country != country)
                 {
-                    existingUser.LastActive = DateTime.UtcNow;
-                    return existingUser;
+                    var email = user?.Email ?? "";
+                    user = new BoltUser(email, locale, country, deviceId);
                 }
-                else
-                {
-                    var newUser = new BoltUser
-                    {
-                        Email = _StorageService.GetString("userEmail", ""),
-                        Locale = DeviceUtils.GetDeviceLocale(),
-                        Country = DeviceUtils.GetDeviceCountry(),
-                        DeviceId = DeviceUtils.GetDeviceId()
-                    };
-                    _StorageService.SetObject("userData", newUser);
-                    return newUser;
-                }
+                _StorageService.SetObject(BoltPlayerPrefsKeys.USER_DATA, user);
+                return user;
             }
             catch (Exception ex)
             {
                 LogError($"Failed to initialize user data: {ex.Message}");
-                return new BoltUser
-                {
-                    Locale = DeviceUtils.GetDeviceLocale(),
-                    Country = DeviceUtils.GetDeviceCountry(),
-                    DeviceId = DeviceUtils.GetDeviceId()
-                };
+                var newUser = new BoltUser("", locale, country, deviceId);
+                _StorageService.SetObject(BoltPlayerPrefsKeys.USER_DATA, newUser);
+                return newUser;
             }
         }
 
@@ -183,7 +181,7 @@ namespace BoltApp
         {
             try
             {
-                var historyData = _StorageService.GetString("transactionHistory", "");
+                var historyData = _StorageService.GetString(BoltPlayerPrefsKeys.TRANSACTION_HISTORY, "");
                 if (string.IsNullOrEmpty(historyData))
                 {
                     return new List<TransactionResult>();
@@ -261,7 +259,7 @@ namespace BoltApp
                 }
 
                 var json = JsonUtility.ToJson(transactionHistory);
-                _StorageService.SetString("transactionHistory", json);
+                _StorageService.SetString(BoltPlayerPrefsKeys.TRANSACTION_HISTORY, json);
             }
             catch (Exception ex)
             {

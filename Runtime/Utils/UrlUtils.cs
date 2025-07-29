@@ -10,22 +10,59 @@ namespace BoltApp
     /// </summary>
     public static class UrlUtils
     {
-        public static string AppendQueryParameters(string baseUrl, Dictionary<string, string> parameters)
+
+        public static string BuildCheckoutLink(string baseUrl, BoltConfig config, BoltUser boltUser, IReadOnlyDictionary<string, string> extraParams)
         {
             if (string.IsNullOrEmpty(baseUrl))
-                return baseUrl;
-
-            if (parameters == null || parameters.Count == 0)
                 return baseUrl;
 
             var uriBuilder = new UriBuilder(baseUrl);
             var query = new StringBuilder(uriBuilder.Query);
 
-            foreach (var param in parameters)
+            // Add extra query parameters
+            try
             {
-                if (query.Length > 0)
-                    query.Append('&');
-                query.Append($"{Uri.EscapeDataString(param.Key)}={Uri.EscapeDataString(param.Value)}");
+                if (extraParams != null)
+                {
+                    foreach (var param in extraParams)
+                    {
+                        if (query.Length > 0)
+                            query.Append('&');
+                        query.Append($"metadata_{Uri.EscapeDataString(param.Key)}={Uri.EscapeDataString(param.Value)}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[BoltSDK] Failed to add extra params to checkout link: {ex.Message}");
+            }
+
+
+            // Add user query parameters
+            try
+            {
+                var userData = boltUser.ToDictionary();
+                foreach (var param in userData)
+                {
+                    if (query.Length > 0)
+                        query.Append('&');
+                    query.Append($"{Uri.EscapeDataString(param.Key)}={Uri.EscapeDataString(param.Value)}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[BoltSDK] Failed to add user data to checkout link: {ex.Message}");
+            }
+
+            // Add app name and redirect url
+            try
+            {
+                query.Append($"&game_id={config.gameId}");
+                query.Append($"&redirect_url={config.deepLinkAppName}");
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[BoltSDK] Failed to add app name and redirect url to checkout link: {ex.Message}");
             }
 
             uriBuilder.Query = query.ToString();
@@ -84,56 +121,6 @@ namespace BoltApp
             {
                 return false;
             }
-        }
-
-        public static string GetBaseUrl(string url)
-        {
-            if (string.IsNullOrEmpty(url))
-                return url;
-
-            try
-            {
-                var uri = new Uri(url);
-                return $"{uri.Scheme}://{uri.Authority}{uri.AbsolutePath}";
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError($"Failed to get base URL: {ex.Message}");
-                return url;
-            }
-        }
-
-        public static string UrlEncode(string value)
-        {
-            if (string.IsNullOrEmpty(value))
-                return value;
-
-            return Uri.EscapeDataString(value);
-        }
-
-        public static string UrlDecode(string value)
-        {
-            if (string.IsNullOrEmpty(value))
-                return value;
-
-            return Uri.UnescapeDataString(value);
-        }
-
-        public static string CombineUrl(string baseUrl, string path)
-        {
-            if (string.IsNullOrEmpty(baseUrl))
-                return path;
-
-            if (string.IsNullOrEmpty(path))
-                return baseUrl;
-
-            // Remove trailing slash from base URL
-            baseUrl = baseUrl.TrimEnd('/');
-
-            // Remove leading slash from path
-            path = path.TrimStart('/');
-
-            return $"{baseUrl}/{path}";
         }
 
         public static bool IsDeepLinkCallback(string url, string scheme)
