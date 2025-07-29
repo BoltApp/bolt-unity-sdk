@@ -16,7 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Bolt user object handling
-- Query fields on web link with player preferences
+- Query fields when opening web link
+
+### Fixed
+- Improved handling of url utils
 
 ## [0.0.2] - 2025-07-23
 
