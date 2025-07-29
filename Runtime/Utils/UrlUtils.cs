@@ -24,14 +24,19 @@ namespace BoltApp
             {
                 if (extraParams != null)
                 {
-                    query.Append('&');
-                    query.Append($"meta_data={JsonUtility.ToJson(extraParams)}");
+                    foreach (var param in extraParams)
+                    {
+                        if (query.Length > 0)
+                            query.Append('&');
+                        query.Append($"metadata_{Uri.EscapeDataString(param.Key)}={Uri.EscapeDataString(param.Value)}");
+                    }
                 }
             }
             catch (Exception ex)
             {
                 Debug.LogError($"[BoltSDK] Failed to add extra params to checkout link: {ex.Message}");
             }
+
 
             // Add user query parameters
             try
