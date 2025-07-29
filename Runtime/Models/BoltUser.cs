@@ -17,19 +17,12 @@ namespace BoltApp
         public DateTime CreatedAt { get; set; }
         public DateTime LastActive { get; set; }
 
-        public BoltUser()
-        {
-            CreatedAt = DateTime.UtcNow;
-            LastActive = DateTime.UtcNow;
-        }
-
-        public BoltUser(string email, string locale, string country)
+        public BoltUser(string email, string locale, string country, string deviceId)
         {
             Email = email;
             Locale = locale;
             Country = country;
-            CreatedAt = DateTime.UtcNow;
-            LastActive = DateTime.UtcNow;
+            DeviceId = deviceId;
         }
 
         public override string ToString()

@@ -126,34 +126,25 @@ namespace BoltApp
 
         private BoltUser GetUserData()
         {
+            var locale = DeviceUtils.GetDeviceLocale();
+            var country = DeviceUtils.GetDeviceCountry();
+            var deviceId = DeviceUtils.GetDeviceId();
+
             try
             {
-                var existingUser = _StorageService.GetObject<BoltUser>(BoltPlayerPrefsKeys.USER_DATA);
-                if (existingUser != null)
+                var user = _StorageService.GetObject<BoltUser>(BoltPlayerPrefsKeys.USER_DATA);
+                if (user == null || user.DeviceId != deviceId || user.Locale != locale || user.Country != country)
                 {
-                    existingUser.LastActive = DateTime.UtcNow;
-                    return existingUser;
+                    var email = user?.Email ?? "";
+                    user = new BoltUser(email, locale, country, deviceId);
                 }
-                else
-                {
-                    var newUser = new BoltUser
-                    {
-                        Email = "",
-                        Locale = DeviceUtils.GetDeviceLocale(),
-                        Country = DeviceUtils.GetDeviceCountry(),
-                        DeviceId = DeviceUtils.GetDeviceId()
-                    };
-                    _StorageService.SetObject(BoltPlayerPrefsKeys.USER_DATA, newUser);
-                    return newUser;
-                }
+                _StorageService.SetObject(BoltPlayerPrefsKeys.USER_DATA, user);
+                return user;
             }
             catch (Exception ex)
             {
                 LogError($"Failed to initialize user data: {ex.Message}");
-                var newUser = new BoltUser
-                {
-                    DeviceId = DeviceUtils.GetDeviceId()
-                };
+                var newUser = new BoltUser("", locale, country, deviceId);
                 _StorageService.SetObject(BoltPlayerPrefsKeys.USER_DATA, newUser);
                 return newUser;
             }
