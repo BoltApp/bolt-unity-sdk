@@ -87,6 +87,12 @@ namespace BoltApp
                     };
                 }
 
+                // Check if base64 encode (usually is)
+                if (callbackUrl.Contains("base64"))
+                {
+                    callbackUrl = System.Text.Encoding.UTF8.GetString(System.Convert.FromBase64String(callbackUrl));
+                }
+
                 if (Config.deepLinkAppName != null && !callbackUrl.Contains(Config.deepLinkAppName))
                 {
                     // Skip deep link callback if it does not match the provided app name

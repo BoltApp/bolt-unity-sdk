@@ -5,8 +5,8 @@ using UnityEngine;
 namespace BoltApp.Samples
 {
     /// <summary>
-    /// Basic example showing how to integrate the Bolt SDK
-    /// Add this to your game manager or main controller
+    /// Deep Link example showing how to integrate the Bolt SDK
+    /// Use this as reference for your own implementation.
     /// </summary>
     public class BoltDeepLinkExample : MonoBehaviour
     {
@@ -15,12 +15,11 @@ namespace BoltApp.Samples
         // It is best practice to store deep links in a queue to handle multiple deep links
         private Queue<string> _pendingDeepLinks = new Queue<string>();
 
-
         void Start()
         {
             var boltConfig = new BoltConfig(
-                "com.myapp.test",
-                "MyAppNameForDeepLinks",
+                "com.yourgameid.test",
+                "YourAppNameForDeepLinks://",
                 BoltConfig.Environment.Development);
             _boltSDK = new BoltSDK(boltConfig);
             _boltSDK.onTransactionComplete += OnTransactionComplete;
@@ -30,20 +29,20 @@ namespace BoltApp.Samples
 
         void Awake()
         {
-            // Check for deep links on app start
-            CheckForDeepLinks();
+            // Check for transactions or deep links on app on load
+            OnResume();
         }
 
         async Task OnApplicationFocus(bool hasFocus)
         {
-            // Check for deep links on app resume
+            // Check for transactions or deep links on app resume
             if (hasFocus)
             {
-                CheckForDeepLinks();
+                OnResume();
             }
         }
 
-        void CheckForDeepLinks()
+        void OnResume()
         {
             // Check Unity's built-in deep link properties
             if (!string.IsNullOrEmpty(Application.deepLink))

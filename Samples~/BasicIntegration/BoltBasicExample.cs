@@ -6,7 +6,7 @@ namespace BoltApp.Samples
 {
     /// <summary>
     /// Basic example showing how to integrate the Bolt SDK
-    /// Add this to your game manager or main controller
+    /// Use this as reference for your own implementation.
     /// </summary>
     public class BoltBasicExample : MonoBehaviour
     {
@@ -19,10 +19,27 @@ namespace BoltApp.Samples
                 "com.myapp.test",
                 "MyAppNameForDeepLinks",
                 BoltConfig.Environment.Development);
+
+            // Setup SDK
             _boltSDK = new BoltSDK(boltConfig);
+
+            // Setup callbacks, handle flows appropriately
             _boltSDK.onTransactionComplete += OnTransactionComplete;
             _boltSDK.onTransactionFailed += OnTransactionFailed;
             _boltSDK.onWebLinkOpen += onWebLinkOpen;
+
+            // Fetch User data, use as needed in your APIs and Analytics. Bolt SDK manages user data for you.
+            var user = _boltSDK.GetBoltUser();
+            Debug.Log("User: " + user.ToString());
+
+            // Open A Checkout Link
+            // Note: SDK automatically stores a pending transaction for you using Player Prefs.
+            var checkoutLinkFetchedFromYourBackend = "https://knights-of-valor-bolt.c-staging.bolt.com/c?u=Fv8ZMmDmRb86C4XRiB92x2&publishable_key=_Kq5XZXqaLiS.3TOhnz9Wmacb.9c59b297d066e94294895dd8617ad5d9d8ffc530fe1d36f8ed6d624a4f7855ae";
+            _boltSDK.OpenCheckout(checkoutLinkFetchedFromYourBackend);
+
+            // Check for recent transactions in a pending state
+            // This list gets automatically updated as checkout links are opened
+            var pendingTransactions = _boltSDK.GetPendingTransactions();
         }
 
         /// <summary>
@@ -38,43 +55,51 @@ namespace BoltApp.Samples
                 // Therefor, the user returned to the app after web checkout but not via deep link
                 if (checkoutIsOpen)
                 {
-                    // Check status of latest transaction with backend server
-                    var pendingTransactions = _boltSDK.GetPendingTransactions();
-                    if (pendingTransactions.Count > 0)
-                    {
-                        foreach (var transaction in pendingTransactions)
-                        {
-                            var transactionResult = await ServerVerifyTransaction(transaction.TransactionId);
-                            if (transactionResult == null)
-                            {
-                                // Manually mark transaction as cancelled
-                                _boltSDK.CancelTransaction(transaction.TransactionId);
-                                continue;
-                            }
-
-                            if (transactionResult.Status == TransactionStatus.Completed)
-                            {
-                                // Manually mark transaction as completed
-                                _boltSDK.CompleteTransaction(
-                                    transactionId = transaction.TransactionId,
-                                    isServerVerified = transactionResult.IsServerValidated
-                                );
-                            }
-                            else
-                            {
-                                // Manually mark transaction as cancelled
-                                _boltSDK.CancelTransaction(
-                                    transactionId = transaction.TransactionId,
-                                    isServerVerified = transactionResult.IsServerValidated
-                                );
-                            }
-                        }
-                    }
+                    VerifyRecentTransactions();
                 }
             }
 
             // Web checkout is closed, make sure to update any of your UI variables
             checkoutIsOpen = false;
+        }
+
+        /// <summary>
+        /// Verify the status of the latest transactions with the backend server
+        /// </summary>
+        private void VerifyRecentTransactions()
+        {
+            // Check status of latest transaction with backend server
+            var pendingTransactions = _boltSDK.GetPendingTransactions();
+            if (pendingTransactions.Count > 0)
+            {
+                foreach (var transaction in pendingTransactions)
+                {
+                    var transactionResult = await ServerVerifyTransaction(transaction.TransactionId);
+                    if (transactionResult == null)
+                    {
+                        // Manually mark transaction as cancelled
+                        _boltSDK.CancelTransaction(transaction.TransactionId);
+                        continue;
+                    }
+
+                    if (transactionResult.Status == TransactionStatus.Completed)
+                    {
+                        // Manually mark transaction as completed
+                        _boltSDK.CompleteTransaction(
+                            transactionId = transaction.TransactionId,
+                            isServerVerified = transactionResult.IsServerValidated
+                        );
+                    }
+                    else
+                    {
+                        // Manually mark transaction as cancelled
+                        _boltSDK.CancelTransaction(
+                            transactionId = transaction.TransactionId,
+                            isServerVerified = transactionResult.IsServerValidated
+                        );
+                    }
+                }
+            }
         }
 
         /// <summary>
