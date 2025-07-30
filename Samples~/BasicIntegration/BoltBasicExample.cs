@@ -6,7 +6,7 @@ namespace BoltApp.Samples
 {
     /// <summary>
     /// Basic example showing how to integrate the Bolt SDK
-    /// Add this to your game manager or main controller
+    /// Use this as reference for your own implementation.
     /// </summary>
     public class BoltBasicExample : MonoBehaviour
     {
@@ -33,8 +33,13 @@ namespace BoltApp.Samples
             Debug.Log("User: " + user.ToString());
 
             // Open A Checkout Link
+            // Note: SDK automatically stores a pending transaction for you using Player Prefs.
             var checkoutLinkFetchedFromYourBackend = "https://knights-of-valor-bolt.c-staging.bolt.com/c?u=Fv8ZMmDmRb86C4XRiB92x2&publishable_key=_Kq5XZXqaLiS.3TOhnz9Wmacb.9c59b297d066e94294895dd8617ad5d9d8ffc530fe1d36f8ed6d624a4f7855ae";
             _boltSDK.OpenCheckout(checkoutLinkFetchedFromYourBackend);
+
+            // Check for recent transactions in a pending state
+            // This list gets automatically updated as checkout links are opened
+            var pendingTransactions = _boltSDK.GetPendingTransactions();
         }
 
         /// <summary>

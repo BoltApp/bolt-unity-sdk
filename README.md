@@ -116,7 +116,7 @@ If you have any issues our discord support team will be happy to help.
 
 There is sample integrations in the `Samples~/` folder. 
 - [**BoltBasicExample**](./Samples~/BasicIntegration/BoltBasicExample.cs): will showcase how to initialize the client and check for pending transactions
-- [**BoltDeepLinkExample**](./Samples~/DeepLinkIntegration/BoltDeepLinkExample.cs): will showcase how to handle deep links back into the application
+- [**BoltDeepLinkExample**](./Samples~/DeepLinkIntegration/BoltDeepLinkExample.cs): will showcase how to handle deep links back into the application.
 
 ### Step 3: Continue with Backend Integration
 You will need to implement some features in your backend for secure link and transaction handling. 
