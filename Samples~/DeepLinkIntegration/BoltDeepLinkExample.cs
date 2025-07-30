@@ -30,20 +30,21 @@ namespace BoltApp.Samples
 
         void Awake()
         {
-            // Check for deep links on app start
-            CheckForDeepLinks();
+            // Check for transactions or deep links on app on load
+            OnResume();
+
         }
 
         async Task OnApplicationFocus(bool hasFocus)
         {
-            // Check for deep links on app resume
+            // Check for transactions or deep links on app resume
             if (hasFocus)
             {
-                CheckForDeepLinks();
+                OnResume();
             }
         }
 
-        void CheckForDeepLinks()
+        void OnResume()
         {
             // Check Unity's built-in deep link properties
             if (!string.IsNullOrEmpty(Application.deepLink))
