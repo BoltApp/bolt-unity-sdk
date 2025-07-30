@@ -12,6 +12,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Player pref handling will be reworked
 - Demo scene with Bolt implemented
 
+## [0.0.4] - 2025-07-30
+
+### Fixed
+- Fixed compilation issues with Immutable type
+
 ## [0.0.3] - 2025-07-28
 
 ### Added
