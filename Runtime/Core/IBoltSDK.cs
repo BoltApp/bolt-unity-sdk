@@ -8,8 +8,8 @@ namespace BoltApp
     /// </summary>
     public interface IBoltSDK
     {
-        event Action<PendingPaymentLink> onTransactionComplete;
-        event Action<PendingPaymentLink> onTransactionFailed;
+        event Action<PaymentSession> onTransactionComplete;
+        event Action<PaymentSession> onTransactionFailed;
         event Action onWebLinkOpen;
         BoltConfig Config { get; }
         BoltUser GetBoltUser();

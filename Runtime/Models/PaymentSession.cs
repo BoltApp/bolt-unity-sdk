@@ -11,7 +11,7 @@ namespace BoltApp
     {
         public string PaymentLinkId { get; set; }
         public string PaymentLinkUrl { get; set; }
-        public string Status { get; set; }
+        public PaymentLinkStatus Status { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime LastAccessedAt { get; set; }
         public DateTime CompletedAt { get; set; }
