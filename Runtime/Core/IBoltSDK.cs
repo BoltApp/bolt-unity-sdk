@@ -8,17 +8,17 @@ namespace BoltApp
     /// </summary>
     public interface IBoltSDK
     {
-        event Action<TransactionResult> onTransactionComplete;
-        event Action<TransactionResult> onTransactionFailed;
+        event Action<PendingPaymentLink> onTransactionComplete;
+        event Action<PendingPaymentLink> onTransactionFailed;
         event Action onWebLinkOpen;
         BoltConfig Config { get; }
         BoltUser GetBoltUser();
         BoltUser SetBoltUserData(string email = null, string locale = null, string country = null);
-        void OpenCheckout(string checkoutLink, IReadOnlyDictionary<string, string> extraParams = null);
-        void CancelTransaction(string transactionId, bool serverValidated = false);
-        void CompleteTransaction(string transactionId, bool serverValidated = false);
-        List<TransactionResult> GetTransactions();
-        List<TransactionResult> GetPendingTransactions();
-        TransactionResult HandleDeepLinkCallback(string callbackUrl);
+        void OpenCheckout(string checkoutLink);
+        void HandleDeepLinkCallback(string callbackUrl);
+        List<PaymentSession> GetPendingPaymentSessions();
+        PaymentSession ResolvePaymentSession(string paymentLinkId, PaymentLinkStatus status);
+        List<PaymentSession> GetDevicePaymentSessionHistory();
+
     }
 }

@@ -6,7 +6,7 @@ namespace BoltApp
 {
     public static class DeepLinkUtils
     {
-        public static TransactionResult ParseTransactionResult(Dictionary<string, string> parameters)
+        public static PaymentLinkResult ParsePaymentLinkResult(Dictionary<string, string> parameters)
         {
             try
             {

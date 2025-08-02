@@ -8,9 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Roadmap
-- Web link requires additional work before it's functional
-- Player pref handling will be reworked
 - Demo scene with Bolt implemented
+
+## [0.0.5] - 2025-08-01
+
+### Fixed
+- Simplified handling of transaction statuses and payment links
 
 ## [0.0.4] - 2025-07-30
 

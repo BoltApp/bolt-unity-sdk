@@ -11,20 +11,20 @@ namespace BoltApp
     public class BoltConfig
     {
         public string gameId;
-        public string deepLinkAppName;
+        public string publishableKey;
         public Environment environment = Environment.Development;
 
         public BoltConfig()
         {
             gameId = "com.bolt.unity.test";
-            deepLinkAppName = "BoltAppTest";
+            publishableKey = "found_in.bolt.dashboard";
             environment = Environment.Development;
         }
 
-        public BoltConfig(string gameId, string deepLinkAppName, Environment environment)
+        public BoltConfig(string gameId, string publishableKey, Environment environment)
         {
             this.gameId = gameId;
-            this.deepLinkAppName = deepLinkAppName;
+            this.publishableKey = publishableKey;
             this.environment = environment;
         }
 

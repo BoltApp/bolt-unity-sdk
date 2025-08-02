@@ -17,7 +17,7 @@ namespace BoltApp.Samples
         {
             var boltConfig = new BoltConfig(
                 "com.myapp.test",
-                "MyAppNameForDeepLinks",
+                "example.publishable.key",
                 BoltConfig.Environment.Development);
 
             // Setup SDK
@@ -32,14 +32,12 @@ namespace BoltApp.Samples
             var user = _boltSDK.GetBoltUser();
             Debug.Log("User: " + user.ToString());
 
-            // Open A Checkout Link
-            // Note: SDK automatically stores a pending transaction for you using Player Prefs.
+            // Open A Checkout Link, typically assigned to a button in your UI
+            // Note: SDK automatically stores a pending payment link, used in next step.
             var checkoutLinkFetchedFromYourBackend = "https://knights-of-valor-bolt.c-staging.bolt.com/c?u=Fv8ZMmDmRb86C4XRiB92x2&publishable_key=_Kq5XZXqaLiS.3TOhnz9Wmacb.9c59b297d066e94294895dd8617ad5d9d8ffc530fe1d36f8ed6d624a4f7855ae";
             _boltSDK.OpenCheckout(checkoutLinkFetchedFromYourBackend);
 
-            // Check for recent transactions in a pending state
-            // This list gets automatically updated as checkout links are opened
-            var pendingTransactions = _boltSDK.GetPendingTransactions();
+            // Look at VerifyRecentCheckouts() for how to handle app load and verify checkout results
         }
 
         /// <summary>
@@ -49,10 +47,8 @@ namespace BoltApp.Samples
         {
             if (hasFocus)
             {
-                Debug.Log("App focused again");
-
-                // The app is refocused and we previously tracked checkout open with the onWebLinkOpen callback callback
-                // Therefor, the user returned to the app after web checkout but not via deep link
+                // The app is refocused and we previously tracked checkout open with the onWebLinkOpen callback
+                // Therefore, the user returned to the app after web checkout but not via deep link
                 if (checkoutIsOpen)
                 {
                     VerifyRecentTransactions();
@@ -64,40 +60,18 @@ namespace BoltApp.Samples
         }
 
         /// <summary>
-        /// Verify the status of the latest transactions with the backend server
+        /// Verify the status of the latest checkouts with the backend server
         /// </summary>
-        private void VerifyRecentTransactions()
+        private void VerifyRecentCheckouts()
         {
             // Check status of latest transaction with backend server
-            var pendingTransactions = _boltSDK.GetPendingTransactions();
-            if (pendingTransactions.Count > 0)
+            var pendingPaymentSessions = _boltSDK.GetPendingPaymentSessions();
+            if (pendingPaymentSessions.Count > 0)
             {
-                foreach (var transaction in pendingTransactions)
+                foreach (var paymentSession in pendingPaymentSessions)
                 {
-                    var transactionResult = await ServerVerifyTransaction(transaction.TransactionId);
-                    if (transactionResult == null)
-                    {
-                        // Manually mark transaction as cancelled
-                        _boltSDK.CancelTransaction(transaction.TransactionId);
-                        continue;
-                    }
-
-                    if (transactionResult.Status == TransactionStatus.Completed)
-                    {
-                        // Manually mark transaction as completed
-                        _boltSDK.CompleteTransaction(
-                            transactionId = transaction.TransactionId,
-                            isServerVerified = transactionResult.IsServerValidated
-                        );
-                    }
-                    else
-                    {
-                        // Manually mark transaction as cancelled
-                        _boltSDK.CancelTransaction(
-                            transactionId = transaction.TransactionId,
-                            isServerVerified = transactionResult.IsServerValidated
-                        );
-                    }
+                    var paymentLinkResult = await ServerVerifyPaymentLink(paymentSession.PaymentLinkId);
+                    _boltSDK.ResolvePaymentSession(paymentSession.PaymentLinkId, paymentLinkResult.Status);
                 }
             }
         }
@@ -107,7 +81,7 @@ namespace BoltApp.Samples
         /// </summary>
         /// <param name="transactionId">The transaction ID to verify</param>
         /// <returns>The transaction result or null if not found</returns>
-        private TransactionResult ServerVerifyTransaction(string transactionId)
+        private TransactionResult ServerVerifyPaymentLink(string transactionId)
         {
             // TODO - Use your http client to call backend to verify and get the following object back:
             var mockResult = new TransactionResult(

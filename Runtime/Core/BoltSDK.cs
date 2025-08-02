@@ -10,8 +10,8 @@ namespace BoltApp
     /// </summary>
     public class BoltSDK : IBoltSDK
     {
-        public event Action<TransactionResult> onTransactionComplete;
-        public event Action<TransactionResult> onTransactionFailed;
+        public event Action<PendingPaymentLink> onTransactionComplete;
+        public event Action<PendingPaymentLink> onTransactionFailed;
         public event Action onWebLinkOpen;
         public BoltConfig Config { get; private set; }
         private IStorageService _StorageService;
@@ -49,7 +49,7 @@ namespace BoltApp
             return GetUserData();
         }
 
-        public void OpenCheckout(string checkoutLink, IReadOnlyDictionary<string, string> extraParams = null)
+        public void OpenCheckout(string checkoutLink)
         {
             try
             {
@@ -57,20 +57,20 @@ namespace BoltApp
                     throw new BoltSDKException("Checkout link cannot be null or empty");
 
                 BoltUser boltUser = GetUserData();
-                string finalCheckoutLink = UrlUtils.BuildCheckoutLink(checkoutLink, Config, boltUser, extraParams);
+                string checkoutLinkWithParams = UrlUtils.BuildCheckoutLink(checkoutLink, Config, boltUser);
 
-                LogDebug($"Opening checkout link: {finalCheckoutLink}");
+                LogDebug($"Opening checkout link: {checkoutLinkWithParams}");
                 onWebLinkOpen?.Invoke();
-                Application.OpenURL(finalCheckoutLink.ToString());
+                Application.OpenURL(checkoutLinkWithParams);
             }
             catch (Exception ex)
             {
-                LogError($"Failed to open checkout link'{checkoutLink}': {ex.Message}");
+                LogError($"Failed to open checkout link'{checkoutLinkWithParams}': {ex.Message}");
                 throw;
             }
         }
 
-        public TransactionResult HandleDeepLinkCallback(string callbackUrl)
+        public void HandleDeepLinkCallback(string callbackUrl)
         {
             try
             {
@@ -78,52 +78,88 @@ namespace BoltApp
                 {
                     var errorMessage = "Failed to parse transaction. 'callbackUrl' cannot be null or empty";
                     LogError(errorMessage);
-                    return new TransactionResult
-                    {
-                        Status = TransactionStatus.Failed,
-                        ErrorMessage = errorMessage,
-                        TransactionId = ""
-                    };
+                    return;
                 }
 
-                // Check if base64 encode (usually is)
-                if (callbackUrl.Contains("base64"))
+                // Check if there is a data field in the callback url, if so then base64 decode it
+                if (callbackUrl.Contains("data="))
                 {
-                    callbackUrl = System.Text.Encoding.UTF8.GetString(System.Convert.FromBase64String(callbackUrl));
-                }
-
-                if (Config.deepLinkAppName != null && !callbackUrl.Contains(Config.deepLinkAppName))
-                {
-                    // Skip deep link callback if it does not match the provided app name
-                    LogDebug($"Deep link callback URL does not match config: {callbackUrl}. Expected: {Config.deepLinkAppName}");
-                    return null;
+                    var data = callbackUrl.Split('data=')[1];
+                    callbackUrl = System.Text.Encoding.UTF8.GetString(System.Convert.FromBase64String(data));
                 }
 
                 var queryParameters = UrlUtils.ExtractQueryParameters(callbackUrl);
-                var transactionResult = DeepLinkUtils.ParseTransactionResult(queryParameters);
+                var paymentLinkResult = DeepLinkUtils.ParsePaymentLinkResult(queryParameters);
 
                 if (transactionResult.IsFailed)
                 {
-                    onTransactionFailed?.Invoke(transactionResult);
+                    // Convert TransactionResult to PendingPaymentLink for interface compatibility
+                    var pendingPaymentLink = new PendingPaymentLink(transactionResult.TransactionId, "");
+                    onTransactionFailed?.Invoke(pendingPaymentLink);
                     LogError($"Failed weblink callback for transaction: {transactionResult.ErrorMessage}");
-                    return transactionResult;
+                    return;
                 }
 
                 CreateOrUpdateTransaction(transactionResult);
-                onTransactionComplete?.Invoke(transactionResult);
+                // Convert TransactionResult to PendingPaymentLink for interface compatibility
+                var paymentLink = new PendingPaymentLink(transactionResult.TransactionId, "");
+                onTransactionComplete?.Invoke(paymentLink);
                 LogDebug($"Successful weblink callback for transaction: {transactionResult.TransactionId}");
-                return transactionResult;
             }
             catch (Exception ex)
             {
                 string errorMessage = $"Error during weblink callback: {ex.Message}";
                 LogError(errorMessage);
-                return new TransactionResult
+            }
+        }
+
+        public List<PendingPaymentLink> GetPendingPaymentLinks()
+        {
+            try
+            {
+                var historyData = _StorageService.GetString(BoltPlayerPrefsKeys.TRANSACTION_HISTORY, "");
+                if (string.IsNullOrEmpty(historyData))
                 {
-                    Status = TransactionStatus.Failed,
-                    ErrorMessage = errorMessage,
-                    TransactionId = ""
-                };
+                    return new List<PendingPaymentLink>();
+                }
+
+                var transactions = JsonUtility.FromJson<List<TransactionResult>>(historyData);
+                if (transactions == null)
+                {
+                    return new List<PendingPaymentLink>();
+                }
+
+                // Convert TransactionResult to PendingPaymentLink
+                var pendingPaymentLinks = transactions
+                    .Where(t => t.Status == TransactionStatus.Pending)
+                    .Select(t => new PendingPaymentLink(t.TransactionId, ""))
+                    .ToList();
+
+                return pendingPaymentLinks;
+            }
+            catch (Exception ex)
+            {
+                LogError($"Failed to load pending payment links: {ex.Message}");
+                return new List<PendingPaymentLink>();
+            }
+        }
+
+        public void RemovePendingPaymentLink(string paymentLinkId)
+        {
+            try
+            {
+                var transactionHistory = GetTransactions();
+                var transaction = transactionHistory.FirstOrDefault(t => t.TransactionId == paymentLinkId);
+                if (transaction != null)
+                {
+                    transactionHistory.Remove(transaction);
+                    var json = JsonUtility.ToJson(transactionHistory);
+                    _StorageService.SetString(BoltPlayerPrefsKeys.TRANSACTION_HISTORY, json);
+                }
+            }
+            catch (Exception ex)
+            {
+                LogError($"Failed to remove pending payment link: {ex.Message}");
             }
         }
 
@@ -270,25 +306,6 @@ namespace BoltApp
             {
                 LogError($"Failed to save pending transactions: {ex.Message}");
             }
-        }
-
-        #endregion
-
-        #region Event Handlers
-
-        private void OnWebLinkOpened()
-        {
-            LogDebug("web link opened");
-        }
-
-        private void OnWebLinkClosed()
-        {
-            LogDebug("web link closed");
-        }
-
-        private void OnWebLinkError(string error)
-        {
-            LogError($"web link error: {error}");
         }
 
         #endregion
