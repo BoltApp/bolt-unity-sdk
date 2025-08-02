@@ -12,27 +12,27 @@ namespace BoltApp
         public string PaymentLinkId { get; set; }
         public string PaymentLinkUrl { get; set; }
         public string Status { get; set; }
-        public string StartedAt { get; set; }
-        public string LastAccessedAt { get; set; }
-        public string CompletedAt { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime LastAccessedAt { get; set; }
+        public DateTime CompletedAt { get; set; }
 
-        public PaymentLinkSession(string paymentLinkId, string paymentLinkUrl)
+        public PaymentLinkSession(string paymentLinkId, string paymentLinkUrl, PaymentLinkStatus status = PaymentLinkStatus.Pending)
         {
             PaymentLinkId = paymentLinkId;
             PaymentLinkUrl = paymentLinkUrl;
-            StartedAt = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss");
-            LastAccessedAt = StartedAt;
-        }
-
-        public void UpdateLastAccessedAt()
-        {
-            LastAccessedAt = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss");
+            Status = status;
+            CreatedAt = DateTime.UtcNow;
+            LastAccessedAt = CreatedAt;
+            if (status == PaymentLinkStatus.Completed)
+            {
+                CompletedAt = LastAccessedAt;
+            }
         }
 
         public void UpdateStatus(PaymentLinkStatus status)
         {
             Status = status;
-            LastAccessedAt = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss");
+            LastAccessedAt = DateTime.UtcNow;
             if (status == PaymentLinkStatus.Completed)
             {
                 CompletedAt = LastAccessedAt;

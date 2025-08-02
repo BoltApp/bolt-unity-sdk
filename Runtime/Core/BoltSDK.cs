@@ -28,11 +28,16 @@ namespace BoltApp
             _StorageService = new PlayerPrefsStorageService();
         }
 
+        public BoltUser GetBoltUser()
+        {
+            return GetUserData();
+        }
+
         public BoltUser SetBoltUserData(string email = null, string locale = null, string country = null)
         {
             var user = GetUserData();
 
-            // TODO - provide type validation safety
+            // TODO - provide type validation safety for all fields
             if (email != null)
                 user.Email = email;
             if (locale != null)
@@ -44,9 +49,33 @@ namespace BoltApp
             return user;
         }
 
-        public BoltUser GetBoltUser()
+        private BoltUser GetUserData()
         {
-            return GetUserData();
+            var locale = DeviceUtils.GetDeviceLocale();
+            var country = DeviceUtils.GetDeviceCountry();
+            var deviceId = DeviceUtils.GetDeviceId();
+
+            try
+            {
+                var user = _StorageService.GetObject<BoltUser>(BoltPlayerPrefsKeys.USER_DATA);
+
+                // Create new user object if user data is not found or is invalid
+                if (user == null || user.DeviceId != deviceId || user.Locale != locale || user.Country != country)
+                {
+                    var email = user?.Email ?? "";
+                    user = new BoltUser(email, locale, country, deviceId);
+                }
+
+                _StorageService.SetObject(BoltPlayerPrefsKeys.USER_DATA, user);
+                return user;
+            }
+            catch (Exception ex)
+            {
+                LogError($"Failed to initialize user data: {ex.Message}");
+                var newUser = new BoltUser("", locale, country, deviceId);
+                _StorageService.SetObject(BoltPlayerPrefsKeys.USER_DATA, newUser);
+                return newUser;
+            }
         }
 
         public void OpenCheckout(string checkoutLink)
@@ -56,16 +85,35 @@ namespace BoltApp
                 if (string.IsNullOrEmpty(checkoutLink))
                     throw new BoltSDKException("Checkout link cannot be null or empty");
 
+                // Append user info to checkout link
                 BoltUser boltUser = GetUserData();
                 string checkoutLinkWithParams = UrlUtils.BuildCheckoutLink(checkoutLink, Config, boltUser);
 
-                LogDebug($"Opening checkout link: {checkoutLinkWithParams}");
+                // Extract payment link id from checkout link
+                var queryParameters = UrlUtils.ExtractQueryParameters(checkoutLinkWithParams);
+                var paymentLinkId = queryParameters["payment_link_id"];
+
+                // Create a new payment session or lookup existing one
+                PaymentSession paymentSession = GetPaymentSession(paymentLinkId);
+                if (paymentSession == null)
+                {
+                    paymentSession = new PaymentSession(paymentLinkId, checkoutLinkWithParams);
+                    SavePaymentSession(paymentSession);
+                }
+                else
+                {
+                    paymentSession.UpdateStatus(PaymentLinkStatus.Pending);
+                    SavePaymentSession(paymentSession);
+                }
+
+                // Invoke callbacks and open checkout link
+                LogDebug($"Opening checkout link: {paymentSession.PaymentLinkUrl}");
                 onWebLinkOpen?.Invoke();
-                Application.OpenURL(checkoutLinkWithParams);
+                Application.OpenURL(paymentSession.PaymentLinkUrl);
             }
             catch (Exception ex)
             {
-                LogError($"Failed to open checkout link'{checkoutLinkWithParams}': {ex.Message}");
+                LogError($"Failed to open checkout link'{checkoutLink}': {ex.Message}");
                 throw;
             }
         }
@@ -88,23 +136,34 @@ namespace BoltApp
                     callbackUrl = System.Text.Encoding.UTF8.GetString(System.Convert.FromBase64String(data));
                 }
 
+                // Create a temporary payment session based on query parameters provided in the callback url
                 var queryParameters = UrlUtils.ExtractQueryParameters(callbackUrl);
-                var paymentSessionResult = DeepLinkUtils.ParsePaymentLinkResult(queryParameters);
+                var temporalSessionResult = DeepLinkUtils.ParsePaymentLinkResult(queryParameters);
 
-                if (paymentSessionResult.IsFailed)
+                // Map temporal session status to existing one on device
+                var paymentSession = GetPaymentSession(temporalSessionResult.PaymentLinkId);
+                if (paymentSession != null)
                 {
-                    // Convert paymentSessionResult to PaymentSession for interface compatibility
-                    var PaymentSession = new PaymentSession(paymentSessionResult.TransactionId, "");
-                    onTransactionFailed?.Invoke(PaymentSession);
-                    LogError($"Failed weblink callback for transaction: {paymentSessionResult.ErrorMessage}");
-                    return;
+                    paymentSession.UpdateStatus(temporalSessionResult.Status);
+                    SavePaymentSession(paymentSession);
+                }
+                else
+                {
+                    paymentSession = temporalSessionResult;
+                    SavePaymentSession(paymentSession);
                 }
 
-                CreateOrUpdateTransaction(paymentSessionResult);
-                // Convert paymentSessionResult to PaymentSession for interface compatibility
-                var paymentSession = new PaymentSession(paymentSessionResult.TransactionId, "");
-                onTransactionComplete?.Invoke(paymentSession);
-                LogDebug($"Successful weblink callback for transaction: {paymentSessionResult.TransactionId}");
+                // Invoke event based on payment session status
+                if (paymentSession.Status == PaymentLinkStatus.Successful)
+                {
+                    onTransactionComplete?.Invoke(paymentSession);
+                    LogDebug($"Successful weblink callback for transaction: {paymentSession.PaymentLinkId}")
+                }
+                else
+                {
+                    onTransactionFailed?.Invoke(paymentSession);
+                    LogError($"Failed weblink callback for transaction: {paymentSession.Status}");
+                }
             }
             catch (Exception ex)
             {
@@ -113,117 +172,55 @@ namespace BoltApp
             }
         }
 
-        public List<PaymentSession> GetPaymentSessions()
+        public PaymentSession GetPaymentSession(string paymentLinkId)
         {
-            try
-            {
-                var historyData = _StorageService.GetString(BoltPlayerPrefsKeys.PAYMENT_SESSION_HISTORY, "");
-                if (string.IsNullOrEmpty(historyData))
-                {
-                    return new List<PaymentSession>();
-                }
-
-                var transactions = JsonUtility.FromJson<List<TransactionResult>>(historyData);
-                if (transactions == null)
-                {
-                    return new List<PaymentSession>();
-                }
-
-                // Convert TransactionResult to PaymentSession
-                var PaymentSessions = transactions
-                    .Where(t => t.Status == TransactionStatus.Pending)
-                    .Select(t => new PaymentSession(t.TransactionId, ""))
-                    .ToList();
-
-                return PaymentSessions;
-            }
-            catch (Exception ex)
-            {
-                LogError($"Failed to load pending payment links: {ex.Message}");
-                return new List<PaymentSession>();
-            }
+            var paymentSessions = GetPaymentSessionHistory();
+            return paymentSessions.FirstOrDefault(p => p.PaymentLinkId == paymentLinkId);
         }
 
-        public void RemovePaymentSession(string paymentLinkId)
+        private PaymentSession SavePaymentSession(PaymentSession paymentSession)
+        {
+            var paymentSessions = GetPaymentSessionHistory();
+            var existingPaymentSession = paymentSessions.FirstOrDefault(p => p.PaymentLinkId == paymentSession.PaymentLinkId);
+            if (existingPaymentSession != null)
+            {
+                existingPaymentSession.UpdateStatus(paymentSession.Status);
+            }
+            else
+            {
+                paymentSessions.Add(paymentSession);
+            }
+
+            var json = JsonUtility.ToJson(paymentSessions);
+            _StorageService.SetString(BoltPlayerPrefsKeys.PAYMENT_SESSION_HISTORY, json);
+            return paymentSession;
+        }
+
+        public void ResolvePaymentSession(string paymentLinkId, PaymentLinkStatus status = PaymentLinkStatus.Completed)
         {
             try
             {
-                var transactionHistory = GetTransactions();
-                var transaction = transactionHistory.FirstOrDefault(t => t.TransactionId == paymentLinkId);
-                if (transaction != null)
+                var paymentSessions = GetPaymentSessions();
+                var paymentSession = paymentSessions.FirstOrDefault(p => p.PaymentLinkId == paymentLinkId);
+                if (paymentSession != null)
                 {
-                    transactionHistory.Remove(transaction);
-                    var json = JsonUtility.ToJson(transactionHistory);
+                    paymentSessions.Remove(paymentSession);
+                    var json = JsonUtility.ToJson(paymentSessions);
                     _StorageService.SetString(BoltPlayerPrefsKeys.PAYMENT_SESSION_HISTORY, json);
                 }
             }
             catch (Exception ex)
             {
-                LogError($"Failed to remove pending payment link: {ex.Message}");
+                LogError($"Failed to resolve payment session: {ex.Message}");
             }
         }
 
-        #region Private Methods
-
-        private BoltUser GetUserData()
-        {
-            var locale = DeviceUtils.GetDeviceLocale();
-            var country = DeviceUtils.GetDeviceCountry();
-            var deviceId = DeviceUtils.GetDeviceId();
-
-            try
-            {
-                var user = _StorageService.GetObject<BoltUser>(BoltPlayerPrefsKeys.USER_DATA);
-                if (user == null || user.DeviceId != deviceId || user.Locale != locale || user.Country != country)
-                {
-                    var email = user?.Email ?? "";
-                    user = new BoltUser(email, locale, country, deviceId);
-                }
-                _StorageService.SetObject(BoltPlayerPrefsKeys.USER_DATA, user);
-                return user;
-            }
-            catch (Exception ex)
-            {
-                LogError($"Failed to initialize user data: {ex.Message}");
-                var newUser = new BoltUser("", locale, country, deviceId);
-                _StorageService.SetObject(BoltPlayerPrefsKeys.USER_DATA, newUser);
-                return newUser;
-            }
-        }
-
-        private TransactionResult CreateNewTransaction(string productId, float price, string currency)
+        public List<PaymentSession> GetPaymentSessionHistory()
         {
             try
             {
-                BoltUser boltUser = GetUserData();
-                var pendingTransaction = new TransactionResult
-                {
-                    TransactionId = Guid.NewGuid().ToString(),
-                    Status = TransactionStatus.Pending,
-                    Amount = (decimal)price,
-                    Currency = currency,
-                    ProductId = productId,
-                    UserEmail = boltUser.Email,
-                    IsServerValidated = false,
-                    Timestamp = DateTime.UtcNow
-                };
-
-                CreateOrUpdateTransaction(pendingTransaction);
-                return pendingTransaction;
-            }
-            catch (Exception ex)
-            {
-                LogError($"Failed to create new transaction: {ex.Message}");
-                return null;
-            }
-        }
-
-        public List<PaymentSession> GetDevicePaymentSessions()
-        {
-            try
-            {
-                var historyData = _StorageService.GetString(BoltPlayerPrefsKeys.PAYMENT_SESSION_HISTORY, "");
-                if (string.IsNullOrEmpty(historyData))
+                var paymentSessionHistory = _StorageService.GetString(BoltPlayerPrefsKeys.PAYMENT_SESSION_HISTORY, "");
+                if (string.IsNullOrEmpty(paymentSessionHistory))
                 {
                     return new List<PaymentSession>();
                 }
@@ -233,84 +230,16 @@ namespace BoltApp
             }
             catch (Exception ex)
             {
-                LogError($"Failed to load pending transactions: {ex.Message}");
-                return new List<TransactionResult>();
+                LogError($"Failed to load payment session history: {ex.Message}");
+                return new List<PaymentSession>();
             }
         }
 
-        public List<TransactionResult> GetPendingTransactions()
+        public List<PaymentSession> GetPendingPaymentSessions()
         {
-            var paymentSessions = GetDevicePaymentSessions();
-            return paymentSessions.Where(t => t.Status == PaymentLinkStatus.Pending).ToList();
+            var paymentSessions = GetPaymentSessionHistory();
+            return paymentSessions.Where(p => p.Status == PaymentLinkStatus.Pending).ToList();
         }
-
-        public void CancelTransaction(string transactionId, bool serverValidated = false)
-        {
-            try
-            {
-                var transactionHistory = GetTransactions();
-                var transaction = transactionHistory.FirstOrDefault(t => t.TransactionId == transactionId);
-                if (transaction != null)
-                {
-                    transaction.Status = TransactionStatus.Cancelled;
-                    transaction.IsServerValidated = serverValidated;
-                    CreateOrUpdateTransaction(transaction);
-                }
-            }
-            catch (Exception ex)
-            {
-                LogError($"Failed to cancel transaction: {ex.Message}");
-            }
-        }
-
-        public void CompleteTransaction(string transactionId, bool serverValidated = false)
-        {
-            try
-            {
-                var transactionHistory = GetTransactions();
-                var transaction = transactionHistory.FirstOrDefault(t => t.TransactionId == transactionId);
-                if (transaction != null)
-                {
-                    transaction.Status = TransactionStatus.Completed;
-                    transaction.IsServerValidated = serverValidated;
-                    CreateOrUpdateTransaction(transaction);
-                }
-            }
-            catch (Exception ex)
-            {
-                LogError($"Failed to complete transaction: {ex.Message}");
-            }
-        }
-
-        private void CreateOrUpdateTransaction(PaymentSession paymentSession)
-        {
-            try
-            {
-                var transactionHistory = GetTransactions();
-
-                // Find the transaction in the list and update it
-                var existingTransaction = transactionHistory.FirstOrDefault(t => t.TransactionId == transactionResult.TransactionId);
-                if (existingTransaction != null)
-                {
-                    existingTransaction = transactionResult;
-                }
-                else
-                {
-                    transactionHistory.Add(transactionResult);
-                }
-
-                var json = JsonUtility.ToJson(transactionHistory);
-                _StorageService.SetString(BoltPlayerPrefsKeys.PAYMENT_SESSION_HISTORY, json);
-            }
-            catch (Exception ex)
-            {
-                LogError($"Failed to save pending transactions: {ex.Message}");
-            }
-        }
-
-        #endregion
-
-        #region Logging
 
         private void LogDebug(string message)
         {
@@ -321,7 +250,5 @@ namespace BoltApp
         {
             Debug.LogError($"[BoltSDK] {message}");
         }
-
-        #endregion
     }
 }

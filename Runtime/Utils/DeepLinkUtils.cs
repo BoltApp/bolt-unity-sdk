@@ -6,28 +6,17 @@ namespace BoltApp
 {
     public static class DeepLinkUtils
     {
-        public static PaymentLinkResult ParsePaymentLinkResult(Dictionary<string, string> parameters)
+        public static PaymentSession ParsePaymentSessionResult(Dictionary<string, string> parameters)
         {
             try
             {
                 //  TODO - Use strong types for parameters
-                var transactionId = parameters.GetValueOrDefault("transaction_id", "");
+                var paymentLinkId = parameters.GetValueOrDefault("payment_link_id", "");
+                var paymentLinkUrl = parameters.GetValueOrDefault("payment_link_url", "");
                 var status = parameters.GetValueOrDefault("status", "");
-                var amount = parameters.GetValueOrDefault("amount", "");
-                var currency = parameters.GetValueOrDefault("currency", "");
-                var productId = parameters.GetValueOrDefault("product_id", "");
-                var email = parameters.GetValueOrDefault("email", "");
 
-                return new TransactionResult
-                {
-                    TransactionId = transactionId,
-                    Status = ParseTransactionStatus(status),
-                    Amount = ParseAmount(amount),
-                    Currency = currency,
-                    ProductId = productId,
-                    UserEmail = email,
-                    Timestamp = DateTime.UtcNow
-                };
+                var status = ParsePaymentLinkStatus(status);
+                return new PaymentSession(paymentLinkId, paymentLinkUrl, status);
             }
             catch (Exception ex)
             {
@@ -40,10 +29,10 @@ namespace BoltApp
             }
         }
 
-        static TransactionStatus ParseTransactionStatus(string status)
+        static PaymentLinkStatus ParsePaymentLinkStatus(string status)
         {
             if (string.IsNullOrEmpty(status))
-                return TransactionStatus.Pending;
+                return PaymentLinkStatus.Pending;
 
             var lowerStatus = status.ToLower();
             switch (lowerStatus)
@@ -51,27 +40,16 @@ namespace BoltApp
                 case "completed":
                 case "success":
                 case "successful":
-                    return TransactionStatus.Completed;
-                case "failed":
-                case "error":
-                    return TransactionStatus.Failed;
+                    return PaymentLinkStatus.Completed;
+                case "expired":
+                    return PaymentLinkStatus.Expired;
+                case "abandoned":
                 case "cancelled":
                 case "canceled":
-                    return TransactionStatus.Cancelled;
+                    return PaymentLinkStatus.Abandoned;
                 default:
-                    return TransactionStatus.Pending;
+                    return PaymentLinkStatus.Pending;
             }
-        }
-
-        static decimal ParseAmount(string amount)
-        {
-            if (string.IsNullOrEmpty(amount))
-                return 0m;
-
-            if (decimal.TryParse(amount, out var result))
-                return result;
-
-            return 0m;
         }
     }
 }
