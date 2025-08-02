@@ -10,8 +10,8 @@ namespace BoltApp
     /// </summary>
     public class BoltSDK : IBoltSDK
     {
-        public event Action<PaymentSession> onTransactionComplete;
-        public event Action<PaymentSession> onTransactionFailed;
+        public event Action<PaymentLinkSession> onTransactionComplete;
+        public event Action<PaymentLinkSession> onTransactionFailed;
         public event Action onWebLinkOpen;
         public BoltConfig Config { get; private set; }
         private IStorageService _StorageService;
@@ -94,22 +94,22 @@ namespace BoltApp
                 var paymentLinkId = queryParameters["payment_link_id"];
 
                 // Create a new payment session or lookup existing one
-                PaymentSession paymentSession = GetPaymentSession(paymentLinkId);
-                if (paymentSession == null)
+                PaymentLinkSession paymentLinkSession = GetPaymentLinkSession(paymentLinkId);
+                if (paymentLinkSession == null)
                 {
-                    paymentSession = new PaymentSession(paymentLinkId, checkoutLinkWithParams);
-                    SavePaymentSession(paymentSession);
+                    paymentLinkSession = new PaymentLinkSession(paymentLinkId, checkoutLinkWithParams);
+                    SavePaymentLinkSession(paymentLinkSession);
                 }
                 else
                 {
-                    paymentSession.UpdateStatus(PaymentLinkStatus.Pending);
-                    SavePaymentSession(paymentSession);
+                    paymentLinkSession.UpdateStatus(PaymentLinkStatus.Pending);
+                    SavePaymentLinkSession(paymentLinkSession);
                 }
 
                 // Invoke callbacks and open checkout link
-                LogDebug($"Opening checkout link: {paymentSession.PaymentLinkUrl}");
+                LogDebug($"Opening checkout link: {paymentLinkSession.PaymentLinkUrl}");
                 onWebLinkOpen?.Invoke();
-                Application.OpenURL(paymentSession.PaymentLinkUrl);
+                Application.OpenURL(paymentLinkSession.PaymentLinkUrl);
             }
             catch (Exception ex)
             {
@@ -141,28 +141,28 @@ namespace BoltApp
                 var temporalSessionResult = DeepLinkUtils.ParsePaymentLinkResult(queryParameters);
 
                 // Map temporal session status to existing one on device
-                var paymentSession = GetPaymentSession(temporalSessionResult.PaymentLinkId);
-                if (paymentSession != null)
+                var paymentLinkSession = GetPaymentLinkSession(temporalSessionResult.PaymentLinkId);
+                if (paymentLinkSession != null)
                 {
-                    paymentSession.UpdateStatus(temporalSessionResult.Status);
-                    SavePaymentSession(paymentSession);
+                    paymentLinkSession.UpdateStatus(temporalSessionResult.Status);
+                    SavePaymentLinkSession(paymentLinkSession);
                 }
                 else
                 {
-                    paymentSession = temporalSessionResult;
-                    SavePaymentSession(paymentSession);
+                    paymentLinkSession = temporalSessionResult;
+                    SavePaymentLinkSession(paymentLinkSession);
                 }
 
                 // Invoke event based on payment session status
-                if (paymentSession.Status == PaymentLinkStatus.Successful)
+                if (paymentLinkSession.Status == PaymentLinkStatus.Successful)
                 {
-                    onTransactionComplete?.Invoke(paymentSession);
-                    LogDebug($"Successful weblink callback for transaction: {paymentSession.PaymentLinkId}");
+                    onTransactionComplete?.Invoke(paymentLinkSession);
+                    LogDebug($"Successful weblink callback for transaction: {paymentLinkSession.PaymentLinkId}");
                 }
                 else
                 {
-                    onTransactionFailed?.Invoke(paymentSession);
-                    LogError($"Failed weblink callback for transaction: {paymentSession.Status}");
+                    onTransactionFailed?.Invoke(paymentLinkSession);
+                    LogError($"Failed weblink callback for transaction: {paymentLinkSession.Status}");
                 }
             }
             catch (Exception ex)
@@ -172,40 +172,40 @@ namespace BoltApp
             }
         }
 
-        public PaymentSession GetPaymentSession(string paymentLinkId)
+        public PaymentLinkSession GetPaymentLinkSession(string paymentLinkId)
         {
-            var paymentSessions = GetPaymentSessionHistory();
-            return paymentSessions.FirstOrDefault(p => p.PaymentLinkId == paymentLinkId);
+            var paymentLinkSessions = GetPaymentLinkSessionHistory();
+            return paymentLinkSessions.FirstOrDefault(p => p.PaymentLinkId == paymentLinkId);
         }
 
-        private PaymentSession SavePaymentSession(PaymentSession paymentSession)
+        private PaymentLinkSession SavePaymentLinkSession(PaymentLinkSession paymentLinkSession)
         {
-            var paymentSessions = GetPaymentSessionHistory();
-            var existingPaymentSession = paymentSessions.FirstOrDefault(p => p.PaymentLinkId == paymentSession.PaymentLinkId);
-            if (existingPaymentSession != null)
+            var paymentLinkSessions = GetPaymentLinkSessionHistory();
+            var existingPaymentLinkSession = paymentLinkSessions.FirstOrDefault(p => p.PaymentLinkId == paymentLinkSession.PaymentLinkId);
+            if (existingPaymentLinkSession != null)
             {
-                existingPaymentSession.UpdateStatus(paymentSession.Status);
+                existingPaymentLinkSession.UpdateStatus(paymentLinkSession.Status);
             }
             else
             {
-                paymentSessions.Add(paymentSession);
+                paymentLinkSessions.Add(paymentLinkSession);
             }
 
-            var json = JsonUtility.ToJson(paymentSessions);
+            var json = JsonUtility.ToJson(paymentLinkSessions);
             _StorageService.SetString(BoltPlayerPrefsKeys.PAYMENT_SESSION_HISTORY, json);
-            return paymentSession;
+            return paymentLinkSession;
         }
 
-        public void ResolvePaymentSession(string paymentLinkId, PaymentLinkStatus status = PaymentLinkStatus.Completed)
+        public void ResolvePaymentLinkSession(string paymentLinkId, PaymentLinkStatus status = PaymentLinkStatus.Completed)
         {
             try
             {
-                var paymentSessions = GetPaymentSessions();
-                var paymentSession = paymentSessions.FirstOrDefault(p => p.PaymentLinkId == paymentLinkId);
-                if (paymentSession != null)
+                var paymentLinkSessions = GetPaymentLinkSessions();
+                var paymentLinkSession = paymentLinkSessions.FirstOrDefault(p => p.PaymentLinkId == paymentLinkId);
+                if (paymentLinkSession != null)
                 {
-                    paymentSessions.Remove(paymentSession);
-                    var json = JsonUtility.ToJson(paymentSessions);
+                    paymentLinkSessions.Remove(paymentLinkSession);
+                    var json = JsonUtility.ToJson(paymentLinkSessions);
                     _StorageService.SetString(BoltPlayerPrefsKeys.PAYMENT_SESSION_HISTORY, json);
                 }
             }
@@ -215,30 +215,30 @@ namespace BoltApp
             }
         }
 
-        public List<PaymentSession> GetPaymentSessionHistory()
+        public List<PaymentLinkSession> GetPaymentLinkSessionHistory()
         {
             try
             {
-                var paymentSessionHistory = _StorageService.GetString(BoltPlayerPrefsKeys.PAYMENT_SESSION_HISTORY, "");
-                if (string.IsNullOrEmpty(paymentSessionHistory))
+                var paymentLinkSessionHistory = _StorageService.GetString(BoltPlayerPrefsKeys.PAYMENT_SESSION_HISTORY, "");
+                if (string.IsNullOrEmpty(paymentLinkSessionHistory))
                 {
-                    return new List<PaymentSession>();
+                    return new List<PaymentLinkSession>();
                 }
 
-                var paymentSessions = JsonUtility.FromJson<List<PaymentSession>>(historyData);
-                return paymentSessions ?? new List<PaymentSession>();
+                var paymentLinkSessions = JsonUtility.FromJson<List<PaymentLinkSession>>(historyData);
+                return paymentLinkSessions ?? new List<PaymentLinkSession>();
             }
             catch (Exception ex)
             {
                 LogError($"Failed to load payment session history: {ex.Message}");
-                return new List<PaymentSession>();
+                return new List<PaymentLinkSession>();
             }
         }
 
-        public List<PaymentSession> GetPendingPaymentSessions()
+        public List<PaymentLinkSession> GetPendingPaymentLinkSessions()
         {
-            var paymentSessions = GetPaymentSessionHistory();
-            return paymentSessions.Where(p => p.Status == PaymentLinkStatus.Pending).ToList();
+            var paymentLinkSessions = GetPaymentLinkSessionHistory();
+            return paymentLinkSessions.Where(p => p.Status == PaymentLinkStatus.Pending).ToList();
         }
 
         private void LogDebug(string message)

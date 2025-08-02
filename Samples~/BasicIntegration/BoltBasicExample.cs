@@ -65,13 +65,13 @@ namespace BoltApp.Samples
         private void VerifyRecentCheckouts()
         {
             // Check status of latest transaction with backend server
-            var pendingPaymentSessions = _boltSDK.GetPendingPaymentSessions();
-            if (pendingPaymentSessions.Count > 0)
+            var pendingPaymentLinkSessions = _boltSDK.GetPendingPaymentLinkSessions();
+            if (pendingPaymentLinkSessions.Count > 0)
             {
-                foreach (var paymentSession in pendingPaymentSessions)
+                foreach (var paymentLinkSession in pendingPaymentLinkSessions)
                 {
-                    var paymentLinkResult = await ServerVerifyPaymentLink(paymentSession.PaymentLinkId);
-                    _boltSDK.ResolvePaymentSession(paymentSession.PaymentLinkId, paymentLinkResult.Status);
+                    var paymentLinkResult = await ServerVerifyPaymentLink(paymentLinkSession.PaymentLinkId);
+                    _boltSDK.ResolvePaymentLinkSession(paymentLinkSession.PaymentLinkId, paymentLinkResult.Status);
                 }
             }
         }

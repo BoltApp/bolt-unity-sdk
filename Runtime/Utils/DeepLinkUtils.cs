@@ -6,7 +6,7 @@ namespace BoltApp
 {
     public static class DeepLinkUtils
     {
-        public static PaymentSession ParsePaymentSessionResult(Dictionary<string, string> parameters)
+        public static PaymentLinkSession ParsePaymentLinkSessionResult(Dictionary<string, string> parameters)
         {
             try
             {
@@ -16,7 +16,7 @@ namespace BoltApp
                 var status = parameters.GetValueOrDefault("status", "");
 
                 var status = ParsePaymentLinkStatus(status);
-                return new PaymentSession(paymentLinkId, paymentLinkUrl, status);
+                return new PaymentLinkSession(paymentLinkId, paymentLinkUrl, status);
             }
             catch (Exception ex)
             {
