@@ -132,7 +132,7 @@ namespace BoltApp
                 // Check if there is a data field in the callback url, if so then base64 decode it
                 if (callbackUrl.Contains("data="))
                 {
-                    var data = callbackUrl.Split('data=')[1];
+                    var data = callbackUrl.Split('=')[1];
                     callbackUrl = System.Text.Encoding.UTF8.GetString(System.Convert.FromBase64String(data));
                 }
 
@@ -157,7 +157,7 @@ namespace BoltApp
                 if (paymentSession.Status == PaymentLinkStatus.Successful)
                 {
                     onTransactionComplete?.Invoke(paymentSession);
-                    LogDebug($"Successful weblink callback for transaction: {paymentSession.PaymentLinkId}")
+                    LogDebug($"Successful weblink callback for transaction: {paymentSession.PaymentLinkId}");
                 }
                 else
                 {
