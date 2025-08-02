@@ -10,8 +10,8 @@ namespace BoltApp
     /// </summary>
     public class BoltSDK : IBoltSDK
     {
-        public event Action<PendingPaymentLink> onTransactionComplete;
-        public event Action<PendingPaymentLink> onTransactionFailed;
+        public event Action<PaymentSession> onTransactionComplete;
+        public event Action<PaymentSession> onTransactionFailed;
         public event Action onWebLinkOpen;
         public BoltConfig Config { get; private set; }
         private IStorageService _StorageService;
@@ -89,22 +89,22 @@ namespace BoltApp
                 }
 
                 var queryParameters = UrlUtils.ExtractQueryParameters(callbackUrl);
-                var paymentLinkResult = DeepLinkUtils.ParsePaymentLinkResult(queryParameters);
+                var paymentSessionResult = DeepLinkUtils.ParsePaymentLinkResult(queryParameters);
 
-                if (transactionResult.IsFailed)
+                if (paymentSessionResult.IsFailed)
                 {
-                    // Convert TransactionResult to PendingPaymentLink for interface compatibility
-                    var pendingPaymentLink = new PendingPaymentLink(transactionResult.TransactionId, "");
-                    onTransactionFailed?.Invoke(pendingPaymentLink);
-                    LogError($"Failed weblink callback for transaction: {transactionResult.ErrorMessage}");
+                    // Convert paymentSessionResult to PaymentSession for interface compatibility
+                    var PaymentSession = new PaymentSession(paymentSessionResult.TransactionId, "");
+                    onTransactionFailed?.Invoke(PaymentSession);
+                    LogError($"Failed weblink callback for transaction: {paymentSessionResult.ErrorMessage}");
                     return;
                 }
 
-                CreateOrUpdateTransaction(transactionResult);
-                // Convert TransactionResult to PendingPaymentLink for interface compatibility
-                var paymentLink = new PendingPaymentLink(transactionResult.TransactionId, "");
-                onTransactionComplete?.Invoke(paymentLink);
-                LogDebug($"Successful weblink callback for transaction: {transactionResult.TransactionId}");
+                CreateOrUpdateTransaction(paymentSessionResult);
+                // Convert paymentSessionResult to PaymentSession for interface compatibility
+                var paymentSession = new PaymentSession(paymentSessionResult.TransactionId, "");
+                onTransactionComplete?.Invoke(paymentSession);
+                LogDebug($"Successful weblink callback for transaction: {paymentSessionResult.TransactionId}");
             }
             catch (Exception ex)
             {
@@ -113,38 +113,38 @@ namespace BoltApp
             }
         }
 
-        public List<PendingPaymentLink> GetPendingPaymentLinks()
+        public List<PaymentSession> GetPaymentSessions()
         {
             try
             {
-                var historyData = _StorageService.GetString(BoltPlayerPrefsKeys.TRANSACTION_HISTORY, "");
+                var historyData = _StorageService.GetString(BoltPlayerPrefsKeys.PAYMENT_SESSION_HISTORY, "");
                 if (string.IsNullOrEmpty(historyData))
                 {
-                    return new List<PendingPaymentLink>();
+                    return new List<PaymentSession>();
                 }
 
                 var transactions = JsonUtility.FromJson<List<TransactionResult>>(historyData);
                 if (transactions == null)
                 {
-                    return new List<PendingPaymentLink>();
+                    return new List<PaymentSession>();
                 }
 
-                // Convert TransactionResult to PendingPaymentLink
-                var pendingPaymentLinks = transactions
+                // Convert TransactionResult to PaymentSession
+                var PaymentSessions = transactions
                     .Where(t => t.Status == TransactionStatus.Pending)
-                    .Select(t => new PendingPaymentLink(t.TransactionId, ""))
+                    .Select(t => new PaymentSession(t.TransactionId, ""))
                     .ToList();
 
-                return pendingPaymentLinks;
+                return PaymentSessions;
             }
             catch (Exception ex)
             {
                 LogError($"Failed to load pending payment links: {ex.Message}");
-                return new List<PendingPaymentLink>();
+                return new List<PaymentSession>();
             }
         }
 
-        public void RemovePendingPaymentLink(string paymentLinkId)
+        public void RemovePaymentSession(string paymentLinkId)
         {
             try
             {
@@ -154,7 +154,7 @@ namespace BoltApp
                 {
                     transactionHistory.Remove(transaction);
                     var json = JsonUtility.ToJson(transactionHistory);
-                    _StorageService.SetString(BoltPlayerPrefsKeys.TRANSACTION_HISTORY, json);
+                    _StorageService.SetString(BoltPlayerPrefsKeys.PAYMENT_SESSION_HISTORY, json);
                 }
             }
             catch (Exception ex)
@@ -218,18 +218,18 @@ namespace BoltApp
             }
         }
 
-        public List<TransactionResult> GetTransactions()
+        public List<PaymentSession> GetDevicePaymentSessions()
         {
             try
             {
-                var historyData = _StorageService.GetString(BoltPlayerPrefsKeys.TRANSACTION_HISTORY, "");
+                var historyData = _StorageService.GetString(BoltPlayerPrefsKeys.PAYMENT_SESSION_HISTORY, "");
                 if (string.IsNullOrEmpty(historyData))
                 {
-                    return new List<TransactionResult>();
+                    return new List<PaymentSession>();
                 }
 
-                var transactions = JsonUtility.FromJson<List<TransactionResult>>(historyData);
-                return transactions ?? new List<TransactionResult>();
+                var paymentSessions = JsonUtility.FromJson<List<PaymentSession>>(historyData);
+                return paymentSessions ?? new List<PaymentSession>();
             }
             catch (Exception ex)
             {
@@ -240,8 +240,8 @@ namespace BoltApp
 
         public List<TransactionResult> GetPendingTransactions()
         {
-            var transactions = GetTransactions();
-            return transactions.Where(t => t.Status == TransactionStatus.Pending).ToList();
+            var paymentSessions = GetDevicePaymentSessions();
+            return paymentSessions.Where(t => t.Status == PaymentLinkStatus.Pending).ToList();
         }
 
         public void CancelTransaction(string transactionId, bool serverValidated = false)
@@ -282,7 +282,7 @@ namespace BoltApp
             }
         }
 
-        private void CreateOrUpdateTransaction(TransactionResult transactionResult)
+        private void CreateOrUpdateTransaction(PaymentSession paymentSession)
         {
             try
             {
@@ -300,7 +300,7 @@ namespace BoltApp
                 }
 
                 var json = JsonUtility.ToJson(transactionHistory);
-                _StorageService.SetString(BoltPlayerPrefsKeys.TRANSACTION_HISTORY, json);
+                _StorageService.SetString(BoltPlayerPrefsKeys.PAYMENT_SESSION_HISTORY, json);
             }
             catch (Exception ex)
             {

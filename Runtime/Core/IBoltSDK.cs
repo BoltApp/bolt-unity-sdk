@@ -19,6 +19,5 @@ namespace BoltApp
         List<PaymentSession> GetPendingPaymentSessions();
         PaymentSession ResolvePaymentSession(string paymentLinkId, PaymentLinkStatus status);
         List<PaymentSession> GetDevicePaymentSessionHistory();
-
     }
 }
