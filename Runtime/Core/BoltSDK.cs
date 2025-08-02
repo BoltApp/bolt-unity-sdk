@@ -93,7 +93,7 @@ namespace BoltApp
                 var queryParameters = UrlUtils.ExtractQueryParameters(checkoutLinkWithParams);
                 var paymentLinkId = queryParameters["payment_link_id"];
 
-                // Create a new payment session or lookup existing one
+                // Create a new payment link session or lookup existing one
                 PaymentLinkSession paymentLinkSession = GetPaymentLinkSession(paymentLinkId);
                 if (paymentLinkSession == null)
                 {
@@ -136,7 +136,7 @@ namespace BoltApp
                     callbackUrl = System.Text.Encoding.UTF8.GetString(System.Convert.FromBase64String(data));
                 }
 
-                // Create a temporary payment session based on query parameters provided in the callback url
+                // Create a temporary payment link session based on query parameters provided in the callback url
                 var queryParameters = UrlUtils.ExtractQueryParameters(callbackUrl);
                 var temporalSessionResult = DeepLinkUtils.ParsePaymentLinkResult(queryParameters);
 
@@ -153,7 +153,7 @@ namespace BoltApp
                     SavePaymentLinkSession(paymentLinkSession);
                 }
 
-                // Invoke event based on payment session status
+                // Invoke event based on payment link session status
                 if (paymentLinkSession.Status == PaymentLinkStatus.Successful)
                 {
                     onTransactionComplete?.Invoke(paymentLinkSession);
@@ -196,7 +196,7 @@ namespace BoltApp
             return paymentLinkSession;
         }
 
-        public void ResolvePaymentLinkSession(string paymentLinkId, PaymentLinkStatus status = PaymentLinkStatus.Completed)
+        public PaymentLinkSession ResolvePaymentLinkSession(string paymentLinkId, PaymentLinkStatus status = PaymentLinkStatus.Completed)
         {
             try
             {
@@ -208,10 +208,11 @@ namespace BoltApp
                     var json = JsonUtility.ToJson(paymentLinkSessions);
                     _StorageService.SetString(BoltPlayerPrefsKeys.PAYMENT_SESSION_HISTORY, json);
                 }
+                return paymentLinkSession;
             }
             catch (Exception ex)
             {
-                LogError($"Failed to resolve payment session: {ex.Message}");
+                LogError($"Failed to resolve payment link session: {ex.Message}");
             }
         }
 
@@ -230,7 +231,7 @@ namespace BoltApp
             }
             catch (Exception ex)
             {
-                LogError($"Failed to load payment session history: {ex.Message}");
+                LogError($"Failed to load payment link session history: {ex.Message}");
                 return new List<PaymentLinkSession>();
             }
         }
