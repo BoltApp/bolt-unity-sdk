@@ -15,7 +15,7 @@ namespace BoltApp
         BoltUser GetBoltUser();
         BoltUser SetBoltUserData(string email = null, string locale = null, string country = null);
         void OpenCheckout(string checkoutLink);
-        void HandleDeepLinkCallback(string callbackUrl);
+        PaymentLinkSession HandleDeepLinkCallback(string callbackUrl);
         PaymentLinkSession GetPaymentLinkSession(string paymentLinkId);
         PaymentLinkSession ResolvePaymentLinkSession(string paymentLinkId, PaymentLinkStatus status = PaymentLinkStatus.Completed);
         List<PaymentLinkSession> GetPaymentLinkSessionHistory();

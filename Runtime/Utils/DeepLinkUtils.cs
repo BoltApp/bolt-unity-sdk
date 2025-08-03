@@ -15,17 +15,13 @@ namespace BoltApp
                 var paymentLinkUrl = parameters.GetValueOrDefault("payment_link_url", "");
                 var status = parameters.GetValueOrDefault("status", "");
 
-                var status = ParsePaymentLinkStatus(status);
-                return new PaymentLinkSession(paymentLinkId, paymentLinkUrl, status);
+                PaymentLinkStatus paymentLinkStatus = ParsePaymentLinkStatus(status);
+                return new PaymentLinkSession(paymentLinkId, paymentLinkUrl, paymentLinkStatus);
             }
             catch (Exception ex)
             {
-                Debug.LogError($"[BoltSDK] Failed to parse transaction result: {ex.Message}");
-                return new TransactionResult
-                {
-                    Status = TransactionStatus.Failed,
-                    ErrorMessage = ex.Message
-                };
+                Debug.LogError($"[BoltSDK] Failed to parse payment link session result: {ex.Message}");
+                return null;
             }
         }
 

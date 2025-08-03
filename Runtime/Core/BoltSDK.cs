@@ -118,7 +118,7 @@ namespace BoltApp
             }
         }
 
-        public void HandleDeepLinkCallback(string callbackUrl)
+        public void HandleDeepLinkCallback(string callbackUrl, bool triggerCallbacks = false)
         {
             try
             {
@@ -138,7 +138,12 @@ namespace BoltApp
 
                 // Create a temporary payment link session based on query parameters provided in the callback url
                 var queryParameters = UrlUtils.ExtractQueryParameters(callbackUrl);
-                var temporalSessionResult = DeepLinkUtils.ParsePaymentLinkResult(queryParameters);
+                var temporalSessionResult = DeepLinkUtils.ParsePaymentLinkSessionResult(queryParameters);
+                if (temporalSessionResult == null)
+                {
+                    LogError($"Failed to parse payment link session result: {callbackUrl}");
+                    return;
+                }
 
                 // Map temporal session status to existing one on device
                 var paymentLinkSession = GetPaymentLinkSession(temporalSessionResult.PaymentLinkId);
@@ -154,15 +159,18 @@ namespace BoltApp
                 }
 
                 // Invoke event based on payment link session status
-                if (paymentLinkSession.Status == PaymentLinkStatus.Successful)
+                if (triggerCallbacks)
                 {
-                    onTransactionComplete?.Invoke(paymentLinkSession);
-                    LogDebug($"Successful weblink callback for transaction: {paymentLinkSession.PaymentLinkId}");
-                }
-                else
-                {
-                    onTransactionFailed?.Invoke(paymentLinkSession);
-                    LogError($"Failed weblink callback for transaction: {paymentLinkSession.Status}");
+                    if (paymentLinkSession.Status == PaymentLinkStatus.Successful)
+                    {
+                        onTransactionComplete?.Invoke(paymentLinkSession);
+                        LogDebug($"Successful weblink callback for transaction: {paymentLinkSession.PaymentLinkId}");
+                    }
+                    else
+                    {
+                        onTransactionFailed?.Invoke(paymentLinkSession);
+                        LogError($"Failed weblink callback for transaction: {paymentLinkSession.Status}");
+                    }
                 }
             }
             catch (Exception ex)
@@ -207,6 +215,14 @@ namespace BoltApp
                     paymentLinkSessions.Remove(paymentLinkSession);
                     var json = JsonUtility.ToJson(paymentLinkSessions);
                     _StorageService.SetString(BoltPlayerPrefsKeys.PAYMENT_SESSION_HISTORY, json);
+                }
+                if (status == PaymentLinkStatus.Successful)
+                {
+                    onTransactionComplete?.Invoke(paymentLinkSession);
+                }
+                else
+                {
+                    onTransactionFailed?.Invoke(paymentLinkSession);
                 }
                 return paymentLinkSession;
             }
