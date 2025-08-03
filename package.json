@@ -11,9 +11,6 @@
     "email": "support@bolt.com",
     "url": "https://bolt.com"
   },
-  "dependencies": {
-    "com.unity.nuget.newtonsoft-json": "3.0.2"
-  },
   "testables": [
     "com.unity.test-framework"
   ],

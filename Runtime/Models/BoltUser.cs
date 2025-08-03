@@ -15,7 +15,7 @@ namespace BoltApp
         public string? Country { get; set; }
         public string? DeviceId { get; set; }
         public DateTime CreatedAt { get; set; }
-        public DateTime LastActive { get; set; }
+        public DateTime UpdatedAt { get; set; }
 
         public BoltUser(string email, string locale, string country, string deviceId)
         {
@@ -23,6 +23,11 @@ namespace BoltApp
             Locale = locale;
             Country = country;
             DeviceId = deviceId;
+            UpdatedAt = DateTime.UtcNow;
+            if (CreatedAt == null)
+            {
+                CreatedAt = DateTime.UtcNow;
+            }
         }
 
         public override string ToString()
@@ -33,7 +38,7 @@ namespace BoltApp
                 $" Locale: {nullString(Locale)}," +
                 $" Country: {nullString(Country)}," +
                 $" CreatedAt: {CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")}," +
-                $" LastActive: {LastActive.ToString("yyyy-MM-dd HH:mm:ss")})";
+                $" UpdatedAt: {UpdatedAt.ToString("yyyy-MM-dd HH:mm:ss")})";
         }
 
         public Dictionary<string, string> ToDictionary()
@@ -45,7 +50,7 @@ namespace BoltApp
                 { "locale", Locale ?? "" },
                 { "country", Country ?? "" },
                 { "created_at", CreatedAt.ToString("yyyy-MM-dd HH:mm:ss") },
-                { "last_active", LastActive.ToString("yyyy-MM-dd HH:mm:ss") }
+                { "updated_at", UpdatedAt.ToString("yyyy-MM-dd HH:mm:ss") }
             };
         }
     }

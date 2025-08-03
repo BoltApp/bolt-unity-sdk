@@ -31,6 +31,6 @@ namespace BoltApp
         /// <summary>
         /// Key for storing transaction history
         /// </summary>
-        public const string TRANSACTION_HISTORY = PREFIX + "transaction_history";
+        public const string PAYMENT_SESSION_HISTORY = PREFIX + "payment_session_history";
     }
 }

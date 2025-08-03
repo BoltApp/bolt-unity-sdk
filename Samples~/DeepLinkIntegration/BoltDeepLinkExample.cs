@@ -5,15 +5,15 @@ using UnityEngine;
 namespace BoltApp.Samples
 {
     /// <summary>
-    /// Deep Link example showing how to integrate the Bolt SDK
+    /// Deep Link example showing how to integrate the Bolt SDK with a web callback
     /// Use this as reference for your own implementation.
     /// </summary>
     public class BoltDeepLinkExample : MonoBehaviour
     {
-        private BoltSDK _boltSDK;
+        private BoltSDK boltSDK;
 
-        // It is best practice to store deep links in a queue to handle multiple deep links
-        private Queue<string> _pendingDeepLinks = new Queue<string>();
+        // It is best practice to store deep links in a queue to handle multiple links back to the app
+        private Queue<string> pendingDeepLinks = new Queue<string>();
 
         void Start()
         {
@@ -21,19 +21,16 @@ namespace BoltApp.Samples
                 "com.yourgameid.test",
                 "YourAppNameForDeepLinks://",
                 BoltConfig.Environment.Development);
-            _boltSDK = new BoltSDK(boltConfig);
-            _boltSDK.onTransactionComplete += OnTransactionComplete;
-            _boltSDK.onTransactionFailed += OnTransactionFailed;
-            _boltSDK.onWebLinkOpen += onWebLinkOpen;
-        }
+            boltSDK = new BoltSDK(boltConfig);
+            boltSDK.onTransactionComplete += OnTransactionComplete;
+            boltSDK.onTransactionFailed += OnTransactionFailed;
+            boltSDK.onWebLinkOpen += onWebLinkOpen;
 
-        void Awake()
-        {
-            // Check for transactions or deep links on app on load
+            // Process any deep links that were received before the SDK was initialized
             OnResume();
         }
 
-        async Task OnApplicationFocus(bool hasFocus)
+        void OnApplicationFocus(bool hasFocus)
         {
             // Check for transactions or deep links on app resume
             if (hasFocus)
@@ -47,26 +44,50 @@ namespace BoltApp.Samples
             // Check Unity's built-in deep link properties
             if (!string.IsNullOrEmpty(Application.deepLink))
             {
-                _pendingDeepLinks.Enqueue(Application.deepLink);
+                pendingDeepLinks.Enqueue(Application.deepLink);
                 Application.deepLink = null;
             }
 
+            // Check for transactions or deep links on app resume
             if (!string.IsNullOrEmpty(Application.absoluteURL))
             {
-                _pendingDeepLinks.Enqueue(Application.absoluteURL);
+                pendingDeepLinks.Enqueue(Application.absoluteURL);
                 Application.absoluteURL = null;
             }
 
             ProcessPendingDeepLinks();
         }
 
-        void ProcessPendingDeepLinks()
+        async void ProcessPendingDeepLinks()
         {
-            while (_pendingDeepLinks.Count > 0)
+            while (pendingDeepLinks.Count > 0)
             {
-                var deepLink = _pendingDeepLinks.Dequeue();
-                _boltSDK.HandleDeepLinkCallback(deepLink);
+                var deepLink = pendingDeepLinks.Dequeue();
+                PaymentLinkSession paymentLinkSession = boltSDK.HandleDeepLinkCallback(deepLink, true);
+                if (paymentLinkSession != null)
+                {
+                    // Optional: Call your backend to verify the payment link status
+                    var paymentLinkResult = await VerifyPaymentLinkSuccess(paymentLinkSession.PaymentLinkId);
+
+                    // Resolve the payment link session with the result
+                    // Note: This SDK call will trigger the onTransactionComplete or onTransactionFailed callbacks
+                    boltSDK.ResolvePaymentLinkSession(paymentLinkSession.PaymentLinkId, paymentLinkResult);
+                }
             }
+        }
+
+        /// <summary>
+        /// Mock helper function to verify transaction with backend server
+        /// </summary>
+        /// <param name="paymentLinkId">The payment link ID to verify</param>
+        /// <returns>The payment link status</returns>
+        private PaymentLinkStatus VerifyPaymentLinkSuccess(string paymentLinkId)
+        {
+            // TODO: Use your http client to call backend to verify the transactionID was successful
+            // In that server call you can check for a webhook or perform a GET on the transactionID
+
+            // Example response
+            return PaymentLinkStatus.Successful;
         }
 
         /// <summary>
@@ -75,7 +96,7 @@ namespace BoltApp.Samples
         /// </summary>
         private void OnTransactionComplete(TransactionResult result)
         {
-            Debug.Log("Transaction complete: " + result.TransactionId);
+            Debug.Log("Transaction success: " + result.TransactionId);
         }
 
         /// <summary>
@@ -93,9 +114,8 @@ namespace BoltApp.Samples
         /// </summary>
         private void onWebLinkOpen()
         {
-            // Consider firing analytic event here.
+            // Consider firing analytic event here or dimming the screen to indicate that the checkout is open
             Debug.Log("Checkout open.");
-            checkoutIsOpen = true;
         }
     }
 }

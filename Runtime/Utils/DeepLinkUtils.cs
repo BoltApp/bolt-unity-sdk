@@ -6,44 +6,29 @@ namespace BoltApp
 {
     public static class DeepLinkUtils
     {
-        public static TransactionResult ParseTransactionResult(Dictionary<string, string> parameters)
+        public static PaymentLinkSession ParsePaymentLinkSessionResult(Dictionary<string, string> parameters)
         {
             try
             {
                 //  TODO - Use strong types for parameters
-                var transactionId = parameters.GetValueOrDefault("transaction_id", "");
+                var paymentLinkId = parameters.GetValueOrDefault("payment_link_id", "");
+                var paymentLinkUrl = parameters.GetValueOrDefault("payment_link_url", "");
                 var status = parameters.GetValueOrDefault("status", "");
-                var amount = parameters.GetValueOrDefault("amount", "");
-                var currency = parameters.GetValueOrDefault("currency", "");
-                var productId = parameters.GetValueOrDefault("product_id", "");
-                var email = parameters.GetValueOrDefault("email", "");
 
-                return new TransactionResult
-                {
-                    TransactionId = transactionId,
-                    Status = ParseTransactionStatus(status),
-                    Amount = ParseAmount(amount),
-                    Currency = currency,
-                    ProductId = productId,
-                    UserEmail = email,
-                    Timestamp = DateTime.UtcNow
-                };
+                PaymentLinkStatus paymentLinkStatus = ParsePaymentLinkStatus(status);
+                return new PaymentLinkSession(paymentLinkId, paymentLinkUrl, paymentLinkStatus);
             }
             catch (Exception ex)
             {
-                Debug.LogError($"[BoltSDK] Failed to parse transaction result: {ex.Message}");
-                return new TransactionResult
-                {
-                    Status = TransactionStatus.Failed,
-                    ErrorMessage = ex.Message
-                };
+                Debug.LogError($"[BoltSDK] Failed to parse payment link session result: {ex.Message}");
+                return null;
             }
         }
 
-        static TransactionStatus ParseTransactionStatus(string status)
+        static PaymentLinkStatus ParsePaymentLinkStatus(string status)
         {
             if (string.IsNullOrEmpty(status))
-                return TransactionStatus.Pending;
+                return PaymentLinkStatus.Pending;
 
             var lowerStatus = status.ToLower();
             switch (lowerStatus)
@@ -51,27 +36,16 @@ namespace BoltApp
                 case "completed":
                 case "success":
                 case "successful":
-                    return TransactionStatus.Completed;
-                case "failed":
-                case "error":
-                    return TransactionStatus.Failed;
+                    return PaymentLinkStatus.Successful;
+                case "expired":
+                    return PaymentLinkStatus.Expired;
+                case "abandoned":
                 case "cancelled":
                 case "canceled":
-                    return TransactionStatus.Cancelled;
+                    return PaymentLinkStatus.Abandoned;
                 default:
-                    return TransactionStatus.Pending;
+                    return PaymentLinkStatus.Pending;
             }
-        }
-
-        static decimal ParseAmount(string amount)
-        {
-            if (string.IsNullOrEmpty(amount))
-                return 0m;
-
-            if (decimal.TryParse(amount, out var result))
-                return result;
-
-            return 0m;
         }
     }
 }

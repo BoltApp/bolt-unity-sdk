@@ -10,8 +10,8 @@ namespace BoltApp
     /// </summary>
     public class BoltSDK : IBoltSDK
     {
-        public event Action<TransactionResult> onTransactionComplete;
-        public event Action<TransactionResult> onTransactionFailed;
+        public event Action<PaymentLinkSession> onTransactionComplete;
+        public event Action<PaymentLinkSession> onTransactionFailed;
         public event Action onWebLinkOpen;
         public BoltConfig Config { get; private set; }
         private IStorageService _StorageService;
@@ -28,11 +28,16 @@ namespace BoltApp
             _StorageService = new PlayerPrefsStorageService();
         }
 
+        public BoltUser GetBoltUser()
+        {
+            return GetUserData();
+        }
+
         public BoltUser SetBoltUserData(string email = null, string locale = null, string country = null)
         {
             var user = GetUserData();
 
-            // TODO - provide type validation safety
+            // TODO - provide type validation safety for all fields
             if (email != null)
                 user.Email = email;
             if (locale != null)
@@ -44,91 +49,6 @@ namespace BoltApp
             return user;
         }
 
-        public BoltUser GetBoltUser()
-        {
-            return GetUserData();
-        }
-
-        public void OpenCheckout(string checkoutLink, IReadOnlyDictionary<string, string> extraParams = null)
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(checkoutLink))
-                    throw new BoltSDKException("Checkout link cannot be null or empty");
-
-                BoltUser boltUser = GetUserData();
-                string finalCheckoutLink = UrlUtils.BuildCheckoutLink(checkoutLink, Config, boltUser, extraParams);
-
-                LogDebug($"Opening checkout link: {finalCheckoutLink}");
-                onWebLinkOpen?.Invoke();
-                Application.OpenURL(finalCheckoutLink.ToString());
-            }
-            catch (Exception ex)
-            {
-                LogError($"Failed to open checkout link'{checkoutLink}': {ex.Message}");
-                throw;
-            }
-        }
-
-        public TransactionResult HandleDeepLinkCallback(string callbackUrl)
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(callbackUrl))
-                {
-                    var errorMessage = "Failed to parse transaction. 'callbackUrl' cannot be null or empty";
-                    LogError(errorMessage);
-                    return new TransactionResult
-                    {
-                        Status = TransactionStatus.Failed,
-                        ErrorMessage = errorMessage,
-                        TransactionId = ""
-                    };
-                }
-
-                // Check if base64 encode (usually is)
-                if (callbackUrl.Contains("base64"))
-                {
-                    callbackUrl = System.Text.Encoding.UTF8.GetString(System.Convert.FromBase64String(callbackUrl));
-                }
-
-                if (Config.deepLinkAppName != null && !callbackUrl.Contains(Config.deepLinkAppName))
-                {
-                    // Skip deep link callback if it does not match the provided app name
-                    LogDebug($"Deep link callback URL does not match config: {callbackUrl}. Expected: {Config.deepLinkAppName}");
-                    return null;
-                }
-
-                var queryParameters = UrlUtils.ExtractQueryParameters(callbackUrl);
-                var transactionResult = DeepLinkUtils.ParseTransactionResult(queryParameters);
-
-                if (transactionResult.IsFailed)
-                {
-                    onTransactionFailed?.Invoke(transactionResult);
-                    LogError($"Failed weblink callback for transaction: {transactionResult.ErrorMessage}");
-                    return transactionResult;
-                }
-
-                CreateOrUpdateTransaction(transactionResult);
-                onTransactionComplete?.Invoke(transactionResult);
-                LogDebug($"Successful weblink callback for transaction: {transactionResult.TransactionId}");
-                return transactionResult;
-            }
-            catch (Exception ex)
-            {
-                string errorMessage = $"Error during weblink callback: {ex.Message}";
-                LogError(errorMessage);
-                return new TransactionResult
-                {
-                    Status = TransactionStatus.Failed,
-                    ErrorMessage = errorMessage,
-                    TransactionId = ""
-                };
-            }
-        }
-
-        #region Private Methods
-
         private BoltUser GetUserData()
         {
             var locale = DeviceUtils.GetDeviceLocale();
@@ -138,11 +58,14 @@ namespace BoltApp
             try
             {
                 var user = _StorageService.GetObject<BoltUser>(BoltPlayerPrefsKeys.USER_DATA);
+
+                // Create new user object if user data is not found or is invalid
                 if (user == null || user.DeviceId != deviceId || user.Locale != locale || user.Country != country)
                 {
                     var email = user?.Email ?? "";
                     user = new BoltUser(email, locale, country, deviceId);
                 }
+
                 _StorageService.SetObject(BoltPlayerPrefsKeys.USER_DATA, user);
                 return user;
             }
@@ -155,145 +78,192 @@ namespace BoltApp
             }
         }
 
-        private TransactionResult CreateNewTransaction(string productId, float price, string currency)
+        public void OpenCheckout(string checkoutLink)
         {
             try
             {
-                BoltUser boltUser = GetUserData();
-                var pendingTransaction = new TransactionResult
+                if (string.IsNullOrEmpty(checkoutLink))
                 {
-                    TransactionId = Guid.NewGuid().ToString(),
-                    Status = TransactionStatus.Pending,
-                    Amount = (decimal)price,
-                    Currency = currency,
-                    ProductId = productId,
-                    UserEmail = boltUser.Email,
-                    IsServerValidated = false,
-                    Timestamp = DateTime.UtcNow
-                };
+                    LogError("Checkout link cannot be null or empty");
+                    return;
+                }
 
-                CreateOrUpdateTransaction(pendingTransaction);
-                return pendingTransaction;
+                // Append user info to checkout link
+                BoltUser boltUser = GetUserData();
+                string checkoutLinkWithParams = UrlUtils.BuildCheckoutLink(checkoutLink, Config, boltUser);
+
+                // Extract payment link id from checkout link
+                var queryParameters = UrlUtils.ExtractQueryParameters(checkoutLinkWithParams);
+                var paymentLinkId = queryParameters["payment_link_id"];
+                if (string.IsNullOrEmpty(paymentLinkId))
+                {
+                    LogError("Failed to extract payment_link_id from checkout link");
+                    return;
+                }
+
+                // Create a new payment link session or lookup existing one
+                PaymentLinkSession paymentLinkSession = GetPaymentLinkSession(paymentLinkId);
+                if (paymentLinkSession == null || !paymentLinkSession.IsValid())
+                {
+                    paymentLinkSession = new PaymentLinkSession(paymentLinkId, checkoutLinkWithParams);
+                    SavePaymentLinkSession(paymentLinkSession);
+                }
+                else
+                {
+                    paymentLinkSession.UpdateStatus(PaymentLinkStatus.Pending);
+                    SavePaymentLinkSession(paymentLinkSession);
+                }
+
+                // Invoke callbacks and open checkout link
+                LogDebug($"Opening checkout link: {paymentLinkSession.PaymentLinkUrl}");
+                onWebLinkOpen?.Invoke();
+                Application.OpenURL(paymentLinkSession.PaymentLinkUrl);
             }
             catch (Exception ex)
             {
-                LogError($"Failed to create new transaction: {ex.Message}");
+                LogError($"Failed to open checkout link'{checkoutLink}': {ex.Message}");
+                throw;
+            }
+        }
+
+        public PaymentLinkSession HandleDeepLinkCallback(string callbackUrl)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(callbackUrl))
+                {
+                    LogError("Failed to parse transaction. 'callbackUrl' cannot be null or empty");
+                    return null;
+                }
+
+                // Check if there is a data field in the callback url, if so then base64 decode it
+                if (callbackUrl.Contains("data="))
+                {
+                    var data = callbackUrl.Split('=')[1];
+                    callbackUrl = System.Text.Encoding.UTF8.GetString(System.Convert.FromBase64String(data));
+                }
+
+                // Create a temporary payment link session based on query parameters provided in the callback url
+                var queryParameters = UrlUtils.ExtractQueryParameters(callbackUrl);
+                var temporalSessionResult = DeepLinkUtils.ParsePaymentLinkSessionResult(queryParameters);
+                if (temporalSessionResult == null)
+                {
+                    LogError($"Failed to parse payment link session result: {callbackUrl}");
+                    return null;
+                }
+
+                // Map temporal session status to existing one on device
+                var paymentLinkSession = GetPaymentLinkSession(temporalSessionResult.PaymentLinkId);
+                if (paymentLinkSession != null)
+                {
+                    paymentLinkSession.UpdateStatus(temporalSessionResult.Status);
+                }
+                else
+                {
+                    paymentLinkSession = temporalSessionResult;
+                }
+
+                return paymentLinkSession;
+            }
+            catch (Exception ex)
+            {
+                LogError($"Error during weblink callback: {ex.Message}");
                 return null;
             }
         }
 
-        public List<TransactionResult> GetTransactions()
+        public PaymentLinkSession GetPaymentLinkSession(string paymentLinkId)
+        {
+            var paymentLinkSessions = GetPaymentLinkSessionHistory();
+            return paymentLinkSessions.FirstOrDefault(p => p.PaymentLinkId == paymentLinkId);
+        }
+
+        private PaymentLinkSession SavePaymentLinkSession(PaymentLinkSession paymentLinkSession)
+        {
+            if (!paymentLinkSession.IsValid())
+            {
+                LogError($"Invalid payment link session: {paymentLinkSession.PaymentLinkId}");
+                return null;
+            }
+
+            var paymentLinkSessions = GetPaymentLinkSessionHistory();
+            var savedPaymentLinkSession = paymentLinkSessions.FirstOrDefault(p => p.PaymentLinkId == paymentLinkSession.PaymentLinkId);
+            if (savedPaymentLinkSession != null)
+            {
+                paymentLinkSessions.Remove(savedPaymentLinkSession);
+            }
+
+            if (savedPaymentLinkSession?.IsValid() == true)
+            {
+                savedPaymentLinkSession.UpdateStatus(paymentLinkSession.Status);
+            }
+            else
+            {
+                savedPaymentLinkSession = paymentLinkSession;
+            }
+
+            paymentLinkSessions.Add(savedPaymentLinkSession);
+            var serializableWrapper = new PaymentLinkHistory(paymentLinkSessions);
+            var json = JsonUtility.ToJson(serializableWrapper);
+            _StorageService.SetString(BoltPlayerPrefsKeys.PAYMENT_SESSION_HISTORY, json);
+            return savedPaymentLinkSession;
+        }
+
+        public PaymentLinkSession ResolvePaymentLinkSession(string paymentLinkId, PaymentLinkStatus status = PaymentLinkStatus.Successful)
         {
             try
             {
-                var historyData = _StorageService.GetString(BoltPlayerPrefsKeys.TRANSACTION_HISTORY, "");
-                if (string.IsNullOrEmpty(historyData))
+                var paymentLinkSessions = GetPaymentLinkSessionHistory();
+                var paymentLinkSession = paymentLinkSessions.FirstOrDefault(p => p.PaymentLinkId == paymentLinkId);
+                if (paymentLinkSession != null)
                 {
-                    return new List<TransactionResult>();
+                    paymentLinkSession.UpdateStatus(status);
+                    SavePaymentLinkSession(paymentLinkSession);
                 }
 
-                var transactions = JsonUtility.FromJson<List<TransactionResult>>(historyData);
-                return transactions ?? new List<TransactionResult>();
-            }
-            catch (Exception ex)
-            {
-                LogError($"Failed to load pending transactions: {ex.Message}");
-                return new List<TransactionResult>();
-            }
-        }
-
-        public List<TransactionResult> GetPendingTransactions()
-        {
-            var transactions = GetTransactions();
-            return transactions.Where(t => t.Status == TransactionStatus.Pending).ToList();
-        }
-
-        public void CancelTransaction(string transactionId, bool serverValidated = false)
-        {
-            try
-            {
-                var transactionHistory = GetTransactions();
-                var transaction = transactionHistory.FirstOrDefault(t => t.TransactionId == transactionId);
-                if (transaction != null)
+                if (status == PaymentLinkStatus.Successful)
                 {
-                    transaction.Status = TransactionStatus.Cancelled;
-                    transaction.IsServerValidated = serverValidated;
-                    CreateOrUpdateTransaction(transaction);
-                }
-            }
-            catch (Exception ex)
-            {
-                LogError($"Failed to cancel transaction: {ex.Message}");
-            }
-        }
-
-        public void CompleteTransaction(string transactionId, bool serverValidated = false)
-        {
-            try
-            {
-                var transactionHistory = GetTransactions();
-                var transaction = transactionHistory.FirstOrDefault(t => t.TransactionId == transactionId);
-                if (transaction != null)
-                {
-                    transaction.Status = TransactionStatus.Completed;
-                    transaction.IsServerValidated = serverValidated;
-                    CreateOrUpdateTransaction(transaction);
-                }
-            }
-            catch (Exception ex)
-            {
-                LogError($"Failed to complete transaction: {ex.Message}");
-            }
-        }
-
-        private void CreateOrUpdateTransaction(TransactionResult transactionResult)
-        {
-            try
-            {
-                var transactionHistory = GetTransactions();
-
-                // Find the transaction in the list and update it
-                var existingTransaction = transactionHistory.FirstOrDefault(t => t.TransactionId == transactionResult.TransactionId);
-                if (existingTransaction != null)
-                {
-                    existingTransaction = transactionResult;
+                    onTransactionComplete?.Invoke(paymentLinkSession);
                 }
                 else
                 {
-                    transactionHistory.Add(transactionResult);
+                    onTransactionFailed?.Invoke(paymentLinkSession);
                 }
 
-                var json = JsonUtility.ToJson(transactionHistory);
-                _StorageService.SetString(BoltPlayerPrefsKeys.TRANSACTION_HISTORY, json);
+                return paymentLinkSession;
             }
             catch (Exception ex)
             {
-                LogError($"Failed to save pending transactions: {ex.Message}");
+                LogError($"Failed to resolve payment link session: {ex.Message}");
+                return null;
             }
         }
 
-        #endregion
-
-        #region Event Handlers
-
-        private void OnWebLinkOpened()
+        public List<PaymentLinkSession> GetPaymentLinkSessionHistory()
         {
-            LogDebug("web link opened");
+            try
+            {
+                var sessionHistory = _StorageService.GetString(BoltPlayerPrefsKeys.PAYMENT_SESSION_HISTORY, "");
+                if (string.IsNullOrEmpty(sessionHistory))
+                {
+                    return new List<PaymentLinkSession>();
+                }
+
+                var paymentLinkHistory = JsonUtility.FromJson<PaymentLinkHistory>(sessionHistory);
+                return paymentLinkHistory?.sessions ?? new List<PaymentLinkSession>();
+            }
+            catch (Exception ex)
+            {
+                LogError($"Failed to load payment link session history: {ex.Message}");
+                return new List<PaymentLinkSession>();
+            }
         }
 
-        private void OnWebLinkClosed()
+        public List<PaymentLinkSession> GetPendingPaymentLinkSessions()
         {
-            LogDebug("web link closed");
+            var paymentLinkSessions = GetPaymentLinkSessionHistory();
+            return paymentLinkSessions.Where(p => p.Status == PaymentLinkStatus.Pending).ToList();
         }
-
-        private void OnWebLinkError(string error)
-        {
-            LogError($"web link error: {error}");
-        }
-
-        #endregion
-
-        #region Logging
 
         private void LogDebug(string message)
         {
@@ -304,7 +274,5 @@ namespace BoltApp
         {
             Debug.LogError($"[BoltSDK] {message}");
         }
-
-        #endregion
     }
 }

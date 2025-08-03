@@ -11,32 +11,13 @@ namespace BoltApp
     public static class UrlUtils
     {
 
-        public static string BuildCheckoutLink(string baseUrl, BoltConfig config, BoltUser boltUser, IReadOnlyDictionary<string, string> extraParams)
+        public static string BuildCheckoutLink(string baseUrl, BoltConfig config, BoltUser boltUser)
         {
             if (string.IsNullOrEmpty(baseUrl))
                 return baseUrl;
 
             var uriBuilder = new UriBuilder(baseUrl);
             var query = new StringBuilder(uriBuilder.Query);
-
-            // Add extra query parameters
-            try
-            {
-                if (extraParams != null)
-                {
-                    foreach (var param in extraParams)
-                    {
-                        if (query.Length > 0)
-                            query.Append('&');
-                        query.Append($"metadata_{Uri.EscapeDataString(param.Key)}={Uri.EscapeDataString(param.Value)}");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError($"[BoltSDK] Failed to add extra params to checkout link: {ex.Message}");
-            }
-
 
             // Add user query parameters
             try
@@ -54,15 +35,22 @@ namespace BoltApp
                 Debug.LogError($"[BoltSDK] Failed to add user data to checkout link: {ex.Message}");
             }
 
-            // Add app name and redirect url
+            // Add game id and publishable key
             try
             {
-                query.Append($"&game_id={config.gameId}");
-                query.Append($"&redirect_url={config.deepLinkAppName}");
+                if (!query.ToString().Contains("game_id"))
+                {
+                    query.Append($"&game_id={config.gameId}");
+                }
+
+                if (!query.ToString().Contains("publishable_key"))
+                {
+                    query.Append($"&publishable_key={config.publishableKey}");
+                }
             }
             catch (Exception ex)
             {
-                Debug.LogError($"[BoltSDK] Failed to add app name and redirect url to checkout link: {ex.Message}");
+                Debug.LogError($"[BoltSDK] Failed to add app name and publishable key to checkout link: {ex.Message}");
             }
 
             uriBuilder.Query = query.ToString();
@@ -105,38 +93,6 @@ namespace BoltApp
             }
 
             return parameters;
-        }
-
-        public static bool IsValidUrl(string url)
-        {
-            if (string.IsNullOrEmpty(url))
-                return false;
-
-            try
-            {
-                var uri = new Uri(url);
-                return uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        public static bool IsDeepLinkCallback(string url, string scheme)
-        {
-            if (string.IsNullOrEmpty(url) || string.IsNullOrEmpty(scheme))
-                return false;
-
-            try
-            {
-                var uri = new Uri(url);
-                return uri.Scheme.Equals(scheme, StringComparison.OrdinalIgnoreCase);
-            }
-            catch
-            {
-                return false;
-            }
         }
     }
 }
