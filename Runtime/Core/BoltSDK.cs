@@ -197,7 +197,7 @@ namespace BoltApp
         {
             try
             {
-                var paymentLinkSessions = GetPaymentLinkSessions();
+                var paymentLinkSessions = GetPaymentLinkSessionHistory();
                 var paymentLinkSession = paymentLinkSessions.FirstOrDefault(p => p.PaymentLinkId == paymentLinkId);
                 if (paymentLinkSession != null)
                 {
