@@ -38,5 +38,15 @@ namespace BoltApp
                 CompletedAt = DateTime.UtcNow;
             }
         }
+
+        public bool IsValid()
+        {
+            return !string.IsNullOrEmpty(PaymentLinkId) && !string.IsNullOrEmpty(PaymentLinkUrl);
+        }
+
+        public string ToString()
+        {
+            return $"PaymentLinkId: {PaymentLinkId}, PaymentLinkUrl: {PaymentLinkUrl}, Status: {Status}, CreatedAt: {CreatedAt}, LastAccessedAt: {LastAccessedAt}, CompletedAt: {CompletedAt}";
+        }
     }
 }

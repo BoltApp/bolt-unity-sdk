@@ -180,9 +180,15 @@ namespace BoltApp
 
         private PaymentLinkSession SavePaymentLinkSession(PaymentLinkSession paymentLinkSession)
         {
+            if (!paymentLinkSession.IsValid())
+            {
+                LogError($"Invalid payment link session: {paymentLinkSession.PaymentLinkId}");
+                return null;
+            }
+
             var paymentLinkSessions = GetPaymentLinkSessionHistory();
             var savedPaymentLinkSession = paymentLinkSessions.FirstOrDefault(p => p.PaymentLinkId == paymentLinkSession.PaymentLinkId);
-            if (savedPaymentLinkSession != null)
+            if (savedPaymentLinkSession != null && savedPaymentLinkSession.IsValid())
             {
                 paymentLinkSessions.Remove(savedPaymentLinkSession);
                 savedPaymentLinkSession.UpdateStatus(paymentLinkSession.Status);
