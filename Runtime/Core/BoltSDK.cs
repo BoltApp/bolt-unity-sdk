@@ -103,7 +103,7 @@ namespace BoltApp
 
                 // Create a new payment link session or lookup existing one
                 PaymentLinkSession paymentLinkSession = GetPaymentLinkSession(paymentLinkId);
-                if (paymentLinkSession == null)
+                if (paymentLinkSession == null || !paymentLinkSession.IsValid())
                 {
                     paymentLinkSession = new PaymentLinkSession(paymentLinkId, checkoutLinkWithParams);
                     SavePaymentLinkSession(paymentLinkSession);
@@ -188,9 +188,13 @@ namespace BoltApp
 
             var paymentLinkSessions = GetPaymentLinkSessionHistory();
             var savedPaymentLinkSession = paymentLinkSessions.FirstOrDefault(p => p.PaymentLinkId == paymentLinkSession.PaymentLinkId);
-            if (savedPaymentLinkSession != null && savedPaymentLinkSession.IsValid())
+            if (savedPaymentLinkSession != null)
             {
                 paymentLinkSessions.Remove(savedPaymentLinkSession);
+            }
+
+            if (savedPaymentLinkSession?.IsValid())
+            {
                 savedPaymentLinkSession.UpdateStatus(paymentLinkSession.Status);
             }
             else
