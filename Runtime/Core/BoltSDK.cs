@@ -193,7 +193,7 @@ namespace BoltApp
                 paymentLinkSessions.Remove(savedPaymentLinkSession);
             }
 
-            if (savedPaymentLinkSession?.IsValid())
+            if (savedPaymentLinkSession?.IsValid() == true)
             {
                 savedPaymentLinkSession.UpdateStatus(paymentLinkSession.Status);
             }
