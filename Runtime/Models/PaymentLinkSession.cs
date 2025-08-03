@@ -22,10 +22,10 @@ namespace BoltApp
             PaymentLinkUrl = paymentLinkUrl;
             Status = status;
             CreatedAt = DateTime.UtcNow;
-            LastAccessedAt = CreatedAt;
+            LastAccessedAt = DateTime.UtcNow;
             if (status == PaymentLinkStatus.Successful)
             {
-                CompletedAt = LastAccessedAt;
+                CompletedAt = DateTime.UtcNow;
             }
         }
 
@@ -35,7 +35,7 @@ namespace BoltApp
             LastAccessedAt = DateTime.UtcNow;
             if (status == PaymentLinkStatus.Successful)
             {
-                CompletedAt = LastAccessedAt;
+                CompletedAt = DateTime.UtcNow;
             }
         }
     }

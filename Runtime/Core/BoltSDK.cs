@@ -95,6 +95,11 @@ namespace BoltApp
                 // Extract payment link id from checkout link
                 var queryParameters = UrlUtils.ExtractQueryParameters(checkoutLinkWithParams);
                 var paymentLinkId = queryParameters["payment_link_id"];
+                if (string.IsNullOrEmpty(paymentLinkId))
+                {
+                    LogError("Failed to extract payment_link_id from checkout link");
+                    return;
+                }
 
                 // Create a new payment link session or lookup existing one
                 PaymentLinkSession paymentLinkSession = GetPaymentLinkSession(paymentLinkId);
