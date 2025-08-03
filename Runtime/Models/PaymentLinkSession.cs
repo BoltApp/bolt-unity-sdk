@@ -9,12 +9,12 @@ namespace BoltApp
     [Serializable]
     public class PaymentLinkSession
     {
-        public string PaymentLinkId { get; set; }
-        public string PaymentLinkUrl { get; set; }
-        public PaymentLinkStatus Status { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime LastAccessedAt { get; set; }
-        public DateTime CompletedAt { get; set; }
+        public string PaymentLinkId;
+        public string PaymentLinkUrl;
+        public PaymentLinkStatus Status;
+        public DateTime CreatedAt;
+        public DateTime LastAccessedAt;
+        public DateTime CompletedAt;
 
         public PaymentLinkSession(string paymentLinkId, string paymentLinkUrl, PaymentLinkStatus status = PaymentLinkStatus.Pending)
         {
@@ -27,6 +27,16 @@ namespace BoltApp
             {
                 CompletedAt = DateTime.UtcNow;
             }
+        }
+
+        public PaymentLinkSession(string paymentLinkId, string paymentLinkUrl, PaymentLinkStatus status, DateTime createdAt, DateTime lastAccessedAt, DateTime completedAt)
+        {
+            PaymentLinkId = paymentLinkId;
+            PaymentLinkUrl = paymentLinkUrl;
+            Status = status;
+            CreatedAt = createdAt;
+            LastAccessedAt = lastAccessedAt;
+            CompletedAt = completedAt;
         }
 
         public void UpdateStatus(PaymentLinkStatus status)
