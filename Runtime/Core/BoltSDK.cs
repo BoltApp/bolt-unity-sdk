@@ -193,7 +193,8 @@ namespace BoltApp
             }
 
             paymentLinkSessions.Add(savedPaymentLinkSession);
-            var json = JsonUtility.ToJson(paymentLinkSessions);
+            var serializableWrapper = new PaymentLinkHistory(paymentLinkSessions);
+            var json = JsonUtility.ToJson(serializableWrapper);
             _StorageService.SetString(BoltPlayerPrefsKeys.PAYMENT_SESSION_HISTORY, json);
             return savedPaymentLinkSession;
         }
@@ -238,8 +239,8 @@ namespace BoltApp
                     return new List<PaymentLinkSession>();
                 }
 
-                var paymentLinkSessions = JsonUtility.FromJson<List<PaymentLinkSession>>(sessionHistory);
-                return paymentLinkSessions ?? new List<PaymentLinkSession>();
+                var paymentLinkHistory = JsonUtility.FromJson<PaymentLinkHistory>(sessionHistory);
+                return paymentLinkHistory?.sessions ?? new List<PaymentLinkSession>();
             }
             catch (Exception ex)
             {
