@@ -56,7 +56,7 @@ namespace BoltApp
 
         public string ToString()
         {
-            return $"PaymentLinkId: {PaymentLinkId}, PaymentLinkUrl: {PaymentLinkUrl}, Status: {Status}, CreatedAt: {CreatedAt}, LastAccessedAt: {LastAccessedAt}, CompletedAt: {CompletedAt}";
+            return $"PaymentLinkId: {PaymentLinkId}, Status: {Status}, CreatedAt: {CreatedAt}, LastAccessedAt: {LastAccessedAt}, CompletedAt: {CompletedAt}, PaymentLinkUrl: {PaymentLinkUrl}";
         }
     }
 }
