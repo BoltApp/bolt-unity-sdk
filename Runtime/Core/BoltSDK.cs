@@ -83,7 +83,10 @@ namespace BoltApp
             try
             {
                 if (string.IsNullOrEmpty(checkoutLink))
-                    throw new BoltSDKException("Checkout link cannot be null or empty");
+                {
+                    LogError("Checkout link cannot be null or empty");
+                    return;
+                }
 
                 // Append user info to checkout link
                 BoltUser boltUser = GetUserData();
@@ -124,9 +127,8 @@ namespace BoltApp
             {
                 if (string.IsNullOrEmpty(callbackUrl))
                 {
-                    var errorMessage = "Failed to parse transaction. 'callbackUrl' cannot be null or empty";
-                    LogError(errorMessage);
-                    return;
+                    LogError("Failed to parse transaction. 'callbackUrl' cannot be null or empty");
+                    return null;
                 }
 
                 // Check if there is a data field in the callback url, if so then base64 decode it
@@ -142,7 +144,7 @@ namespace BoltApp
                 if (temporalSessionResult == null)
                 {
                     LogError($"Failed to parse payment link session result: {callbackUrl}");
-                    return;
+                    return null;
                 }
 
                 // Map temporal session status to existing one on device
@@ -160,8 +162,8 @@ namespace BoltApp
             }
             catch (Exception ex)
             {
-                string errorMessage = $"Error during weblink callback: {ex.Message}";
-                LogError(errorMessage);
+                LogError($"Error during weblink callback: {ex.Message}");
+                return null;
             }
         }
 
@@ -188,10 +190,10 @@ namespace BoltApp
             paymentLinkSessions.Add(savedPaymentLinkSession);
             var json = JsonUtility.ToJson(paymentLinkSessions);
             _StorageService.SetString(BoltPlayerPrefsKeys.PAYMENT_SESSION_HISTORY, json);
-            return paymentLinkSession;
+            return savedPaymentLinkSession;
         }
 
-        public PaymentLinkSession ResolvePaymentLinkSession(string paymentLinkId, PaymentLinkStatus status = PaymentLinkStatus.Completed)
+        public PaymentLinkSession ResolvePaymentLinkSession(string paymentLinkId, PaymentLinkStatus status = PaymentLinkStatus.Successful)
         {
             try
             {
@@ -217,6 +219,7 @@ namespace BoltApp
             catch (Exception ex)
             {
                 LogError($"Failed to resolve payment link session: {ex.Message}");
+                return null;
             }
         }
 
@@ -224,13 +227,13 @@ namespace BoltApp
         {
             try
             {
-                var paymentLinkSessionHistory = _StorageService.GetString(BoltPlayerPrefsKeys.PAYMENT_SESSION_HISTORY, "");
-                if (string.IsNullOrEmpty(paymentLinkSessionHistory))
+                var sessionHistory = _StorageService.GetString(BoltPlayerPrefsKeys.PAYMENT_SESSION_HISTORY, "");
+                if (string.IsNullOrEmpty(sessionHistory))
                 {
                     return new List<PaymentLinkSession>();
                 }
 
-                var paymentLinkSessions = JsonUtility.FromJson<List<PaymentLinkSession>>(historyData);
+                var paymentLinkSessions = JsonUtility.FromJson<List<PaymentLinkSession>>(sessionHistory);
                 return paymentLinkSessions ?? new List<PaymentLinkSession>();
             }
             catch (Exception ex)

@@ -23,7 +23,7 @@ namespace BoltApp
             Status = status;
             CreatedAt = DateTime.UtcNow;
             LastAccessedAt = CreatedAt;
-            if (status == PaymentLinkStatus.Completed)
+            if (status == PaymentLinkStatus.Successful)
             {
                 CompletedAt = LastAccessedAt;
             }
@@ -33,7 +33,7 @@ namespace BoltApp
         {
             Status = status;
             LastAccessedAt = DateTime.UtcNow;
-            if (status == PaymentLinkStatus.Completed)
+            if (status == PaymentLinkStatus.Successful)
             {
                 CompletedAt = LastAccessedAt;
             }

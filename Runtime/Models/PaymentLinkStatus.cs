@@ -5,6 +5,6 @@ namespace BoltApp
         Pending,
         Abandoned,
         Expired,
-        Completed
+        Successful
     }
 }

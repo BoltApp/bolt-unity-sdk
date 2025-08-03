@@ -36,7 +36,7 @@ namespace BoltApp
                 case "completed":
                 case "success":
                 case "successful":
-                    return PaymentLinkStatus.Completed;
+                    return PaymentLinkStatus.Successful;
                 case "expired":
                     return PaymentLinkStatus.Expired;
                 case "abandoned":
