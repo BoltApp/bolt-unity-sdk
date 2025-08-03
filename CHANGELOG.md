@@ -8,12 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Roadmap
-- Demo scene with Bolt implemented
+- Demo scene with Bolt quick start guide
 
-## [0.0.5] - 2025-08-01
+## [0.0.5] - 2025-08-03
 
 ### Fixed
-- Simplified handling of transaction statuses and payment links
+- Introduced payment links to simplify handling of transaction statuses
+- Fixed serialization issues
 
 ## [0.0.4] - 2025-07-30
 
