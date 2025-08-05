@@ -58,7 +58,7 @@ We also support other platforms:
 
 ## 📚 Documentation
 
-For broad documentation and API reference visit our [documentation site](https://docs.bolt.com).
+For documentation and API reference visit our [quick start guide](https://bolt-gaming-docs.vercel.app/guide/checkout-quickstart.html).
 
 ## 💰 Why Bolt
 
@@ -74,7 +74,7 @@ You need 3 things to get started:
 
 1. **Existing App:** You will need an application in the same platform as this SDK
 2. **Backend Server:** You will need to bring your own backend server (any language)
-3. **Bolt Merchant Account:** Dashboard access to manage your store ([signup](https://merchant.bolt.com/onboarding/get-started) or [login](https://merchant.bolt.com/))
+3. **Bolt Merchant Account:** Dashboard access to manage your store ([signup](https://merchant.bolt.com/onboarding/get-started/gaming) or [login](https://merchant.bolt.com/))
 
 
 
@@ -82,7 +82,7 @@ You need 3 things to get started:
 
 ### Step 1: Install the Unity SDK
 
-**Note:** For any of these options you can specify a specific version by appending it to the URL with a hashtag, e.g. `https://github.com/BoltApp/bolt-unity-sdk.git#v0.0.2` will pin `v0.0.2`
+**Note:** For any of these options you can specify a specific version by appending it to the URL with a hashtag, e.g. `https://github.com/BoltApp/bolt-unity-sdk.git#v0.0.5` will pin `v0.0.5`
 
 #### Option 1: Using manifest.json (Recommended)
 
@@ -119,9 +119,9 @@ There is sample integrations in the `Samples~/` folder.
 - [**BoltDeepLinkExample**](./Samples~/DeepLinkIntegration/BoltDeepLinkExample.cs): will showcase how to handle deep links back into the application.
 
 ### Step 3: Continue with Backend Integration
-You will need to implement some features in your backend for secure link and transaction handling. 
-- Generate Checkout Links (Beta usage only, DM our team for CURL examples)
-- [Handle Transaction Webhooks](https://help.bolt.com/api-merchant/#tag/webhooks)
+You will need to bring your own backend server to complete integration.
+- [**Quick Start**](https://bolt-gaming-docs.vercel.app/guide/checkout-quickstart.html): View our quickstart guide to get the API running
+- [**Example Server**](https://github.com/BoltApp/bolt-gameserver-sample): We also have a sample server in NodeJS for your reference during implementation
 
 ## Need help?
 
