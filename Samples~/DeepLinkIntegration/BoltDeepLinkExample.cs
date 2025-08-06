@@ -5,7 +5,7 @@ using UnityEngine;
 namespace BoltApp.Samples
 {
     /// <summary>
-    /// Deep Link example showing how to integrate the Bolt SDK with a web callback
+    /// Optional: Deep Link example using web callbacks
     /// Use this as reference for your own implementation.
     /// </summary>
     public class BoltDeepLinkExample : MonoBehaviour
@@ -63,7 +63,7 @@ namespace BoltApp.Samples
             while (pendingDeepLinks.Count > 0)
             {
                 var deepLink = pendingDeepLinks.Dequeue();
-                PaymentLinkSession paymentLinkSession = boltSDK.HandleDeepLinkCallback(deepLink, true);
+                PaymentLinkSession paymentLinkSession = boltSDK.HandleDeepLinkCallback(deepLink);
                 if (paymentLinkSession != null)
                 {
                     // Optional: Call your backend to verify the payment link status
