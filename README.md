@@ -74,7 +74,7 @@ You need 3 things to get started:
 
 1. **Existing App:** You will need an application in the same platform as this SDK
 2. **Backend Server:** You will need to bring your own backend server (any language)
-3. **Bolt Merchant Account:** Dashboard access to manage your store ([signup](https://merchant.bolt.com/onboarding/get-started/gaming) or [login](https://merchant.bolt.com/))
+3. **Bolt Merchant Account:** Dashboard access to manage your store ([sign up](https://merchant.bolt.com/onboarding/get-started/gaming) or [log in](https://merchant.bolt.com/))
 
 
 
