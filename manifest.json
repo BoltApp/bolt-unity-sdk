@@ -1,5 +1,5 @@
 {
   "dependencies": {
-    "com.bolt.sdk": "https://github.com/BoltApp/bolt-unity-sdk.git#v0.0.1"
+    "com.bolt.sdk": "https://github.com/BoltApp/bolt-unity-sdk.git#v0.0.6"
   }
 } 

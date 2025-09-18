@@ -16,6 +16,14 @@ namespace BoltApp
         public DateTime LastAccessedAt;
         public DateTime CompletedAt;
 
+        public PaymentLinkSession()
+        {
+            // Would be considered invalid until a paymentLinkID and paymentLinkUrl are set
+            CreatedAt = DateTime.UtcNow;
+            LastAccessedAt = DateTime.UtcNow;
+            Status = PaymentLinkStatus.Pending;
+        }
+
         public PaymentLinkSession(string paymentLinkId, string paymentLinkUrl, PaymentLinkStatus status = PaymentLinkStatus.Pending)
         {
             PaymentLinkId = paymentLinkId;
@@ -34,8 +42,8 @@ namespace BoltApp
             PaymentLinkId = paymentLinkId;
             PaymentLinkUrl = paymentLinkUrl;
             Status = status;
-            CreatedAt = createdAt;
-            LastAccessedAt = lastAccessedAt;
+            CreatedAt = createdAt ?? DateTime.UtcNow;
+            LastAccessedAt = lastAccessedAt ?? DateTime.UtcNow;
             CompletedAt = completedAt;
         }
 

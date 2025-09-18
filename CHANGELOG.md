@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Roadmap
 - Demo scene with Bolt quick start guide
 
+## [0.0.6] - 2025-09-18
+- Fixed an issue where payment links can be initialized with a null date
+
 ## [0.0.5] - 2025-08-03
 
 ### Fixed
