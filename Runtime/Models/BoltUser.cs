@@ -24,7 +24,7 @@ namespace BoltApp
             Country = country;
             DeviceId = deviceId;
             UpdatedAt = DateTime.UtcNow;
-            if (CreatedAt == null)
+            if (CreatedAt == DateTime.MinValue)
             {
                 CreatedAt = DateTime.UtcNow;
             }
@@ -35,10 +35,10 @@ namespace BoltApp
             Func<string, string> nullString = (string s) => s == null ? "null" : s;
             return $"BoltUser(Email: {nullString(Email)}," +
                 $" DeviceId: {nullString(DeviceId)}," +
-                $" Locale: {nullString(Locale)}," +
-                $" Country: {nullString(Country)}," +
-                $" CreatedAt: {CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")}," +
-                $" UpdatedAt: {UpdatedAt.ToString("yyyy-MM-dd HH:mm:ss")})";
+                $" UserLocale: {nullString(Locale)}," +
+                $" UserCountry: {nullString(Country)}," +
+                $" UserCreatedAt: {CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")}," +
+                $" UserUpdatedAt: {UpdatedAt.ToString("yyyy-MM-dd HH:mm:ss")})";
         }
 
         public Dictionary<string, string> ToDictionary()
@@ -49,8 +49,8 @@ namespace BoltApp
                 { "device_id", DeviceId ?? "" },
                 { "locale", Locale ?? "" },
                 { "country", Country ?? "" },
-                { "created_at", CreatedAt.ToString("yyyy-MM-dd HH:mm:ss") },
-                { "updated_at", UpdatedAt.ToString("yyyy-MM-dd HH:mm:ss") }
+                { "user_created_at", CreatedAt.ToString("yyyy-MM-dd HH:mm:ss") },
+                { "user_updated_at", UpdatedAt.ToString("yyyy-MM-dd HH:mm:ss") }
             };
         }
     }

@@ -1,13 +1,13 @@
 {
   "name": "com.bolt.sdk",
-  "version": "0.0.6",
+  "version": "0.0.8",
   "displayName": "Bolt SDK",
-  "description": "A Unity SDK for performing in-app purchases and subscriptions outside of the app store.",
+  "description": "A performant Unity SDK for out of app purchases and subscriptions.",
   "unity": "2021.3",
   "keywords": ["bolt", "sdk", "subscription", "web payment", "iap", "checkout"],
   "license": "MIT",
   "author": {
-    "name": "Bolt",
+    "name": "bolt.com",
     "email": "support@bolt.com",
     "url": "https://bolt.com"
   },

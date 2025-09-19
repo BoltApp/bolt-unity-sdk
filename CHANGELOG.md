@@ -10,6 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Roadmap
 - Demo scene with Bolt quick start guide
 
+## [0.0.8] - 2025-09-19
+### Fixed
+- Fix an issue where user was always initialized without a created at date
+- Improved user ToString formatting
+- Added a missing var in the sample code snippets
+
 ## [0.0.7] - 2025-09-18
 ### Fixed
 - Fix compile issue in PaymentLinks
