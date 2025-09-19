@@ -42,8 +42,8 @@ namespace BoltApp
             PaymentLinkId = paymentLinkId;
             PaymentLinkUrl = paymentLinkUrl;
             Status = status;
-            CreatedAt = createdAt ?? DateTime.UtcNow;
-            LastAccessedAt = lastAccessedAt ?? DateTime.UtcNow;
+            CreatedAt = createdAt;
+            LastAccessedAt = lastAccessedAt;
             CompletedAt = completedAt;
         }
 
