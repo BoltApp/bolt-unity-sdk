@@ -5,7 +5,7 @@
 
 ## What is this?
 
-Native Unity support for Bolt Web Payments. A programmatic way to for out-of-app purchases and subscriptions.
+Native Unity support for Bolt Web Payments. A programmatic way to enable out-of-app purchases and subscriptions.
 
 We also support other platforms:
 
@@ -50,23 +50,23 @@ We also support other platforms:
 
 <div align="center">
 
-[![Discord](https://img.shields.io/badge/Discord-Have%20A%20Request%3F-7289DA?style=for-the-badge&logo=discord&logoColor=white&logoWidth=60)](https://discord.gg/BSUp9qjtnc)
-
 ### Chat with us on Discord for help and inquiries!
+
+[![Discord](https://img.shields.io/badge/Discord-Have%20A%20Request%3F-7289DA?style=for-the-badge&logo=discord&logoColor=white&logoWidth=60)](https://discord.gg/BSUp9qjtnc)
 
 </div>
 
 ## 📚 Documentation
 
-For documentation and API reference visit our [quick start guide](https://bolt-gaming-docs.vercel.app/guide/checkout-quickstart.html).
+For documentation and API reference visit our [Quickstart guide](https://gaming-help.bolt.com/guide/quickstart.html).
 
 ## 💰 Why Bolt
 
 Only with Bolt you get **2.1% + $0.30 on all transactions**. That's 10x better than traditional app stores which take 30% of your revenue! That's the fair and transparent pricing you get with using Bolt.
 
-<p style="font-size:12px;font-style:italic;opacity:85%">
-<strong>Disclaimer:</strong> Fees are subject to change but will continue to remain highly competitive. See <a href="https://www.bolt.com/pricing">bolt.com/pricing</a> for up to date rates and visit  <a href="https://www.bolt.com/end-user-terms">bolt.com/end-user-terms</a> for end user terms and conditions.
-</p>
+> Bolt’s fees are subject to change but will remain highly competitive. 
+> For the latest rates, see [Bolt Pricing](https://www.bolt.com/pricing). 
+> For details, review the [End User Terms and Conditions](https://www.bolt.com/end-user-terms).
 
 ## 🛠️ Prerequisites
 
@@ -74,7 +74,7 @@ You need 3 things to get started:
 
 1. **Existing App:** You will need an application in the same platform as this SDK
 2. **Backend Server:** You will need to bring your own backend server (any language)
-3. **Bolt Merchant Account:** Dashboard access to manage your store ([signup](https://merchant.bolt.com/onboarding/get-started/gaming) or [login](https://merchant.bolt.com/))
+3. **Bolt Merchant Account:** Dashboard access to manage your store ([sign up](https://merchant.bolt.com/onboarding/get-started/gaming) or [log in](https://merchant.bolt.com/))
 
 
 
@@ -120,7 +120,7 @@ There is sample integrations in the `Samples~/` folder.
 
 ### Step 3: Continue with Backend Integration
 You will need to bring your own backend server to complete integration.
-- [**Quick Start**](https://bolt-gaming-docs.vercel.app/guide/checkout-quickstart.html): View our quickstart guide to get the API running
+- [**Quickstart**](https://gaming-help.bolt.com/guide/quickstart.html): View our quickstart guide to get the API running
 - [**Example Server**](https://github.com/BoltApp/bolt-gameserver-sample): We also have a sample server in NodeJS for your reference during implementation
 
 ## Need help?
