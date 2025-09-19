@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
-using BoltApp;
 using UnityEngine;
+using BoltApp;
 
 namespace BoltApp.Samples
 {
@@ -21,7 +21,7 @@ namespace BoltApp.Samples
                 BoltConfig.Environment.Development);
 
             // Setup SDK
-            boltSDK = new BoltSDK(boltConfig);
+            var boltSDK = new BoltSDK(boltConfig);
 
             // Setup callbacks, handle flows appropriately
             boltSDK.onTransactionComplete += OnTransactionComplete;

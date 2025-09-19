@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
-using BoltApp;
 using UnityEngine;
+using BoltApp;
 
 namespace BoltApp.Samples
 {
@@ -21,7 +21,7 @@ namespace BoltApp.Samples
                 "com.yourgameid.test",
                 "YourAppNameForDeepLinks://",
                 BoltConfig.Environment.Development);
-            boltSDK = new BoltSDK(boltConfig);
+            var boltSDK = new BoltSDK(boltConfig);
             boltSDK.onTransactionComplete += OnTransactionComplete;
             boltSDK.onTransactionFailed += OnTransactionFailed;
             boltSDK.onWebLinkOpen += onWebLinkOpen;
