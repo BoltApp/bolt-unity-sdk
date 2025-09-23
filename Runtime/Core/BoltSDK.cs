@@ -138,7 +138,7 @@ namespace BoltApp
 
                 // Extract payment link id from checkout link
                 var queryParameters = UrlUtils.ExtractQueryParameters(checkoutLinkWithParams);
-                var paymentLinkId = queryParameters.HasKey("payment_link_id") ? queryParameters["payment_link_id"] : "";
+                var paymentLinkId = queryParameters.ContainsKey("payment_link_id") ? queryParameters["payment_link_id"] : "";
                 if (string.IsNullOrEmpty(paymentLinkId))
                 {
                     LogError("Failed to extract payment_link_id from checkout link");
