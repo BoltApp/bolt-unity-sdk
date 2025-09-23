@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace BoltApp
 {
@@ -29,8 +30,23 @@ namespace BoltApp
         public const string DEVICE_COUNTRY = PREFIX + "device_country";
 
         /// <summary>
-        /// Key for storing transaction history
+        /// Key for storing pending payment link sessions
         /// </summary>
-        public const string PAYMENT_SESSION_HISTORY = PREFIX + "payment_session_history";
+        public const string PENDING_PAYMENT_SESSIONS = PREFIX + "pending_payment_sessions";
+
+        /// <summary>
+        /// Gets all Bolt SDK related keys from PlayerPrefs
+        /// </summary>
+        /// <returns>List of Bolt SDK keys</returns>
+        public static List<string> GetAllBoltKeys()
+        {
+            return new List<string>
+            {
+                USER_DATA,
+                DEVICE_LOCALE,
+                DEVICE_COUNTRY,
+                PENDING_PAYMENT_SESSIONS,
+            };
+        }
     }
 }

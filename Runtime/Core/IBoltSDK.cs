@@ -18,7 +18,6 @@ namespace BoltApp
         PaymentLinkSession HandleDeepLinkCallback(string callbackUrl);
         PaymentLinkSession GetPaymentLinkSession(string paymentLinkId);
         PaymentLinkSession ResolvePaymentLinkSession(string paymentLinkId, PaymentLinkStatus status = PaymentLinkStatus.Successful);
-        List<PaymentLinkSession> GetPaymentLinkSessionHistory();
-        List<PaymentLinkSession> GetPendingPaymentLinkSessions();
+        Dictionary<string, PaymentLinkSession> GetPendingPaymentLinkSessions();
     }
 }

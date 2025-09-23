@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "com.bolt.sdk": "https://github.com/BoltApp/bolt-unity-sdk.git"
+    "com.bolt.sdk": "https://github.com/BoltApp/bolt-unity-sdk.git",
+    "com.unity.nuget.newtonsoft-json": "https://github.com/jilleJr/Newtonsoft.Json.git"
   }
 } 

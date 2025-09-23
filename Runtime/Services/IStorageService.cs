@@ -16,6 +16,8 @@ namespace BoltApp
         bool GetBool(string key, bool defaultValue = false);
         void SetObject<T>(string key, T obj);
         T GetObject<T>(string key, T defaultValue = default(T));
+        void SetDictionary<TKey, TValue>(string key, Dictionary<TKey, TValue> dictionary);
+        Dictionary<TKey, TValue> GetDictionary<TKey, TValue>(string key, Dictionary<TKey, TValue> defaultValue = null);
         bool HasKey(string key);
         void DeleteKey(string key);
         void DeleteAll();
