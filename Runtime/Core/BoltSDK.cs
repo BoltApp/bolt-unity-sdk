@@ -121,7 +121,7 @@ namespace BoltApp
             }
             catch (Exception ex)
             {
-                LogError($"Failed to open checkout link'{checkoutLink}': {ex.Message}");
+                LogError($"Failed to open checkout link '{checkoutLink}': {ex.Message}");
                 throw;
             }
         }
@@ -193,14 +193,22 @@ namespace BoltApp
                 paymentLinkSessions.Remove(savedPaymentLinkSession);
             }
 
+            // Update status if it exists and is valid
             if (savedPaymentLinkSession?.IsValid() == true)
             {
                 savedPaymentLinkSession.UpdateStatus(paymentLinkSession.Status);
             }
-            else
+
+            // Create new payment link session if it doesn't exist
+            if (savedPaymentLinkSession == null)
             {
                 savedPaymentLinkSession = paymentLinkSession;
             }
+
+            // Keep only the most recent items, then add the new one
+            paymentLinkSessions = paymentLinkSessions
+                .TakeLast(Config.maxPaymentHistoryCount - 1)
+                .ToList();
 
             paymentLinkSessions.Add(savedPaymentLinkSession);
             var serializableWrapper = new PaymentLinkHistory(paymentLinkSessions);
