@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Roadmap
 - Demo scene with Bolt quick start guide
+- Serverless quick start (no game server needed)
+
+## [0.1.0] - 2025-09-23
+### Fixed
+- Improved handling of payment links history, only tracks pending payment links. Resolving a link now removes it from SDK history (keeps memory usage light)
+- Uses Newton soft to deal with dictionaries and improves serialization
+- Keeps payment links in memory to minimize I/O only to app load and checkout link open
+
+### Removed
+- Got rid of the cap of payment links stored in history
+
+## [0.0.9] - 2025-09-22
+### Added
+- Experimental change to introduce a cap to the number of payment links stored in history
 
 ## [0.0.8] - 2025-09-19
 ### Fixed
