@@ -15,9 +15,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Add missing dependency to package.json
 
-### Removed
-- Got rid of the cap of payment links stored in history
-
 ## [0.1.0] - 2025-09-23
 ### Fixed
 - Improved handling of payment links history, only tracks pending payment links. Resolving a link now removes it from SDK history (keeps memory usage light)
