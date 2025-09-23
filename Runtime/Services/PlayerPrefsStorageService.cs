@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Newtonsoft.Json;
 
 namespace BoltApp
 {
@@ -16,8 +17,7 @@ namespace BoltApp
         {
             try
             {
-                PlayerPrefs.SetString(GetPrefixedKey(key), value);
-                PlayerPrefs.Save();
+                PlayerPrefs.SetString(key, value);
             }
             catch (Exception ex)
             {
@@ -29,7 +29,7 @@ namespace BoltApp
         {
             try
             {
-                return PlayerPrefs.GetString(GetPrefixedKey(key), defaultValue);
+                return PlayerPrefs.GetString(key, defaultValue);
             }
             catch (Exception ex)
             {
@@ -42,8 +42,7 @@ namespace BoltApp
         {
             try
             {
-                PlayerPrefs.SetInt(GetPrefixedKey(key), value);
-                PlayerPrefs.Save();
+                PlayerPrefs.SetInt(key, value);
             }
             catch (Exception ex)
             {
@@ -55,7 +54,7 @@ namespace BoltApp
         {
             try
             {
-                return PlayerPrefs.GetInt(GetPrefixedKey(key), defaultValue);
+                return PlayerPrefs.GetInt(key, defaultValue);
             }
             catch (Exception ex)
             {
@@ -68,8 +67,7 @@ namespace BoltApp
         {
             try
             {
-                PlayerPrefs.SetInt(GetPrefixedKey(key), value ? 1 : 0);
-                PlayerPrefs.Save();
+                PlayerPrefs.SetInt(key, value ? 1 : 0);
             }
             catch (Exception ex)
             {
@@ -81,7 +79,7 @@ namespace BoltApp
         {
             try
             {
-                return PlayerPrefs.GetInt(GetPrefixedKey(key), defaultValue ? 1 : 0) == 1;
+                return PlayerPrefs.GetInt(key, defaultValue ? 1 : 0) == 1;
             }
             catch (Exception ex)
             {
@@ -94,7 +92,7 @@ namespace BoltApp
         {
             try
             {
-                var json = JsonUtility.ToJson(obj);
+                var json = JsonConvert.SerializeObject(obj, Formatting.None);
                 SetString(key, json);
             }
             catch (Exception ex)
@@ -111,7 +109,7 @@ namespace BoltApp
                 if (string.IsNullOrEmpty(json))
                     return defaultValue;
 
-                return JsonUtility.FromJson<T>(json);
+                return JsonConvert.DeserializeObject<T>(json) ?? defaultValue;
             }
             catch (Exception ex)
             {
@@ -120,11 +118,41 @@ namespace BoltApp
             }
         }
 
+        public void SetDictionary<TKey, TValue>(string key, Dictionary<TKey, TValue> dictionary)
+        {
+            try
+            {
+                var json = JsonConvert.SerializeObject(dictionary, Formatting.None);
+                SetString(key, json);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Failed to set dictionary for key '{key}': {ex.Message}");
+            }
+        }
+
+        public Dictionary<TKey, TValue> GetDictionary<TKey, TValue>(string key, Dictionary<TKey, TValue> defaultValue = null)
+        {
+            try
+            {
+                var json = GetString(key, "");
+                if (string.IsNullOrEmpty(json))
+                    return defaultValue ?? new Dictionary<TKey, TValue>();
+
+                return JsonConvert.DeserializeObject<Dictionary<TKey, TValue>>(json) ?? defaultValue ?? new Dictionary<TKey, TValue>();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Failed to get dictionary for key '{key}': {ex.Message}");
+                return defaultValue ?? new Dictionary<TKey, TValue>();
+            }
+        }
+
         public bool HasKey(string key)
         {
             try
             {
-                return PlayerPrefs.HasKey(GetPrefixedKey(key));
+                return PlayerPrefs.HasKey(key);
             }
             catch (Exception ex)
             {
@@ -137,8 +165,7 @@ namespace BoltApp
         {
             try
             {
-                PlayerPrefs.DeleteKey(GetPrefixedKey(key));
-                PlayerPrefs.Save();
+                PlayerPrefs.DeleteKey(key);
             }
             catch (Exception ex)
             {
@@ -150,17 +177,11 @@ namespace BoltApp
         {
             try
             {
-                // Get all keys and delete only Bolt SDK related ones
-                var keys = new List<string>();
-
-                // This is a simplified approach - in a real implementation you might want to track keys
-                // or use a different approach to delete only Bolt SDK related keys
-                foreach (var key in GetAllBoltKeys())
+                foreach (var key in BoltPlayerPrefsKeys.GetAllBoltKeys())
                 {
                     PlayerPrefs.DeleteKey(key);
                 }
 
-                PlayerPrefs.Save();
             }
             catch (Exception ex)
             {
@@ -180,54 +201,6 @@ namespace BoltApp
             }
         }
 
-        /// <summary>
-        /// Gets a prefixed key to avoid conflicts with other systems
-        /// </summary>
-        /// <param name="key">The original key</param>
-        /// <returns>The prefixed key</returns>
-        private string GetPrefixedKey(string key)
-        {
-            return $"{PREFIX}{key}";
-        }
-
-        /// <summary>
-        /// Gets all Bolt SDK related keys from PlayerPrefs
-        /// </summary>
-        /// <returns>List of Bolt SDK keys</returns>
-        private List<string> GetAllBoltKeys()
-        {
-            var keys = new List<string>();
-
-            // This is a simplified implementation
-            // In a real implementation, you might want to track keys or use a different approach
-            var commonKeys = new[]
-            {
-                "gameId",
-                "userEmail",
-                "userLocale",
-                "userCountry",
-                "deviceId",
-                "transactionHistory",
-                "acknowledgedTransactions",
-                "catalogData",
-                "sessionId"
-            };
-
-            foreach (var key in commonKeys)
-            {
-                var prefixedKey = GetPrefixedKey(key);
-                if (PlayerPrefs.HasKey(prefixedKey))
-                {
-                    keys.Add(prefixedKey);
-                }
-            }
-
-            return keys;
-        }
-
-        /// <summary>
-        /// Clears all data for testing purposes
-        /// </summary>
         public void ClearAllForTesting()
         {
             DeleteAll();

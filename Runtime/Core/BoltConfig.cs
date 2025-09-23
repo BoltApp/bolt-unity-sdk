@@ -14,24 +14,18 @@ namespace BoltApp
         public string publishableKey;
         public Environment environment = Environment.Development;
 
-        // Track most recent payment links opened by the user. Used for analytic purposes only.
-        // You should rely on the API for an up to date record of paid links.
-        public int maxPaymentHistoryCount = 10;
-
         public BoltConfig()
         {
             gameId = "com.bolt.unity.test";
             publishableKey = "found_in.bolt.dashboard";
             environment = Environment.Development;
-            maxPaymentHistoryCount = 10;
         }
 
-        public BoltConfig(string gameId, string publishableKey, Environment environment, int maxPaymentHistoryCount = 10)
+        public BoltConfig(string gameId, string publishableKey, Environment environment)
         {
             this.gameId = gameId;
             this.publishableKey = publishableKey;
             this.environment = environment;
-            this.maxPaymentHistoryCount = maxPaymentHistoryCount;
         }
 
         public enum Environment
