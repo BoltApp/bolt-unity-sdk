@@ -17,7 +17,9 @@ namespace BoltApp
         void OpenCheckout(string checkoutLink);
         PaymentLinkSession HandleDeepLinkCallback(string callbackUrl);
         PaymentLinkSession GetPaymentLinkSession(string paymentLinkId);
-        PaymentLinkSession ResolvePaymentLinkSession(string paymentLinkId, PaymentLinkStatus status = PaymentLinkStatus.Successful);
+        PaymentLinkSession ResolvePaymentLinkSession(string paymentLinkId, PaymentLinkStatus status = PaymentLinkStatus.Successful, bool autoSave = true);
         Dictionary<string, PaymentLinkSession> GetPendingPaymentLinkSessions();
+        bool HasPendingPaymentLinkSessions();
+        void ManualSave();
     }
 }

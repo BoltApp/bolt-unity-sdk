@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Demo scene with Bolt quick start guide
 - Serverless quick start (no game server needed)
 
+## [0.1.3] - 2025-09-24
+### Added
+- Option to prevent saving on each payment link resolution
+- Method to manually save
+- Method to see if pending payment links exist
+
 ## [0.1.2] - 2025-09-23
 ### Fixed
 - Broken usage of dict struct in bolt sdk

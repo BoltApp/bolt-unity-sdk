@@ -21,7 +21,7 @@ namespace BoltApp.Samples
                 BoltConfig.Environment.Development);
 
             // Setup SDK
-            var boltSDK = new BoltSDK(boltConfig);
+            boltSDK = new BoltSDK(boltConfig);
 
             // Setup callbacks, handle flows appropriately
             boltSDK.onTransactionComplete += OnTransactionComplete;
@@ -52,7 +52,7 @@ namespace BoltApp.Samples
                 // Therefore, the user returned to the app after web checkout but not via deep link
                 if (checkoutIsOpen)
                 {
-                    VerifyRecentTransactions();
+                    VerifyRecentCheckouts();
                 }
             }
 
@@ -69,8 +69,9 @@ namespace BoltApp.Samples
             var pendingPaymentLinkSessions = boltSDK.GetPendingPaymentLinkSessions();
             if (pendingPaymentLinkSessions.Count > 0)
             {
-                foreach (var paymentLinkSession in pendingPaymentLinkSessions)
+                foreach (var keyValuePair in pendingPaymentLinkSessions)
                 {
+                    var paymentLinkSession = keyValuePair.Value;
                     // Call your backend to verify the payment link status
                     var paymentLinkResult = await VerifyPaymentLinkSuccess(paymentLinkSession.PaymentLinkId);
 
@@ -86,7 +87,7 @@ namespace BoltApp.Samples
         /// </summary>
         /// <param name="paymentLinkId">The payment link ID to verify</param>
         /// <returns>The payment link status</returns>
-        private async PaymentLinkStatus VerifyPaymentLinkSuccess(string paymentLinkId)
+        private async Task<PaymentLinkStatus> VerifyPaymentLinkSuccess(string paymentLinkId)
         {
             // TODO: Use your http client to call backend to verify the payment link status
             // In that server call you can check for a webhook or perform a GET on the payment link ID
@@ -99,18 +100,18 @@ namespace BoltApp.Samples
         /// When transaction is complete, this callback will be called.
         /// Show a success screen and fire any analytic events here.
         /// </summary>
-        private void OnTransactionComplete(TransactionResult result)
+        private void OnTransactionComplete(PaymentLinkSession paymentLinkSession)
         {
-            Debug.Log("Transaction complete: " + result.TransactionId);
+            Debug.Log("Transaction complete: " + paymentLinkSession.PaymentLinkId);
         }
 
         /// <summary>
         /// When transaction is failed, this callback will be called.
         /// Show a failure screen and fire any analytic events here.
         /// </summary>
-        private void OnTransactionFailed(TransactionResult result)
+        private void OnTransactionFailed(PaymentLinkSession paymentLinkSession)
         {
-            Debug.Log("Transaction failed: " + result.TransactionId);
+            Debug.Log("Transaction failed: " + paymentLinkSession.PaymentLinkId);
         }
 
         /// <summary>

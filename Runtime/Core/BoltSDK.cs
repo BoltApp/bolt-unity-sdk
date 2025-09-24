@@ -41,7 +41,7 @@ namespace BoltApp
                     BoltPlayerPrefsKeys.PENDING_PAYMENT_SESSIONS,
                     new Dictionary<string, PaymentLinkSession>());
 
-                // Filter to only pending sessions (defensive programming)
+                // Only keep pending links, some defensive programming for older versions of the SDK
                 _pendingPaymentLinkSessions = allSessions
                     .Where(kvp => kvp.Value.Status == PaymentLinkStatus.Pending)
                     .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
@@ -86,8 +86,7 @@ namespace BoltApp
             if (country != null)
                 user.Country = country;
 
-            _StorageService.SetObject(BoltPlayerPrefsKeys.USER_DATA, user);
-            _StorageService.Save();
+            SaveUserData(user);
             return user;
         }
 
@@ -106,20 +105,24 @@ namespace BoltApp
                 {
                     var email = user?.Email ?? "";
                     user = new BoltUser(email, locale, country, deviceId);
+                    SaveUserData(user);
                 }
 
-                _StorageService.SetObject(BoltPlayerPrefsKeys.USER_DATA, user);
-                _StorageService.Save();
                 return user;
             }
             catch (Exception ex)
             {
                 LogError($"Failed to initialize user data: {ex.Message}");
                 var newUser = new BoltUser("", locale, country, deviceId);
-                _StorageService.SetObject(BoltPlayerPrefsKeys.USER_DATA, newUser);
-                _StorageService.Save();
+                SaveUserData(newUser);
                 return newUser;
             }
+        }
+
+        private void SaveUserData(BoltUser user)
+        {
+            _StorageService.SetObject(BoltPlayerPrefsKeys.USER_DATA, user);
+            _StorageService.Save();
         }
 
         public void OpenCheckout(string checkoutLink)
@@ -254,7 +257,7 @@ namespace BoltApp
             return paymentLinkSession;
         }
 
-        public PaymentLinkSession ResolvePaymentLinkSession(string paymentLinkId, PaymentLinkStatus status = PaymentLinkStatus.Successful)
+        public PaymentLinkSession ResolvePaymentLinkSession(string paymentLinkId, PaymentLinkStatus status = PaymentLinkStatus.Successful, bool autoSave = true)
         {
             try
             {
@@ -267,7 +270,11 @@ namespace BoltApp
                     if (status != PaymentLinkStatus.Pending)
                     {
                         _pendingPaymentLinkSessions.Remove(paymentLinkId);
-                        SavePendingPaymentLinkSessionsToStorage();
+
+                        if (autoSave)
+                        {
+                            SavePendingPaymentLinkSessionsToStorage();
+                        }
                     }
                 }
 
@@ -294,6 +301,11 @@ namespace BoltApp
             return new Dictionary<string, PaymentLinkSession>(_pendingPaymentLinkSessions);
         }
 
+        public bool HasPendingPaymentLinkSessions()
+        {
+            return _pendingPaymentLinkSessions.Count > 0;
+        }
+
         private void LogDebug(string message)
         {
             Debug.Log($"[BoltSDK] {message}");
@@ -302,6 +314,12 @@ namespace BoltApp
         private void LogError(string message)
         {
             Debug.LogError($"[BoltSDK] {message}");
+        }
+
+        public void ManualSave()
+        {
+            SaveUserData(GetUserData());
+            SavePendingPaymentLinkSessionsToStorage();
         }
     }
 }
