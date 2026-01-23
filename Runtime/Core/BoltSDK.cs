@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace BoltApp
@@ -13,11 +14,17 @@ namespace BoltApp
         public event Action<PaymentLinkSession> onTransactionComplete;
         public event Action<PaymentLinkSession> onTransactionFailed;
         public event Action onWebLinkOpen;
+        public event Action<string> onAdOpened;
+        public event Action<string> onAdCompleted;
         public BoltConfig Config { get; private set; }
         private IStorageService _StorageService;
+        private IAdWebViewService _AdWebViewService;
 
         // In-memory dictionary for pending payment link sessions only
         private Dictionary<string, PaymentLinkSession> _pendingPaymentLinkSessions;
+        
+        // Track active ad session
+        private AdSession _activeAdSession;
 
         public BoltSDK()
         {
@@ -30,6 +37,14 @@ namespace BoltApp
         {
             Config = config;
             _StorageService = new PlayerPrefsStorageService();
+            LoadPendingPaymentLinkSessionsFromStorage();
+        }
+
+        public BoltSDK(BoltConfig config, IAdWebViewService adWebViewService)
+        {
+            Config = config;
+            _StorageService = new PlayerPrefsStorageService();
+            _AdWebViewService = adWebViewService;
             LoadPendingPaymentLinkSessionsFromStorage();
         }
 
@@ -316,10 +331,149 @@ namespace BoltApp
             Debug.LogError($"[BoltSDK] {message}");
         }
 
+        private void LogWarning(string message)
+        {
+            Debug.LogWarning($"[BoltSDK] {message}");
+        }
+
         public void ManualSave()
         {
             SaveUserData(GetUserData());
             SavePendingPaymentLinkSessionsToStorage();
+        }
+
+        public AdSession PreloadAd(string adLink, AdType adType = AdType.Timed)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(adLink))
+                {
+                    LogError("Advertisement link cannot be null or empty");
+                    return null;
+                }
+
+                if (_AdWebViewService == null)
+                {
+                    LogError("IAdWebViewService is not set. Please provide an implementation when creating BoltSDK.");
+                    return null;
+                }
+
+                LogDebug($"Preloading ad link: {adLink}");
+                LogDebug($"Ad type: {adType}");
+
+                // Initialize webview if needed (idempotent)
+                _AdWebViewService.Initialize();
+
+                // Set up onClaim callback
+                _AdWebViewService.SetOnClaimCallback(HandleAdClaim);
+
+                // Create ad session with callback to fire onAdCompleted on this BoltSDK instance
+                AdSession adSession = null;
+                adSession = new AdSession(adLink, adType, () =>
+                {
+                    LogDebug($"Showing preloaded ad: {adLink}");
+                    ShowAdWebView(adSession);
+                }, (link) =>
+                {
+                    // This callback fires when onClaim is received
+                    LogDebug($"Ad completed: {link}");
+                    onAdCompleted?.Invoke(link);
+                });
+
+                LogDebug($"Ad preloaded: {adLink}");
+
+                return adSession;
+            }
+            catch (Exception ex)
+            {
+                LogError($"Failed to preload advertisement: {ex.Message}");
+                throw;
+            }
+        }
+
+        private void ShowAdWebView(AdSession adSession)
+        {
+            if (adSession == null || !adSession.IsValid())
+            {
+                LogError("Cannot show webview for invalid ad session");
+                return;
+            }
+
+            if (_AdWebViewService == null)
+            {
+                LogError("IAdWebViewService is not set");
+                adSession.UpdateStatus(AdStatus.Failed, "WebView service not available");
+                return;
+            }
+
+            // Cleanup previous active session if exists
+            if (_activeAdSession != null && _activeAdSession.Status == AdStatus.Showing)
+            {
+                LogDebug("Replacing active ad session");
+                _AdWebViewService?.Cleanup();
+            }
+
+            // Set new active session
+            _activeAdSession = adSession;
+
+            try
+            {
+                _AdWebViewService.Show(adSession.AdLink);
+                onAdOpened?.Invoke(adSession.AdLink);
+            }
+            catch (Exception ex)
+            {
+                LogError($"Failed to show webview: {ex.Message}");
+                adSession.UpdateStatus(AdStatus.Failed, ex.Message);
+                _activeAdSession = null;
+            }
+        }
+
+        private void HandleAdClaim()
+        {
+            if (_activeAdSession == null)
+            {
+                LogWarning("onClaim received but no active session");
+                return;
+            }
+
+            LogDebug("Handling ad claim - ad completed and claimed");
+
+            // Update session status
+            _activeAdSession.UpdateStatus(AdStatus.Completed);
+
+            // Fire onAdCompleted callback on the session
+            _activeAdSession.FireOnCompleted();
+
+            // Cleanup webview
+            _AdWebViewService?.Cleanup();
+
+            // Clear active session
+            _activeAdSession = null;
+        }
+
+        public async Task<AdSession> OpenAd(string adLink, AdType adType = AdType.Timed)
+        {
+            try
+            {
+                var adSession = PreloadAd(adLink, adType);
+                if (adSession == null)
+                {
+                    var failedSession = new AdSession();
+                    failedSession.UpdateStatus(AdStatus.Failed, "Failed to preload ad");
+                    return failedSession;
+                }
+
+                await adSession.Show();
+                return adSession;
+            }
+            catch (Exception ex)
+            {
+                LogError($"Failed to open advertisement: {ex.Message}");
+                var failedSession = new AdSession();
+                failedSession.UpdateStatus(AdStatus.Failed, ex.Message);
+                return failedSession;
+            }
         }
     }
 }
