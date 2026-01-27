@@ -32,7 +32,26 @@ namespace BoltApp
         {
             Development,
             Staging,
+            Sandbox,
             Production
+        }
+
+        /// <summary>
+        /// ad URL, per environment
+        /// </summary>
+        public string GetAdLink()
+        {
+            switch (environment)
+            {
+                case Environment.Development:
+                case Environment.Staging:
+                    return "https://play.staging-bolt.com";
+                case Environment.Sandbox:
+                    return "https://play.sandbox-bolt.com";
+                case Environment.Production:
+                default:
+                    return "https://play.bolt.com";
+            }
         }
 
         public string GetEnvironmentDisplayName()
@@ -43,6 +62,8 @@ namespace BoltApp
                     return "Development";
                 case Environment.Staging:
                     return "Staging";
+                case Environment.Sandbox:
+                    return "Sandbox";
                 case Environment.Production:
                     return "Production";
                 default:
@@ -63,6 +84,11 @@ namespace BoltApp
         public bool IsStaging()
         {
             return environment == Environment.Staging;
+        }
+
+        public bool IsSandbox()
+        {
+            return environment == Environment.Sandbox;
         }
     }
 }
