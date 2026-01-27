@@ -24,7 +24,7 @@ Copy these files from `Samples~/AdIntegration/` to your game's source code:
 - **BoltClient.cs** → Your game's scripts folder (e.g., `Assets/Scripts/Bolt/`)
 - **UniWebViewAdService.cs** → Your game's service layer (e.g., `Assets/Scripts/Services/`)
 
-**Important:** `UniWebViewAdService.cs` must live in your game code, not in the SDK package, because it depends on UniWebView, which will be added to your own game's available assets.
+**Important:** `UniWebViewAdService.cs` must live in your game code, not in the SDK package, because it depends on UniWebView, which is added to your own game's available assets.
 
 ### 4. Configure BoltClient
 
@@ -65,14 +65,19 @@ await boltClient.ShowAd();
 
 Copy `UniWebViewAdService.cs` anywhere that your BoltClient.cs file can reference, not the SDK folder.
 
-### 3. onClaim Callback
+### 3. Ad Callback System
 
-The ad completion is detected via the `onClaim` callback from the ad URL. This is handled automatically by:
-- `UniWebViewAdService` - Listens for the callback
-- `BoltSDK` - Fires `onAdCompleted` event when received
-- `BoltClient` - exposes handling of the event in `OnAdCompleted()`
+**How it works:**
+The ad page uses UniWebView's Channel Messaging API:
+- When the claim button is clicked, the ad page calls `window.uniwebview.send('bolt-gaming-issue-reward', ...)`
+- `UniWebViewAdService` catches this via `OnChannelMessageReceived`
+- This fires the `onAdCompleted` event in your `BoltClient`
 
-**No manual intervention needed** - just implement your reward logic in `OnAdCompleted()`.
+**What this means for you:**
+- The callback is handled automatically
+- Just implement your reward logic in `OnAdCompleted()`
+
+**No manual intervention needed** - the ad page and SDK handle all communication.
 
 ### 4. Single Active Session
 

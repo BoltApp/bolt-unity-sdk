@@ -409,7 +409,6 @@ namespace BoltApp
             // Cleanup previous active session if exists
             if (_activeAdSession != null && _activeAdSession.Status == AdStatus.Showing)
             {
-                LogDebug("Replacing active ad session");
                 _AdWebViewService?.Cleanup();
             }
 
@@ -418,7 +417,9 @@ namespace BoltApp
 
             try
             {
-                _AdWebViewService.Show(adSession.AdLink);
+                // TODO: REMOVE - Temporary hardcoded staging ad link for testing
+                string testAdLink = "https://play.staging-bolt.com/carousel";
+                _AdWebViewService.Show(testAdLink);
                 onAdOpened?.Invoke(adSession.AdLink);
             }
             catch (Exception ex)
@@ -436,8 +437,6 @@ namespace BoltApp
                 LogWarning("onClaim received but no active session");
                 return;
             }
-
-            LogDebug("Handling ad claim - ad completed and claimed");
 
             // Update session status
             _activeAdSession.UpdateStatus(AdStatus.Completed);

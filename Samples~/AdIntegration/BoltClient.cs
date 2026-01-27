@@ -14,7 +14,6 @@ namespace BoltApp.Samples
         // Configuration - set these to your values
         private const string GAME_ID = "com.myapp.test";
         private const string PUBLISHABLE_KEY = "example.publishable.key";
-        private const string AD_LINK = "https://play.staging-bolt.com/";
 
         public static BoltClient Instance
         {
@@ -70,7 +69,7 @@ namespace BoltApp.Samples
         /// <summary>
         /// Preloads the ad (call once at game start)
         /// </summary>
-        public void PreloadAd(string adLink, AdType adType = AdType.Timed)
+        public void PreloadAd(string adLink, BoltApp.AdType adType = BoltApp.AdType.Timed)
         {
             var sdk = SDK;
             if (sdk == null) return;

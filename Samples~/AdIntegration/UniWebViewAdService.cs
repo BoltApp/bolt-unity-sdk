@@ -27,6 +27,13 @@ namespace BoltApp.Samples
             var webViewGameObject = new GameObject("BoltAdWebView");
             _webView = webViewGameObject.AddComponent<UniWebView>();
             _webView.Frame = new Rect(0, 0, Screen.width, Screen.height);
+            
+            Debug.Log("[UniWebViewAdService] Setting SetOpenLinksInExternalBrowser(true)");
+            _webView.SetOpenLinksInExternalBrowser(true);
+            Debug.Log("[UniWebViewAdService] SetOpenLinksInExternalBrowser configured");
+
+            UniWebView.SetJavaScriptEnabled(true);
+            UniWebView.SetForwardWebConsoleToNativeOutput(true);
 
             SetupEventHandlers();
         }
@@ -60,31 +67,40 @@ namespace BoltApp.Samples
 
         private void SetupEventHandlers()
         {
-            // Handle onClaim via message handler
-            _webView.OnMessageReceived += (view, message) =>
+            _webView.OnPageErrorReceived += (view, errorCode, message) =>
             {
-                if (message.Path != null && message.Path.Equals("onClaim", StringComparison.OrdinalIgnoreCase))
-                {
-                    Debug.Log("[UniWebViewAdService] onClaim message received");
-                    _onClaimCallback?.Invoke();
-                }
+                Debug.LogError($"[UniWebViewAdService] Page error: {errorCode} - {message}");
             };
 
-            // Handle onClaim via channel message handler
+            _webView.OnPageStarted += (view, url) =>
+            {
+                Debug.Log($"[UniWebViewAdService] Page started loading: {url}");
+            };
+
+            _webView.OnPageCommitted += (view, url) =>
+            {
+                Debug.Log($"[UniWebViewAdService] Page committed (navigation): {url}");
+            };
+
+            _webView.OnPageFinished += (view, statusCode, url) =>
+            {
+                Debug.Log($"[UniWebViewAdService] Page finished loading: {url} (status: {statusCode})");
+            };
+
+            _webView.OnShouldClose += (view) =>
+            {
+                return false;
+            };
+
             _webView.OnChannelMessageReceived += (view, channelMessage) =>
             {
-                if (channelMessage.action != null && channelMessage.action.Equals("onClaim", StringComparison.OrdinalIgnoreCase))
+                // Check for bolt-gaming-issue-reward from UniWebView channel API
+                if (channelMessage.action != null && channelMessage.action.Equals("bolt-gaming-issue-reward", StringComparison.OrdinalIgnoreCase))
                 {
-                    Debug.Log("[UniWebViewAdService] onClaim channel message received");
                     _onClaimCallback?.Invoke();
-                    
-                    if (channelMessage.isSyncCall || channelMessage.isAsyncRequest)
-                    {
-                        return UniWebViewChannelMessageResponse.Success("Claim received");
-                    }
                 }
                 
-                return UniWebViewChannelMessageResponse.Success("");
+                return null;
             };
         }
     }
