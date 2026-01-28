@@ -85,10 +85,5 @@ namespace BoltApp
         {
             return environment == Environment.Staging;
         }
-
-        public bool IsSandbox()
-        {
-            return environment == Environment.Sandbox;
-        }
     }
 }

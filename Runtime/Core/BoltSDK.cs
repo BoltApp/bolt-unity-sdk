@@ -13,8 +13,8 @@ namespace BoltApp
         public event Action<PaymentLinkSession> onTransactionComplete;
         public event Action<PaymentLinkSession> onTransactionFailed;
         public event Action onWebLinkOpen;
-        public event Action<string> onAdOpened;
-        public event Action<string> onAdCompleted;
+        public event Action onAdOpened;
+        public event Action onAdCompleted;
         public BoltConfig Config { get; private set; }
         private IStorageService _StorageService;
         private IAdWebViewService _AdWebViewService;
@@ -365,11 +365,11 @@ namespace BoltApp
 
                 var adSession = new AdSession(adLink, (link) =>
                 {
-                    LogDebug($"Ad completed: {link}");
-                    onAdCompleted?.Invoke(link);
+                    LogDebug($"Ad completed");
+                    onAdCompleted?.Invoke();
                 });
 
-                LogDebug($"Ad preloaded: {adLink}");
+                LogDebug($"Ad preloaded");
                 _adSession = adSession;
                 return adSession;
             }
@@ -398,7 +398,7 @@ namespace BoltApp
             try
             {
                 _AdWebViewService.Show();
-                onAdOpened?.Invoke(adSession.AdLink);
+                onAdOpened?.Invoke();
             }
             catch (Exception ex)
             {
