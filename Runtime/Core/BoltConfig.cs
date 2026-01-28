@@ -39,7 +39,7 @@ namespace BoltApp
         /// <summary>
         /// ad URL, per environment
         /// </summary>
-        public string GetAdLink()
+        public string GetAdUrl()
         {
             switch (environment)
             {
