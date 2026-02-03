@@ -357,8 +357,7 @@ namespace BoltApp
                     return null;
                 }
 
-                var adLink = Config.GetAdLink();
-                LogDebug($"Preloading ad link: {adLink}");
+                var adLink = UrlUtils.BuildAdLink(Config);
 
                 _AdWebViewService.Preload(adLink);
                 _AdWebViewService.SetOnClaimCallback(HandleAdClaim);
