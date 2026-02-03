@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace BoltApp
 {
@@ -12,8 +11,8 @@ namespace BoltApp
         event Action<PaymentLinkSession> onTransactionComplete;
         event Action<PaymentLinkSession> onTransactionFailed;
         event Action onWebLinkOpen;
-        event Action<string> onAdOpened;
-        event Action<string> onAdCompleted;
+        event Action onAdOpened;
+        event Action onAdCompleted;
         BoltConfig Config { get; }
         BoltUser GetBoltUser();
         BoltUser SetBoltUserData(string email = null, string locale = null, string country = null);

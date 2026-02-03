@@ -13,11 +13,16 @@ namespace BoltApp
         public event Action<PaymentLinkSession> onTransactionComplete;
         public event Action<PaymentLinkSession> onTransactionFailed;
         public event Action onWebLinkOpen;
+        public event Action onAdOpened;
+        public event Action onAdCompleted;
         public BoltConfig Config { get; private set; }
         private IStorageService _StorageService;
+        private IAdWebViewService _AdWebViewService;
 
         // In-memory dictionary for pending payment link sessions only
         private Dictionary<string, PaymentLinkSession> _pendingPaymentLinkSessions;
+        
+        private AdSession _adSession;
 
         public BoltSDK()
         {
@@ -25,11 +30,26 @@ namespace BoltApp
             _StorageService = new PlayerPrefsStorageService();
             LoadPendingPaymentLinkSessionsFromStorage();
         }
-
         public BoltSDK(BoltConfig config)
         {
             Config = config;
             _StorageService = new PlayerPrefsStorageService();
+            LoadPendingPaymentLinkSessionsFromStorage();
+        }
+
+        public BoltSDK(IAdWebViewService adWebViewService)
+        {
+            Config = new BoltConfig();
+            _StorageService = new PlayerPrefsStorageService();
+            _AdWebViewService = adWebViewService;
+            LoadPendingPaymentLinkSessionsFromStorage();
+        }
+
+        public BoltSDK(BoltConfig config, IAdWebViewService adWebViewService)
+        {
+            Config = config;
+            _StorageService = new PlayerPrefsStorageService();
+            _AdWebViewService = adWebViewService;
             LoadPendingPaymentLinkSessionsFromStorage();
         }
 
@@ -316,10 +336,113 @@ namespace BoltApp
             Debug.LogError($"[BoltSDK] {message}");
         }
 
+        private void LogWarning(string message)
+        {
+            Debug.LogWarning($"[BoltSDK] {message}");
+        }
+
         public void ManualSave()
         {
             SaveUserData(GetUserData());
             SavePendingPaymentLinkSessionsToStorage();
+        }
+
+        public AdSession PreloadAd()
+        {
+            try
+            {
+                if (_AdWebViewService == null)
+                {
+                    LogError("IAdWebViewService is not set. Please provide an IAdWebViewService implementation when creating BoltSDK.");
+                    return null;
+                }
+
+                var adLink = Config.GetAdLink();
+                LogDebug($"Preloading ad link: {adLink}");
+
+                _AdWebViewService.Preload(adLink);
+                _AdWebViewService.SetOnClaimCallback(HandleAdClaim);
+
+                var adSession = new AdSession(adLink, (link) =>
+                {
+                    LogDebug($"Ad completed");
+                    onAdCompleted?.Invoke();
+                });
+
+                LogDebug($"Ad preloaded");
+                _adSession = adSession;
+                return adSession;
+            }
+            catch (Exception ex)
+            {
+                LogError($"Failed to preload advertisement: {ex.Message}");
+                throw;
+            }
+        }
+
+        private void ShowAdWebView(AdSession adSession)
+        {
+            if (adSession == null || !adSession.IsValid())
+            {
+                LogError("Cannot show webview for invalid ad session");
+                return;
+            }
+
+            if (_AdWebViewService == null)
+            {
+                LogError("IAdWebViewService is not set");
+                adSession.UpdateStatus(AdStatus.Failed, "WebView service not available");
+                return;
+            }
+
+            try
+            {
+                _AdWebViewService.Show();
+                onAdOpened?.Invoke();
+            }
+            catch (Exception ex)
+            {
+                LogError($"Failed to show webview: {ex.Message}");
+                adSession.UpdateStatus(AdStatus.Failed, ex.Message);
+                _adSession = null;
+            }
+        }
+
+        private void HandleAdClaim()
+        {
+            if (_adSession == null || _adSession.Status != AdStatus.Showing)
+            {
+                LogWarning("ad claim received without a shown ad session");
+                return;
+            }
+
+            _adSession.UpdateStatus(AdStatus.Completed);
+            _adSession.FireOnCompleted();
+            _AdWebViewService?.Cleanup();
+            _adSession = null;
+
+            try
+            {
+                PreloadAd();
+            }
+            catch (Exception ex)
+            {
+                LogError($"Failed to preload next ad: {ex.Message}");
+            }
+        }
+
+        public AdSession ShowAd()
+        {
+            if (_adSession == null || _adSession.Status != AdStatus.Preloaded)
+            {
+                var failedSession = new AdSession();
+                failedSession.UpdateStatus(AdStatus.Failed, "No preloaded ad available");
+                return failedSession;
+            }
+
+            _adSession.UpdateStatus(AdStatus.Showing);
+            ShowAdWebView(_adSession);
+            return _adSession;
         }
     }
 }
