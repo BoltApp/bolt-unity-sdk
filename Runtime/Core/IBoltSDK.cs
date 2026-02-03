@@ -11,10 +11,14 @@ namespace BoltApp
         event Action<PaymentLinkSession> onTransactionComplete;
         event Action<PaymentLinkSession> onTransactionFailed;
         event Action onWebLinkOpen;
+        event Action onAdOpened;
+        event Action onAdCompleted;
         BoltConfig Config { get; }
         BoltUser GetBoltUser();
         BoltUser SetBoltUserData(string email = null, string locale = null, string country = null);
         void OpenCheckout(string checkoutLink);
+        AdSession PreloadAd();
+        AdSession ShowAd();
         PaymentLinkSession HandleDeepLinkCallback(string callbackUrl);
         PaymentLinkSession GetPaymentLinkSession(string paymentLinkId);
         PaymentLinkSession ResolvePaymentLinkSession(string paymentLinkId, PaymentLinkStatus status = PaymentLinkStatus.Successful, bool autoSave = true);

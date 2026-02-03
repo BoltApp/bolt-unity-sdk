@@ -10,6 +10,29 @@ namespace BoltApp
     /// </summary>
     public static class UrlUtils
     {
+        public static string BuildAdLink(BoltConfig config)
+        {
+            var baseUrl = config.GetAdUrl();
+            if (string.IsNullOrEmpty(baseUrl))
+                return baseUrl;
+
+            var queryParams = new Dictionary<string, string>
+            {
+                { "publishable_key", config.publishableKey },
+                { "client_device_id", DeviceUtils.GetDeviceId() }
+            };
+
+            var uriBuilder = new UriBuilder(baseUrl);
+            var query = new StringBuilder(uriBuilder.Query);
+            foreach (var kvp in queryParams)
+            {
+                if (query.Length > 0)
+                    query.Append('&');
+                query.Append($"{Uri.EscapeDataString(kvp.Key)}={Uri.EscapeDataString(kvp.Value ?? "")}");
+            }
+            uriBuilder.Query = query.ToString();
+            return uriBuilder.ToString();
+        }
 
         public static string BuildCheckoutLink(string baseUrl, BoltConfig config, BoltUser boltUser)
         {
