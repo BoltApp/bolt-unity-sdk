@@ -21,7 +21,8 @@ namespace BoltApp
 
         // In-memory dictionary for pending payment link sessions only
         private Dictionary<string, PaymentLinkSession> _pendingPaymentLinkSessions;
-        
+
+        // In-memory ad session
         private AdSession _adSession;
 
         public BoltSDK()

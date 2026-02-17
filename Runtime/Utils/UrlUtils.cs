@@ -12,26 +12,36 @@ namespace BoltApp
     {
         public static string BuildAdLink(BoltConfig config)
         {
-            var baseUrl = config.GetAdUrl();
-            if (string.IsNullOrEmpty(baseUrl))
-                return baseUrl;
 
-            var queryParams = new Dictionary<string, string>
+            try
             {
-                { "publishable_key", config.publishableKey },
-                { "client_device_id", DeviceUtils.GetDeviceId() }
-            };
+                var baseUrl = config.GetAdUrl();
+                if (string.IsNullOrEmpty(baseUrl))
+                    return baseUrl;
 
-            var uriBuilder = new UriBuilder(baseUrl);
-            var query = new StringBuilder(uriBuilder.Query);
-            foreach (var kvp in queryParams)
-            {
-                if (query.Length > 0)
-                    query.Append('&');
-                query.Append($"{Uri.EscapeDataString(kvp.Key)}={Uri.EscapeDataString(kvp.Value ?? "")}");
+                var queryParams = new Dictionary<string, string>
+                {
+                    { "publishable_key", config.publishableKey },
+                    { "client_device_id", DeviceUtils.GetDeviceId() }
+                    { "game_id", config.gameId },
+                };
+
+                var uriBuilder = new UriBuilder(baseUrl);
+                var query = new StringBuilder(uriBuilder.Query);
+                foreach (var kvp in queryParams)
+                {
+                    if (query.Length > 0)
+                        query.Append('&');
+                    query.Append($"{Uri.EscapeDataString(kvp.Key)}={Uri.EscapeDataString(kvp.Value ?? "")}");
+                }
+                uriBuilder.Query = query.ToString();
+                return uriBuilder.ToString();
             }
-            uriBuilder.Query = query.ToString();
-            return uriBuilder.ToString();
+            catch (Exception ex)
+            {
+                Debug.LogError($"[BoltSDK] Failed to build ad link: {ex.Message}");
+                return null;
+            }
         }
 
         public static string BuildCheckoutLink(string baseUrl, BoltConfig config, BoltUser boltUser)
