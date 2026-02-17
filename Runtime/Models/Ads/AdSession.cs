@@ -13,6 +13,9 @@ namespace BoltApp
         public DateTime CreatedAt;
         public DateTime CompletedAt;
         public string Error;
+        public string ButtonID;
+        public AdPlacement Placement;
+        public AdMetaData Metadata;
 
         private readonly Action<string> _onCompleted;
 
