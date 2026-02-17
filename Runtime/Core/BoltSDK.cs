@@ -398,6 +398,7 @@ namespace BoltApp
             {
                 _AdWebViewService.Show();
                 onAdOpened?.Invoke();
+                _AdWebViewService.PostAdShownMetadataEvent("{}"); // TODO: add metadata
             }
             catch (Exception ex)
             {

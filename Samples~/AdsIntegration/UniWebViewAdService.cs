@@ -52,6 +52,17 @@ namespace BoltApp.Samples // TODO: replace with your own namespace
             _webView.Show();
         }
 
+        public void PostAdShownMetadataEvent(string eventPayloadJson)
+        {
+            if (_webView == null) return;
+            var script = "window.dispatchEvent(new CustomEvent('uniwebview-ad-shown', { detail: " + eventPayloadJson + " }));";
+            _webView.EvaluateJavaScript(script, (payload) =>
+            {
+                if (payload == null || !payload.resultCode.Equals("0"))
+                    Debug.LogWarning("[UniWebViewAdService] PostAdShownMetadataEvent EvaluateJavaScript failed: " + (payload?.data ?? "null"));
+            });
+        }
+
         public void Cleanup()
         {
             if (_webView != null)
