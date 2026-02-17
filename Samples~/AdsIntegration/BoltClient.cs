@@ -35,13 +35,13 @@ namespace BoltApp.Samples // TODO: replace with your own namespace
                 {
                     var environment = BoltConfig.Environment.Sandbox; // Set to your environment
                     var boltConfig = new BoltConfig(GAME_ID, PUBLISHABLE_KEY, environment);
-                    
-                    #if UNIWEBVIEW
+
+#if UNIWEBVIEW
                     _adWebViewService = new UniWebViewAdService();
                     _boltSDK = new BoltSDK(boltConfig, _adWebViewService);
-                    #else
+#else
                     _boltSDK = new BoltSDK(boltConfig);
-                    #endif
+#endif
 
                     // Subscribe to ad events
                     _boltSDK.onAdOpened += OnAdOpened;
@@ -83,7 +83,14 @@ namespace BoltApp.Samples // TODO: replace with your own namespace
         /// </summary>
         public bool ShowAd()
         {
-            var result = SDK.ShowAd();
+            // The id associated with the button clicked to show the ad
+            var buttonID = "homePageButton";
+
+            // Any metadata you want to associate with the ad object
+            var myInternalUserID = "example_user_id";
+            var myInternalTrackingID = "example_tracking_id";
+            var metadata = AdMetaData.New().Add("user_id", myInternalTrackingID).Add("tracking_id", myInternalTrackingID);
+            var result = SDK.ShowAd(buttonID, AdPlacement.MainMenu, metadata);
             return result != null && result.Status != AdStatus.Failed;
         }
 
@@ -99,12 +106,12 @@ namespace BoltApp.Samples // TODO: replace with your own namespace
 
         void OnApplicationPause(bool pauseStatus)
         {
-            #if UNIWEBVIEW
+#if UNIWEBVIEW
             if (pauseStatus && _adWebViewService != null)
             {
                 _adWebViewService.Cleanup();
             }
-            #endif
+#endif
         }
 
         private void OnDestroy()
