@@ -22,8 +22,8 @@ namespace BoltApp
                 var queryParams = new Dictionary<string, string>
                 {
                     { "publishable_key", config.publishableKey },
-                    { "client_device_id", DeviceUtils.GetDeviceId() }
-                    { "game_id", config.gameId },
+                    { "client_device_id", DeviceUtils.GetDeviceId() },
+                    { "game_id", config.gameId }
                 };
 
                 var uriBuilder = new UriBuilder(baseUrl);
