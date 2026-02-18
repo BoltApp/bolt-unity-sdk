@@ -31,7 +31,7 @@ namespace BoltApp
         {
             if (key == null)
                 throw new ArgumentNullException(nameof(key));
-            
+
             _data[key] = value ?? string.Empty;
             return this;
         }
