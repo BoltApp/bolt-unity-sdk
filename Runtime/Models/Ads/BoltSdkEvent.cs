@@ -35,20 +35,13 @@ namespace BoltApp
         [JsonProperty("timestamp")]
         public long Timestamp { get; set; }
 
-        /// <summary>
-        /// Serializes the event to JSON for posting to the webview.
-        /// </summary>
         public string ToJson()
         {
             return JsonConvert.SerializeObject(this, Formatting.None);
         }
 
-        /// <summary>
-        /// Creates a bolt-gaming-sdk-openad event from ad session data.
-        /// </summary>
         public static BoltSdkEvent CreateAdOpenEvent(string adPlacement, string buttonID, AdMetaData metadata)
         {
-            var unixTimestamp = (long)(DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
             return new BoltSdkEvent
             {
                 Type = "bolt-gaming-sdk-openad",
@@ -58,8 +51,8 @@ namespace BoltApp
                     ButtonID = buttonID ?? string.Empty,
                     Metadata = metadata ?? AdMetaData.New()
                 },
-                Id = $"bolt-event-{unixTimestamp}-{Guid.NewGuid().ToString("N").Substring(0, 8)}",
-                Timestamp = unixTimestamp
+                Id = "bolt-event-" + Guid.NewGuid().ToString(),
+                Timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
             };
         }
     }
