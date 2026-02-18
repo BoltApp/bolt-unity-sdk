@@ -11,6 +11,6 @@ namespace BoltApp
         void Show();
         void Cleanup();
         void SetOnClaimCallback(Action onClaimCallback);
-        void PostAdShownMetadataEvent(string eventPayloadJson);
+        void PostIframeMessage(BoltSdkEvent eventData);
     }
 }

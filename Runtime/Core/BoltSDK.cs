@@ -400,11 +400,12 @@ namespace BoltApp
                 _AdWebViewService.Show();
                 onAdOpened?.Invoke();
 
-                // Serialize metadata to JSON, defaulting to empty object if null
-                var metadataJson = adSession.Metadata != null
-                    ? adSession.Metadata.ToJson()
-                    : "{}";
-                _AdWebViewService.PostAdShownMetadataEvent(metadataJson);
+                // Build and post the open-ad event to the iframe
+                var eventData = BoltSdkEvent.CreateAdOpenEvent(
+                    adSession.Placement?.ToString() ?? string.Empty,
+                    adSession.ButtonID ?? string.Empty,
+                    adSession.Metadata);
+                _AdWebViewService.PostIframeMessage(eventData);
             }
             catch (Exception ex)
             {
