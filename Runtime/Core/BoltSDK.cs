@@ -402,7 +402,7 @@ namespace BoltApp
 
                 // Build and post the open-ad event to the iframe
                 var eventData = BoltSdkEvent.CreateAdOpenEvent(
-                    adSession.Placement?.ToString() ?? string.Empty,
+                    adSession.Placement.ToString(),
                     adSession.ButtonID ?? string.Empty,
                     adSession.Metadata);
                 _AdWebViewService.PostIframeMessage(eventData);
