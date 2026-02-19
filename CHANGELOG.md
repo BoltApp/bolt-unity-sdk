@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Demo scene with Bolt quick start guide
 - Serverless quick start (no game server needed)
 
+## [1.0.1] - 2026-02-17
+### Added 
+- Improved Ad handling
+- Added AdPlacement type for analytic reporting
+
 ## [1.0.0] - 2026-02-02
 ### Added 
 - Support for Bolt Ads

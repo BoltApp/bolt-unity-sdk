@@ -62,7 +62,7 @@ namespace BoltApp
             return !string.IsNullOrEmpty(PaymentLinkId) && !string.IsNullOrEmpty(PaymentLinkUrl);
         }
 
-        public string ToString()
+        public override string ToString()
         {
             return $"PaymentLinkId: {PaymentLinkId}, Status: {Status}, CreatedAt: {CreatedAt}, LastAccessedAt: {LastAccessedAt}, CompletedAt: {CompletedAt}, PaymentLinkUrl: {PaymentLinkUrl}";
         }
