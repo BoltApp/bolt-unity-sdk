@@ -3,7 +3,7 @@ using System;
 using UnityEngine;
 using BoltApp;
 
-namespace BoltApp.Samples // TODO: replace with your own namespace
+namespace Boltapp.Samples // TODO: replace with your own namespace
 {
     /// <summary>
     /// Implementation of Bolt SDK's IAdWebViewService interface for UniWebView
@@ -52,15 +52,16 @@ namespace BoltApp.Samples // TODO: replace with your own namespace
             _webView.Show();
         }
 
-        public void PostIframeMessage(BoltSdkEvent eventData)
+        public void PostWebviewMessage(BoltSdkEvent eventData)
         {
             if (_webView == null || eventData == null) return;
             var eventJson = eventData.ToJson();
-            var script = "window.dispatchEvent(new CustomEvent('uniwebview-ad-shown', { detail: " + eventJson + " }));";
+            var escaped = eventJson.Replace("\\", "\\\\").Replace("'", "\\'").Replace("\r", "\\r").Replace("\n", "\\n");
+            var script = "window.postMessage(JSON.parse('" + escaped + "'), '*');";
             _webView.EvaluateJavaScript(script, (payload) =>
             {
                 if (payload == null || !payload.resultCode.Equals("0"))
-                    Debug.LogWarning("[UniWebViewAdService] PostIframeMessage EvaluateJavaScript failed: " + (payload?.data ?? "null"));
+                    Debug.LogWarning("[UniWebViewAdService] PostWebviewMessage EvaluateJavaScript failed: " + (payload?.data ?? "null"));
             });
         }
 

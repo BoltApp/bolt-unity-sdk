@@ -400,12 +400,12 @@ namespace BoltApp
                 _AdWebViewService.Show();
                 onAdOpened?.Invoke();
 
-                // Build and post the open-ad event to the iframe
+                // Build and post the open-ad event to the web view
                 var eventData = BoltSdkEvent.CreateAdOpenEvent(
                     adSession.Placement.ToString(),
                     adSession.ButtonID ?? string.Empty,
                     adSession.Metadata);
-                _AdWebViewService.PostIframeMessage(eventData);
+                _AdWebViewService.PostWebviewMessage(eventData);
             }
             catch (Exception ex)
             {

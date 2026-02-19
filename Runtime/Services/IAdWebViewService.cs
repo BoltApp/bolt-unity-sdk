@@ -11,6 +11,6 @@ namespace BoltApp
         void Show();
         void Cleanup();
         void SetOnClaimCallback(Action onClaimCallback);
-        void PostIframeMessage(BoltSdkEvent eventData);
+        void PostWebviewMessage(BoltSdkEvent eventData);
     }
 }
