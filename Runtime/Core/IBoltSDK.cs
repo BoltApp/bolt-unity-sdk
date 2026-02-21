@@ -18,7 +18,7 @@ namespace BoltApp
         BoltUser SetBoltUserData(string email = null, string locale = null, string country = null);
         void OpenCheckout(string checkoutLink);
         AdSession PreloadAd();
-        AdSession ShowAd();
+        AdSession ShowAd(string buttonID, AdPlacement placement, AdMetaData metadata);
         PaymentLinkSession HandleDeepLinkCallback(string callbackUrl);
         PaymentLinkSession GetPaymentLinkSession(string paymentLinkId);
         PaymentLinkSession ResolvePaymentLinkSession(string paymentLinkId, PaymentLinkStatus status = PaymentLinkStatus.Successful, bool autoSave = true);

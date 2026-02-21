@@ -21,7 +21,8 @@ namespace BoltApp
 
         // In-memory dictionary for pending payment link sessions only
         private Dictionary<string, PaymentLinkSession> _pendingPaymentLinkSessions;
-        
+
+        // In-memory ad session
         private AdSession _adSession;
 
         public BoltSDK()
@@ -398,6 +399,13 @@ namespace BoltApp
             {
                 _AdWebViewService.Show();
                 onAdOpened?.Invoke();
+
+                // Build and post the open-ad event to the web view
+                var eventData = BoltSdkEvent.CreateAdOpenEvent(
+                    adSession.Placement.ToString(),
+                    adSession.ButtonID ?? string.Empty,
+                    adSession.Metadata);
+                _AdWebViewService.PostWebviewMessage(eventData);
             }
             catch (Exception ex)
             {
@@ -430,7 +438,7 @@ namespace BoltApp
             }
         }
 
-        public AdSession ShowAd()
+        public AdSession ShowAd(string buttonID, AdPlacement placement, AdMetaData metadata)
         {
             if (_adSession == null || _adSession.Status != AdStatus.Preloaded)
             {
@@ -438,6 +446,11 @@ namespace BoltApp
                 failedSession.UpdateStatus(AdStatus.Failed, "No preloaded ad available");
                 return failedSession;
             }
+
+            // Store metadata, buttonID, and placement in the session
+            _adSession.ButtonID = buttonID;
+            _adSession.Placement = placement;
+            _adSession.Metadata = metadata ?? AdMetaData.New();
 
             _adSession.UpdateStatus(AdStatus.Showing);
             ShowAdWebView(_adSession);
