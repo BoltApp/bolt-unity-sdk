@@ -81,16 +81,17 @@ namespace BoltApp.Samples // TODO: replace with your own namespace
         /// <summary>
         /// Shows the preloaded ad. Returns true if the ad was shown, false if none available or failed.
         /// </summary>
-        public bool ShowAd()
+        public bool ShowAd(string buttonID = null, AdSurface surface = default(AdSurface))
         {
-            // The id associated with the button clicked to show the ad
-            var buttonID = "homePageButton";
+            var metadata = AdMetaData.New();
 
             // Any metadata you want to associate with the ad object
-            var myInternalUserID = "example_user_id";
-            var myInternalTrackingID = "example_tracking_id";
-            var metadata = AdMetaData.New().Add("user_id", myInternalTrackingID).Add("tracking_id", myInternalTrackingID);
-            var result = SDK.ShowAd(buttonID, AdPlacement.MainMenu, metadata);
+            var sample_metadata_key = "";
+            if (!string.IsNullOrEmpty(sample_metadata_key)) metadata.Add("sample_metadata_key", sample_metadata_key);
+
+            if (!string.IsNullOrEmpty(buttonID)) metadata.Add("button_id", buttonID);
+            if (surface.IsSet) metadata.Add("ad_surface", surface.ToString());
+            var result = SDK.ShowAd(metadata);
             return result != null && result.Status != AdStatus.Failed;
         }
 
@@ -102,16 +103,6 @@ namespace BoltApp.Samples // TODO: replace with your own namespace
         private void OnAdCompleted()
         {
             Debug.Log($"[BoltClient] Ad completed");
-        }
-
-        void OnApplicationPause(bool pauseStatus)
-        {
-#if UNIWEBVIEW
-            if (pauseStatus && _adWebViewService != null)
-            {
-                _adWebViewService.Cleanup();
-            }
-#endif
         }
 
         private void OnDestroy()

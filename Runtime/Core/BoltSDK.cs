@@ -359,6 +359,8 @@ namespace BoltApp
                 }
 
                 var adLink = UrlUtils.BuildAdLink(Config);
+                // TODO: @aweislow remove
+                LogDebug($"PreloadAd URL: {adLink}");
 
                 _AdWebViewService.Preload(adLink);
                 _AdWebViewService.SetOnClaimCallback(HandleAdClaim);
@@ -401,10 +403,7 @@ namespace BoltApp
                 onAdOpened?.Invoke();
 
                 // Build and post the open-ad event to the web view
-                var eventData = BoltSdkEvent.CreateAdOpenEvent(
-                    adSession.Placement.ToString(),
-                    adSession.ButtonID ?? string.Empty,
-                    adSession.Metadata);
+                var eventData = BoltSdkEvent.CreateAdOpenEvent(adSession.Metadata);
                 _AdWebViewService.PostWebviewMessage(eventData);
             }
             catch (Exception ex)
@@ -438,7 +437,7 @@ namespace BoltApp
             }
         }
 
-        public AdSession ShowAd(string buttonID, AdPlacement placement, AdMetaData metadata)
+        public AdSession ShowAd(AdMetaData metadata)
         {
             if (_adSession == null || _adSession.Status != AdStatus.Preloaded)
             {
@@ -447,9 +446,7 @@ namespace BoltApp
                 return failedSession;
             }
 
-            // Store metadata, buttonID, and placement in the session
-            _adSession.ButtonID = buttonID;
-            _adSession.Placement = placement;
+            // Store metadata in the session
             _adSession.Metadata = metadata ?? AdMetaData.New();
 
             _adSession.UpdateStatus(AdStatus.Showing);

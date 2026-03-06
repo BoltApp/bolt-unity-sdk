@@ -8,8 +8,8 @@ namespace BoltApp
     /// </summary>
     public class AdOpenEventPayload
     {
-        [JsonProperty("ad_placement")]
-        public string AdPlacement { get; set; }
+        [JsonProperty("ad_surface")]
+        public string AdSurface { get; set; }
 
         [JsonProperty("buttonID")]
         public string ButtonID { get; set; }
@@ -40,19 +40,17 @@ namespace BoltApp
             return JsonConvert.SerializeObject(this, Formatting.None);
         }
 
-        public static BoltSdkEvent CreateAdOpenEvent(string adPlacement, string buttonID, AdMetaData metadata)
+        public static BoltSdkEvent CreateAdOpenEvent(AdMetaData metadata)
         {
             return new BoltSdkEvent
             {
                 Type = "bolt-gaming-sdk-openad",
                 Payload = new AdOpenEventPayload
                 {
-                    AdPlacement = adPlacement ?? string.Empty,
-                    ButtonID = buttonID ?? string.Empty,
                     Metadata = metadata ?? AdMetaData.New()
                 },
                 Id = "bolt-event-" + Guid.NewGuid().ToString(),
-                Timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
+                Timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
             };
         }
     }

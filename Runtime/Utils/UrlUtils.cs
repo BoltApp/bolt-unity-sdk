@@ -36,7 +36,10 @@ namespace BoltApp
                     query.Append($"{Uri.EscapeDataString(kvp.Key)}={Uri.EscapeDataString(kvp.Value ?? "")}");
                 }
                 uriBuilder.Query = query.ToString();
-                return uriBuilder.ToString();
+                var adLink = uriBuilder.ToString();
+                // TODO: @aweislow remove
+                Debug.Log($"[BoltSDK] BuildAdLink URL: {adLink}");
+                return adLink;
             }
             catch (Exception ex)
             {

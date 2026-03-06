@@ -3,7 +3,7 @@ using System;
 using UnityEngine;
 using BoltApp;
 
-namespace Boltapp.Samples // TODO: replace with your own namespace
+namespace BoltApp.Samples // TODO: replace with your own namespace
 {
     /// <summary>
     /// Implementation of Bolt SDK's IAdWebViewService interface for UniWebView
@@ -13,14 +13,19 @@ namespace Boltapp.Samples // TODO: replace with your own namespace
     {
         private UniWebView _webView;
         private Action _onClaimCallback;
+        private string _adHost;
 
         public void Preload(string adLink)
         {
+            // TODO: @aweislow remove
+            Debug.Log($"[UniWebViewAdService] Preload URL: {adLink}");
             if (_webView != null)
             {
                 _webView.Load(adLink);
                 return;
             }
+
+            _adHost = new Uri(adLink).Host;
 
             UniWebView.SetAllowAutoPlay(true);
             UniWebView.SetAllowInlinePlay(true);
@@ -28,10 +33,6 @@ namespace Boltapp.Samples // TODO: replace with your own namespace
             var webViewGameObject = new GameObject("BoltAdWebView");
             _webView = webViewGameObject.AddComponent<UniWebView>();
             _webView.Frame = new Rect(0, 0, Screen.width, Screen.height);
-            
-            Debug.Log("[UniWebViewAdService] Setting SetOpenLinksInExternalBrowser(true)");
-            _webView.SetOpenLinksInExternalBrowser(true);
-            Debug.Log("[UniWebViewAdService] SetOpenLinksInExternalBrowser configured");
 
             UniWebView.SetJavaScriptEnabled(true);
             UniWebView.SetForwardWebConsoleToNativeOutput(true);
@@ -89,6 +90,12 @@ namespace Boltapp.Samples // TODO: replace with your own namespace
             _webView.OnPageStarted += (view, url) =>
             {
                 Debug.Log($"[UniWebViewAdService] Page started loading: {url}");
+                if (!string.IsNullOrEmpty(url) && Uri.TryCreate(url, UriKind.Absolute, out var uri) && uri.Host != _adHost)
+                {
+                    view.Stop();
+                    Application.OpenURL(url);
+                    Debug.Log($"[UniWebViewAdService] External link opened in system browser: {url}");
+                }
             };
 
             _webView.OnPageCommitted += (view, url) =>
