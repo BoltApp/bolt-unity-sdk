@@ -90,7 +90,7 @@ namespace BoltApp.Samples // TODO: replace with your own namespace
             if (!string.IsNullOrEmpty(sample_metadata_key)) metadata.Add("sample_metadata_key", sample_metadata_key);
 
             if (!string.IsNullOrEmpty(buttonID)) metadata.Add("button_id", buttonID);
-            if (surface.IsSet) metadata.Add("ad_surface", surface.ToString());
+            if (surface.IsSet) metadata.Add("surface", surface.ToString());
             var result = SDK.ShowAd(metadata);
             return result != null && result.Status != AdStatus.Failed;
         }

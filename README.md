@@ -124,12 +124,16 @@ Under your game's project settings, go to `Player` and make the following change
 
 ### Step 4: Add code to your game
 
-There are various sample integrations in the `Samples~/` folder. 
-#### Ads Integration
-1. Copy these files from `Samples~/AdsIntegration/` to your game's source code:
-- [**BoltClient.cs**](./Samples~/AdsIntegration/BoltClient.cs): Your game's scripts folder (e.g., `Assets/Scripts/Bolt/`)
-- [**UniWebViewAdService.cs**](./Samples~/AdsIntegration/UniWebViewAdService.cs): Your game's service layer (e.g., `Assets/Scripts/Services/`)
+The SDK includes sample integrations that you can import into your project via the Unity Package Manager.
 
+1. In the Unity Editor, open **Window > Package Manager**.
+2. Select the **Bolt SDK** package.
+3. In the right-hand pane, find the **Samples** section and click **Import** next to the desired sample (e.g., `AdsIntegration`).
+
+This will copy the sample files into your `Assets/Samples` folder.
+
+#### Ads Integration
+1. After importing the `AdsIntegration` sample, move the files from `Assets/Samples/Bolt SDK/<version>/AdsIntegration` into your game's source code folders (e.g., `Assets/Scripts/`).
 2. Update both `BoltClient.cs` and `UniWebViewAdService.cs` so their namespaces reference your project's paths
 
 3. Update `BoltClient.cs` in the `InitializeBoltSDK()` method (around lines 13-14)

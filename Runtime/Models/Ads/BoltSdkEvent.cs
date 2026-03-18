@@ -8,7 +8,7 @@ namespace BoltApp
     /// </summary>
     public class AdOpenEventPayload
     {
-        [JsonProperty("ad_surface")]
+        [JsonProperty("surface")]
         public string AdSurface { get; set; }
 
         [JsonProperty("buttonID")]
