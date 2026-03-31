@@ -146,20 +146,48 @@ This will copy the sample files into your `Assets/Samples` folder.
 2. Add the `BoltClient` component to it
 3. The client will initialize automatically on `Start()`
 
-### Step 5: Begin Displaying Ads with Button Attachment
- Start by setting up a button in Unity:
- 1. In your code, create a new function that calls the BoltClient's `ShowAd()` function
- 2. In Unity, click on the asset you want to trigger the ad and attach the function via the Unity Inspector's On Click() button setup
+### Step 5: Unity Button Attachment for Displaying Ads
+To display an ad when a user clicks a button, attach a "listener" via code. This allows you to pass important tracking information to the Bolt ad server.
 
-### Example Function
-The client already handles initialization, ad preloading, etc. so at this point you can simply add the following function call 
+Create a new file to handle all button clicks. Similar to Step 4, attach this file to an empty GameObject in your scene. 
+Inside this script's Start method, add one listener per unique button asset. Here's an example:
 ```csharp
-    public void ExampleAdButton()
+using UnityEngine;
+using UnityEngine.UI;
+using BoltApp.Samples; // Replace with your namespace
+
+public class MyGameMenu : MonoBehaviour
+{
+    public Button newLifeButton;
+    public Button bonusButton;
+
+    void Start()
     {
-      // ... add any other button logic required
-        BoltClient.Instance.ShowAd();
+        // Attach a listener to each button
+        newLifeButton.onClick.AddListener(() => {
+            BoltClient.Instance.ShowAd("new_life_1", AdSurface.GameOver);
+        });
+        bonusButton.onClick.AddListener(() => {
+            BoltClient.Instance.ShowAd("bonus_1", AdSurface.MainMenu);
+        });
     }
+}
 ```
+
+#### Why use this instead of the Unity Inspector?
+The Unity Inspector only supports calling functions with zero or one argument (like just a `string`). Since `ShowAd` requires both a **Button ID** and an **Ad Surface** for analytics, using `AddListener` in code is the best way to handle multiple parameters.
+
+#### Analytics Metadata
+By passing these two parameters, you can track exactly where and which button triggered an ad:
+
+*   **Button ID**: A unique string of your choosing to identify which specific UI element the user interacted with.
+*   **Ad Surface**: A categorized location in your game. Using these constants helps group your data:
+    *   `AdSurface.MainMenu`
+    *   `AdSurface.Shop`
+    *   `AdSurface.LevelComplete`
+    *   `AdSurface.GameOver`
+    *   `AdSurface.Other`
+    *   `AdSurface.Custom("your_custom_surface")`
 
 ### Step 6: Handle Ad Lifecycle Events
 The `OnAdOpened()` and `OnAdCompleted()` methods in `BoltClient` allow you to add things like UI updates, game state management, player rewards, etc. 

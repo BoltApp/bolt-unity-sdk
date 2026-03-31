@@ -24,7 +24,8 @@ namespace BoltApp
                 {
                     { "publishable_key", config.publishableKey },
                     { "client_device_id", DeviceUtils.GetDeviceId() },
-                    { "game_id", config.gameId }
+                    { "game_id", config.gameId },
+                    { "fullscreen", "true" }
                 };
 
                 var uriBuilder = new UriBuilder(baseUrl);

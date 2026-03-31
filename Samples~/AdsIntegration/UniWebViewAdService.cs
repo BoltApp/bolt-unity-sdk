@@ -36,7 +36,42 @@ namespace BoltApp.Samples // TODO: replace with your own namespace
             UniWebView.SetForwardWebConsoleToNativeOutput(true);
 
             SetupEventHandlers();
-            _webView.Load(adLink);
+            LoadIframeContent(adLink);
+        }
+
+        private void LoadIframeContent(string adLink)
+        {
+            // Use a clean iframe wrapper to host the ad
+            string iframeHtml = $@"
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>
+                    <style>
+                        body, html {{
+                             margin: 0;
+                             padding: 0;
+                             width: 100vw;
+                             height: 100vh;
+                             overflow: hidden;
+                             background-color: black;
+                        }}
+                        iframe {{
+                            border: none;
+                            width: 100vw;
+                            height: 100vh;
+                            display: block;
+                        }}
+                    </style>
+                </head>
+                <body>
+                    <iframe src='{adLink}' id='bolt-iframe-modal' allow='autoplay; fullscreen' allowfullscreen></iframe>
+                </body>
+                </html>";
+
+            // Use the base URL of the adLink to maintain the same origin for postMessage
+            string baseUrl = adLink.Split('?')[0];
+            _webView.LoadHTMLString(iframeHtml, baseUrl);
         }
 
         public void Show()
@@ -56,7 +91,16 @@ namespace BoltApp.Samples // TODO: replace with your own namespace
             if (_webView == null || eventData == null) return;
             var eventJson = eventData.ToJson();
             var escaped = eventJson.Replace("\\", "\\\\").Replace("'", "\\'").Replace("\r", "\\r").Replace("\n", "\\n");
-            var script = "window.postMessage(JSON.parse('" + escaped + "'), '*');";
+
+            // JS Snippet required to pass messages from the astro ad through uniwebview to the iframe
+            var script = $@"
+                var iframe = document.getElementById('bolt-iframe-modal');
+                if (iframe && iframe.contentWindow) {{
+                    iframe.contentWindow.postMessage(JSON.parse('{escaped}'), '*');
+                }} else {{
+                    window.postMessage(JSON.parse('{escaped}'), '*');
+                }}";
+
             _webView.EvaluateJavaScript(script, (payload) =>
             {
                 if (payload == null || !payload.resultCode.Equals("0"))
