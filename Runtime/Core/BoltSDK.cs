@@ -401,7 +401,6 @@ namespace BoltApp
                 onAdOpened?.Invoke();
 
                 // Build and post the open-ad event to the web view
-                LogDebug("[UNITY SDK 1] Starting AD Here &&&&&\n");
                 var eventData = BoltSdkEvent.CreateAdOpenEvent(adSession.Metadata);
                 _AdWebViewService.PostWebviewMessage(eventData);
             }

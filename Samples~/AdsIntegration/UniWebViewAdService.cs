@@ -41,7 +41,6 @@ namespace BoltApp.Samples // TODO: replace with your own namespace
 
         private void LoadIframeContent(string adLink)
         {
-            // Use a clean iframe wrapper to host the ad
             string iframeHtml = $@"
                 <!DOCTYPE html>
                 <html>
