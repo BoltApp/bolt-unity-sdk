@@ -44,7 +44,7 @@ namespace BoltApp
         {
             return new BoltSdkEvent
             {
-                Type = "bolt-gaming-sdk-openad",
+                Type = "bolt-gaming-start-ads",
                 Payload = new AdOpenEventPayload
                 {
                     Metadata = metadata ?? AdMetaData.New()

@@ -359,8 +359,6 @@ namespace BoltApp
                 }
 
                 var adLink = UrlUtils.BuildAdLink(Config);
-                // TODO: @aweislow remove
-                LogDebug($"PreloadAd URL: {adLink}");
 
                 _AdWebViewService.Preload(adLink);
                 _AdWebViewService.SetOnClaimCallback(HandleAdClaim);

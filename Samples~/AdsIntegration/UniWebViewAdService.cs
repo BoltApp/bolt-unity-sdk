@@ -17,8 +17,6 @@ namespace BoltApp.Samples // TODO: replace with your own namespace
 
         public void Preload(string adLink)
         {
-            // TODO: @aweislow remove
-            Debug.Log($"[UniWebViewAdService] Preload URL: {adLink}");
             if (_webView != null)
             {
                 _webView.Load(adLink);
