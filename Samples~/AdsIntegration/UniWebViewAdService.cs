@@ -3,7 +3,7 @@ using System;
 using UnityEngine;
 using BoltApp;
 
-namespace Boltapp.Samples // TODO: replace with your own namespace
+namespace BoltApp.Samples // TODO: replace with your own namespace
 {
     /// <summary>
     /// Implementation of Bolt SDK's IAdWebViewService interface for UniWebView
@@ -13,6 +13,7 @@ namespace Boltapp.Samples // TODO: replace with your own namespace
     {
         private UniWebView _webView;
         private Action _onClaimCallback;
+        private string _adHost;
 
         public void Preload(string adLink)
         {
@@ -22,22 +23,54 @@ namespace Boltapp.Samples // TODO: replace with your own namespace
                 return;
             }
 
+            _adHost = new Uri(adLink).Host;
+
             UniWebView.SetAllowAutoPlay(true);
             UniWebView.SetAllowInlinePlay(true);
 
             var webViewGameObject = new GameObject("BoltAdWebView");
             _webView = webViewGameObject.AddComponent<UniWebView>();
             _webView.Frame = new Rect(0, 0, Screen.width, Screen.height);
-            
-            Debug.Log("[UniWebViewAdService] Setting SetOpenLinksInExternalBrowser(true)");
-            _webView.SetOpenLinksInExternalBrowser(true);
-            Debug.Log("[UniWebViewAdService] SetOpenLinksInExternalBrowser configured");
 
             UniWebView.SetJavaScriptEnabled(true);
             UniWebView.SetForwardWebConsoleToNativeOutput(true);
 
             SetupEventHandlers();
-            _webView.Load(adLink);
+            LoadIframeContent(adLink);
+        }
+
+        private void LoadIframeContent(string adLink)
+        {
+            string iframeHtml = $@"
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>
+                    <style>
+                        body, html {{
+                             margin: 0;
+                             padding: 0;
+                             width: 100vw;
+                             height: 100vh;
+                             overflow: hidden;
+                             background-color: black;
+                        }}
+                        iframe {{
+                            border: none;
+                            width: 100vw;
+                            height: 100vh;
+                            display: block;
+                        }}
+                    </style>
+                </head>
+                <body>
+                    <iframe src='{adLink}' id='bolt-iframe-modal' allow='autoplay; fullscreen' allowfullscreen></iframe>
+                </body>
+                </html>";
+
+            // Use the base URL of the adLink to maintain the same origin for postMessage
+            string baseUrl = adLink.Split('?')[0];
+            _webView.LoadHTMLString(iframeHtml, baseUrl);
         }
 
         public void Show()
@@ -57,7 +90,16 @@ namespace Boltapp.Samples // TODO: replace with your own namespace
             if (_webView == null || eventData == null) return;
             var eventJson = eventData.ToJson();
             var escaped = eventJson.Replace("\\", "\\\\").Replace("'", "\\'").Replace("\r", "\\r").Replace("\n", "\\n");
-            var script = "window.postMessage(JSON.parse('" + escaped + "'), '*');";
+
+            // JS Snippet required to pass messages from the astro ad through uniwebview to the iframe
+            var script = $@"
+                var iframe = document.getElementById('bolt-iframe-modal');
+                if (iframe && iframe.contentWindow) {{
+                    iframe.contentWindow.postMessage(JSON.parse('{escaped}'), '*');
+                }} else {{
+                    window.postMessage(JSON.parse('{escaped}'), '*');
+                }}";
+
             _webView.EvaluateJavaScript(script, (payload) =>
             {
                 if (payload == null || !payload.resultCode.Equals("0"))
@@ -89,6 +131,12 @@ namespace Boltapp.Samples // TODO: replace with your own namespace
             _webView.OnPageStarted += (view, url) =>
             {
                 Debug.Log($"[UniWebViewAdService] Page started loading: {url}");
+                if (!string.IsNullOrEmpty(url) && Uri.TryCreate(url, UriKind.Absolute, out var uri) && uri.Host != _adHost)
+                {
+                    view.Stop();
+                    Application.OpenURL(url);
+                    Debug.Log($"[UniWebViewAdService] External link opened in system browser: {url}");
+                }
             };
 
             _webView.OnPageCommitted += (view, url) =>

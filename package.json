@@ -1,6 +1,6 @@
 {
   "name": "com.bolt.sdk",
-  "version": "1.0.1",
+  "version": "1.1.1",
   "displayName": "Bolt SDK",
   "description": "A performant Unity SDK for out of app purchases, subscriptions and ads.",
   "unity": "2021.3",

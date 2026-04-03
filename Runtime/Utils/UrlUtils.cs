@@ -24,7 +24,8 @@ namespace BoltApp
                 {
                     { "publishable_key", config.publishableKey },
                     { "client_device_id", DeviceUtils.GetDeviceId() },
-                    { "game_id", config.gameId }
+                    { "game_id", config.gameId },
+                    { "fullscreen", "true" }
                 };
 
                 var uriBuilder = new UriBuilder(baseUrl);
@@ -36,7 +37,8 @@ namespace BoltApp
                     query.Append($"{Uri.EscapeDataString(kvp.Key)}={Uri.EscapeDataString(kvp.Value ?? "")}");
                 }
                 uriBuilder.Query = query.ToString();
-                return uriBuilder.ToString();
+                var adLink = uriBuilder.ToString();
+                return adLink;
             }
             catch (Exception ex)
             {
