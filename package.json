@@ -24,7 +24,7 @@
       "path": "Samples~/BasicIntegration"
     }
   ],
-  "documentationUrl": "https://docs.boltapp.com/unity-sdk",
+  "documentationUrl": "https://help.boltapp.com/unity-sdk",
   "changelogUrl": "https://github.com/BoltApp/bolt-unity-sdk/blobl/main/CHANGELOG.md",
   "repository": {
     "type": "git",
