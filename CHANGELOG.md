@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Demo scene with Bolt quick start guide
 - Serverless quick start (no game server needed)
 
+## [2.0.0] - 2026-07-20
+### Changed
+- **BREAKING:** Migrated all exact `bolt.com` references to `boltapp.com`. The default production ad host (`play.bolt.com`) now targets `play.boltapp.com`; consumers relying on the old default endpoint must update. Staging/sandbox hosts (`staging-bolt.com`, `sandbox-bolt.com`) are intentionally unchanged.
+- Updated package metadata (author name/email/url, documentation URL) and documentation/help/marketing links to `boltapp.com`.
+
 ## [1.1.1] - 2026-04-1 
 ### Added
 - Support for internal and external linkouts

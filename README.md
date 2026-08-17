@@ -57,15 +57,15 @@ We also support other platforms:
 
 ## 📚 Documentation
 
-For further documentation and API reference visit our [Quickstart guide](https://gaming-help.bolt.com/guide/quickstart.html).
+For further documentation and API reference visit our [Quickstart guide](https://gaming-help.boltapp.com/guide/quickstart.html).
 
 ## 💰 Why Bolt
 
 Only with Bolt you get **2.1% + $0.30 on all transactions**. That's 10x better than traditional app stores which take 30% of your revenue! That's the fair and transparent pricing you get with using Bolt.
 
 > Bolt’s fees are subject to change but will remain highly competitive. 
-> For the latest rates, see [Bolt Pricing](https://www.bolt.com/pricing). 
-> For details, review the [End User Terms and Conditions](https://www.bolt.com/end-user-terms).
+> For the latest rates, see [Bolt Pricing](https://www.boltapp.com/pricing). 
+> For details, review the [End User Terms and Conditions](https://www.boltapp.com/end-user-terms).
 
 ## 🛠️ Prerequisites
 
@@ -73,7 +73,7 @@ You need 3 things to get started:
 
 1. **Existing App:** You will need an application in the same platform as this SDK
 2. **Backend Server:** You will need to bring your own backend server (any language)
-3. **Bolt Merchant Account:** Dashboard access to manage your store ([sign up](https://merchant.bolt.com/onboarding/get-started/gaming) or [log in](https://merchant.bolt.com/))
+3. **Bolt Merchant Account:** Dashboard access to manage your store ([sign up](https://merchant.boltapp.com/onboarding/get-started/gaming) or [log in](https://merchant.boltapp.com/))
 4. **UniWebViewAdService.cs** [Unity plugin supporting iOS and Android in-game webviews](https://docs.uniwebview.com/guide/)
 
 
@@ -220,7 +220,7 @@ Integration examples are also provided in the `Samples~/` folder.
 - [**BoltDeepLinkExample**](./Samples~/DeepLinkIntegration/BoltDeepLinkExample.cs): will showcase how to handle deep links back into the application.
 ### Backend Integration
 You will need to bring your own backend server to complete integration for web payments. 
-- [**Quickstart**](https://gaming-help.bolt.com/guide/quickstart.html): View our quickstart guide to get the API running
+- [**Quickstart**](https://gaming-help.boltapp.com/guide/quickstart.html): View our quickstart guide to get the API running
 - [**Example Server**](https://github.com/BoltApp/bolt-gameserver-sample): We also have a sample server in NodeJS for your reference during implementation
 
 
