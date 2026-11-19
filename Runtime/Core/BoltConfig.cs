@@ -50,7 +50,7 @@ namespace BoltApp
                     return "https://play.sandbox-bolt.com";
                 case Environment.Production:
                 default:
-                    return "https://play.bolt.com";
+                    return "https://play.boltapp.com";
             }
         }
 

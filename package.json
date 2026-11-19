@@ -1,6 +1,6 @@
 {
   "name": "com.bolt.sdk",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "displayName": "Bolt SDK",
   "description": "A performant Unity SDK for out of app purchases, subscriptions and ads.",
   "unity": "2021.3",
@@ -9,7 +9,7 @@
   "author": {
     "name": "bolt.com",
     "email": "support@bolt.com",
-    "url": "https://bolt.com"
+    "url": "https://www.boltapp.com"
   },
   "dependencies": {
     "com.unity.nuget.newtonsoft-json": "3.2.1"
@@ -24,8 +24,8 @@
       "path": "Samples~/BasicIntegration"
     }
   ],
-  "documentationUrl": "https://docs.bolt.com/unity-sdk",
-  "changelogUrl": "https://github.com/BoltApp/bolt-unity-sdk/blobl/main/CHANGELOG.md",
+  "documentationUrl": "https://github.com/BoltApp/bolt-unity-sdk#readme",
+  "changelogUrl": "https://github.com/BoltApp/bolt-unity-sdk/blob/main/CHANGELOG.md",
   "repository": {
     "type": "git",
     "url": "https://github.com/BoltApp/bolt-unity-sdk.git"

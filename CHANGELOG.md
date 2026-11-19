@@ -11,6 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Demo scene with Bolt quick start guide
 - Serverless quick start (no game server needed)
 
+## [1.1.2] - 2026-11-19
+### Fixed
+- Production ads now load from `https://play.boltapp.com`. The previous host, `play.bolt.com`, no longer resolves.
+- Updated sample checkout link, merchant dashboard links and package metadata to boltapp.com hosts.
+- README install note no longer references a `v0.0.5` tag that does not exist.
+
 ## [1.1.1] - 2026-04-1 
 ### Added
 - Support for internal and external linkouts

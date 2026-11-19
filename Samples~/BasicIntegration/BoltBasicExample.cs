@@ -34,7 +34,7 @@ namespace BoltApp.Samples
 
             // Open A Checkout Link, typically assigned to a button click in your UI
             // Note: SDK automatically stores a pending payment link in player prefs, used in 'VerifyRecentCheckouts()'
-            var checkoutLinkFetchedFromYourBackend = "https://knights-of-valor-bolt.c-staging.bolt.com/c?u=Fv8ZMmDmRb86C4XRiB92x2&publishable_key=_Kq5XZXqaLiS.3TOhnz9Wmacb.9c59b297d066e94294895dd8617ad5d9d8ffc530fe1d36f8ed6d624a4f7855ae";
+            var checkoutLinkFetchedFromYourBackend = "https://knights-of-valor-bolt.c-staging.boltapp.com/c?u=Fv8ZMmDmRb86C4XRiB92x2&publishable_key=_Kq5XZXqaLiS.3TOhnz9Wmacb.9c59b297d066e94294895dd8617ad5d9d8ffc530fe1d36f8ed6d624a4f7855ae";
             boltSDK.OpenCheckout(checkoutLinkFetchedFromYourBackend);
 
             // Note: On app load you need to check for recent checkouts.
