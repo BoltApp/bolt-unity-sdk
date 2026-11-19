@@ -73,7 +73,7 @@ You need 3 things to get started:
 
 1. **Existing App:** You will need an application in the same platform as this SDK
 2. **Backend Server:** You will need to bring your own backend server (any language)
-3. **Bolt Merchant Account:** Dashboard access to manage your store ([sign up](https://merchant.bolt.com/onboarding/get-started/gaming) or [log in](https://merchant.bolt.com/))
+3. **Bolt Merchant Account:** Dashboard access to manage your store ([sign up](https://merchant.boltapp.com/onboarding/get-started/gaming) or [log in](https://merchant.boltapp.com/))
 4. **UniWebViewAdService.cs** [Unity plugin supporting iOS and Android in-game webviews](https://docs.uniwebview.com/guide/)
 
 
@@ -87,7 +87,7 @@ UniWebView is a Unity plugin supporting in-game webviews for iOS and Android mob
 
 ### Step 1: Install the Unity SDK
 
-**Note:** For any of these options you can specify a specific version by appending it to the URL with a hashtag, e.g. `https://github.com/BoltApp/bolt-unity-sdk.git#v0.0.5` will pin `v0.0.5`
+**Note:** The URLs below install the latest code from the `main` branch. Unity can pin a specific git tag or commit by appending it after the `#` instead of `main`, but this repository does not publish release tags yet.
 
 #### Option 1: Using manifest.json (Recommended)
 
