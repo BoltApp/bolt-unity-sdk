@@ -87,7 +87,7 @@ UniWebView is a Unity plugin supporting in-game webviews for iOS and Android mob
 
 ### Step 1: Install the Unity SDK
 
-**Note:** The URLs below install from the `main` branch, which always has the latest release. Unity can also pin a git tag or commit by appending it after a `#`, but this repository does not publish release tags yet, so `#main` is the supported option for now.
+**Note:** The URLs below install the latest code from the `main` branch. Unity can pin a specific git tag or commit by appending it after the `#` instead of `main`, but this repository does not publish release tags yet.
 
 #### Option 1: Using manifest.json (Recommended)
 

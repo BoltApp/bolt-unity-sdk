@@ -7,7 +7,7 @@
   "keywords": ["bolt", "sdk", "subscription", "web payment", "iap", "checkout", "ads"],
   "license": "MIT",
   "author": {
-    "name": "bolt.com",
+    "name": "Bolt",
     "email": "support@bolt.com",
     "url": "https://www.boltapp.com"
   },

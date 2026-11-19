@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated sample checkout link, merchant dashboard links and package metadata to boltapp.com hosts.
 - README install note no longer references a `v0.0.5` tag that does not exist.
 
-## [1.1.1] - 2026-04-1 
+## [1.1.1] - 2026-04-03
 ### Added
 - Support for internal and external linkouts
 - metadata tracking and lifecycle event fixes
